@@ -3113,6 +3113,12 @@ a.club-row:hover .club-name { opacity: .68; }
   color: var(--press-black);
 }
 .mini-delta-n { flex: 0 0 auto; color: var(--press-black); font-variant-numeric: tabular-nums; }
+
+/* The unit glyph. Set slightly down from the figure so the number stays the
+   thing being read and the star is a suffix on it, not a second character
+   competing for the same weight. */
+.mini-delta-n .star-fill,
+.sec-note .star-fill { margin-left: .3em; font-size: .92em; }
 .mini-delta-d { flex: 0 0 2.6em; text-align: right; font-variant-numeric: tabular-nums; }
 
 /* §4 — twelve months and the years beneath them. */

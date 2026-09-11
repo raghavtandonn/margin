@@ -60,23 +60,30 @@
     <div class="strip-panel">
       <div class="sec-row">
         <h2 class="sec">What <%= locals.self === false ? 'they' : 'you' %> like</h2>
-        <span class="sec-note">MEAN <%= like.overall %></span>
+        <%# The unit, said once in the header and once per row. Every figure
+            in this panel is a rating out of five, and without the glyph the
+            column reads as a bare index nobody can place — 4.2 of what. The
+            DELTA deliberately gets no star: it is a difference between two
+            ratings, not a rating. %>
+        <span class="sec-note">MEAN <%= like.overall %><span class="star-fill" aria-hidden="true">★</span></span>
       </div>
 
       <%# Above the reader's own mean, then below it. The delta is the whole
           point — an absolute 3.8 says nothing without the 3.6 it beats. %>
       <% like.above.slice(0, 3).forEach(function(b) { %>
-        <a class="mini-delta" href="/shelf/finished?<%= b.filter %>">
+        <a class="mini-delta" href="/shelf/finished?<%= b.filter %>"
+           aria-label="<%= b.label %>: <%= b.mean.toFixed(1) %> of 5 stars, <%= b.delta.toFixed(1) %> above the mean">
           <span class="mini-delta-label"><%= b.label %></span>
-          <span class="mini-delta-n mono-s"><%= b.mean.toFixed(1) %></span>
+          <span class="mini-delta-n mono-s"><%= b.mean.toFixed(1) %><span class="star-fill" aria-hidden="true">★</span></span>
           <span class="mini-delta-d mono-s orange">+<%= b.delta.toFixed(1) %></span>
         </a>
       <% }) %>
 
       <% like.below.slice(0, 3 - Math.min(3, like.above.length) + 1).forEach(function(b) { %>
-        <a class="mini-delta" href="/shelf/finished?<%= b.filter %>">
+        <a class="mini-delta" href="/shelf/finished?<%= b.filter %>"
+           aria-label="<%= b.label %>: <%= b.mean.toFixed(1) %> of 5 stars, <%= Math.abs(b.delta).toFixed(1) %> below the mean">
           <span class="mini-delta-label"><%= b.label %></span>
-          <span class="mini-delta-n mono-s"><%= b.mean.toFixed(1) %></span>
+          <span class="mini-delta-n mono-s"><%= b.mean.toFixed(1) %><span class="star-fill" aria-hidden="true">★</span></span>
           <span class="mini-delta-d mono-s dim"><%= b.delta.toFixed(1) %></span>
         </a>
       <% }) %>
