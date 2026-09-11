@@ -87,8 +87,45 @@ for (const file of files) {
 }
 problems.push(...orphans);
 
+// ── EVERY HELPER A TEMPLATE CALLS MUST EXIST ─────────────
+//
+// Compiling a template proves its SYNTAX. It cannot prove that `h.stars(...)`
+// resolves to anything, because that is only known when the expression runs —
+// and it only runs when a book on the page has a rating. So nine call sites
+// across eight templates called a helper that did not exist, every shelf with
+// a rated book on it returned 500, and the whole gate stayed green.
+//
+// This is the cheap half of that lesson: the names are right there in the
+// source on both sides.
+// `h` is not one module: server.js spreads lib/view-helpers.js and then adds
+// a handful of bindings from elsewhere. Checking only the module would call
+// every one of those a fault, so the composition is read where it is written.
+const helperNames = new Set(Object.keys(await import(join(ROOT, 'lib/view-helpers.js'))));
+const composed = /app\.locals\.h\s*=\s*\{([\s\S]*?)\n\};/.exec(readFileSync(join(ROOT, 'server.js'), 'utf8'));
+if (!composed) {
+  problems.push('server.js: could not find the app.locals.h composition to check helpers against');
+} else {
+  for (const part of composed[1].replace(/\/\/[^\n]*/g, '').split(',')) {
+    const key = /^\s*([A-Za-z_$][\w$]*)\s*:/.exec(part) || /^\s*([A-Za-z_$][\w$]*)\s*$/.exec(part);
+    if (key) helperNames.add(key[1]);
+  }
+}
+const missing = new Map();
+for (const file of files) {
+  const src = readFileSync(file, 'utf8');
+  // `h.name(` — a call, not a property read like `h.css.pct`, which resolves
+  // through an object and would need a deeper walk than this is worth.
+  for (const m of src.matchAll(/\bh\.([A-Za-z_$][\w$]*)\s*\(/g)) {
+    const name = m[1];
+    if (helperNames.has(name)) continue;
+    const where = `${relative(ROOT, file)}: h.${name}() is not on app.locals.h`;
+    if (!missing.has(where)) missing.set(where, true);
+  }
+}
+problems.push(...missing.keys());
+
 for (const p of problems) console.log('  BROKEN      ' + p);
 if (!problems.length) {
-  console.log(`templates ok — ${files.length} compile, every include resolves, every page is rendered`);
+  console.log(`templates ok — ${files.length} compile, every include resolves, every page is rendered, every h.helper() exists`);
 }
 process.exit(problems.length ? 1 : 0);

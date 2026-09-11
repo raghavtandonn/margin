@@ -759,3 +759,34 @@ test('§12 — an empty submission says what to do, rather than 500ing', async (
   assert.equal(res.status, 400);
   assert.match(await res.text(), /Choose a file, or paste some titles/);
 });
+
+// ── A SHELF WITH A RATED BOOK ON IT ──────────────────────
+//
+// Every shelf holding a rated book returned 500: views/shelf.ejs called
+// h.stars(), which was on no module, and eight other templates called it too.
+// Compiling a template cannot catch that — the expression only runs when a
+// book on the page has a rating, and no test had ever rendered one.
+//
+// scripts/check-templates.mjs now checks the helper names statically. This
+// covers the other half: that the page actually renders.
+
+test('a shelf with a rated book renders, with its stars', async () => {
+  const who = reader('starshelf', 'public');
+  const res = await GET('/shelf/read', who.cookie);
+  assert.equal(res.status, 200, 'a rated book must not 500 the shelf');
+
+  const html = await res.text();
+  assert.match(html, /class="stars stars-\d+"/, 'the glyphs are rendered as an element');
+  assert.match(html, /aria-label="4 of 5 stars"/, 'and read as words, not as four black stars');
+});
+
+test('an unrated book prints nothing rather than an empty star element', async () => {
+  const H = await import('../lib/view-helpers.js');
+  assert.equal(H.stars(null), '');
+  assert.equal(H.stars(4.5, { size: 11 }),
+    '<span class="stars stars-11" aria-label="4.5 of 5 stars">★★★★½</span>');
+  // Only the sizes margin.css defines. An unknown one inherits rather than
+  // emitting a class that resolves to nothing.
+  assert.equal(H.stars(4, { size: 99 }),
+    '<span class="stars" aria-label="4 of 5 stars">★★★★</span>');
+});
