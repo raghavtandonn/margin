@@ -5,11 +5,11 @@ edition graph, a shelf you can look at, seasons that close into catalogues,
 and a small community layer — with a privacy model enforced in SQL rather
 than in templates.
 
-Built against the markdown specs in this repository (`docs/margin-spec.md`,
-`docs/accounts-and-security-spec.md`, `docs/community-spec.md`,
-`docs/seasons-and-lookbook-spec.md`, `docs/recommendation-system-spec.md`,
-and the amendments beside them). `docs/mockups/` holds the reference HTML the
-design was built against.
+Built against a set of written specs — the product, accounts and security,
+community, seasons and the lookbook, the colour system and recommendations —
+together with the audits written when the product was measured against them.
+Those specs and the reference HTML the design was drawn from are kept
+privately and are not part of this repository.
 
 ---
 
@@ -82,7 +82,7 @@ finished; each check exists because something got past the ones before it.
 | `npm run check:dead` | Exports nothing imports; CSS classes no template uses |
 | `npm run test:csp` | Boots with `MARGIN_CSP=enforce` so violations break rather than report |
 
-See the [security review](docs/security-audit-2026-09-07.md) for confirmed issues and fixes, migration behavior, and remaining deployment requirements.
+`SECURITY.md` records what is built, what is not, and what cannot be built without infrastructure this deployment does not have. Read it before deploying anything.
 
 **Why the link check matters.** `check:routes` originally validated form
 actions only. A regex edit deleted `GET /reviews`; a later one took
@@ -295,8 +295,7 @@ cliché.
 - **Themes over plot, where there is a choice.** A plot summary is a list of
   what happens, and what happens is mostly where and when. Plot is citable
   only when the article has nothing else — which is often, and is why the
-  interpretive-section *gate* was built, measured and reversed (see
-  `docs/colour-system-plan.md` §9).
+  interpretive-section *gate* was built, measured and reversed.
 - **Setting is never the answer.** A book set in a desert can be tender. This
   is enforced by the validator, by pinned fixtures in
   `test/colour-derive.test.js` that assert the *reasoning* rather than the
@@ -359,7 +358,7 @@ a fact about the run, not about the book.
 
 ## Recommendations
 
-Built from `docs/recommendation-system-spec.md`. Two surfaces, and one
+Two surfaces, and one
 sentence that governs both: this is **content-based similarity ranking, not
 personalization**. There is no interaction data anywhere in it. It ranks books
 by how much they resemble what you finish, it does not learn your taste, and
@@ -412,7 +411,7 @@ the product with a native dependency; see **Requirements**.
 
 ## Accounts and privacy
 
-Implemented from `docs/accounts-and-security-spec.md`. **`SECURITY.md` is the
+**`SECURITY.md` is the
 honest accounting** — what is built, and what cannot be built without
 infrastructure this deployment does not have (no real mail delivery, no KMS,
 no CI, no backups). Read it before deploying anything.
@@ -572,7 +571,7 @@ nothing in the repository reads one for you.
 
 ## Notes on the spec
 
-Two places where the implementation departs from `docs/margin-spec.md`, both
+Two places where the implementation departs from the written spec, both
 recorded because the reasoning matters more than the outcome:
 
 **Marginalia is not edition-scoped.** Scoping notes to an edition emptied the
@@ -586,8 +585,5 @@ momentum, feeling as C/M/Y) was removed in a later pass. Jacket colour
 sampling survives it and is what the season strip, the poster and the lookbook
 are built from.
 
-`docs/` holds the specs this was built from and the record of what happened
-when the product was measured against them — the audits, the plans written
-against those audits, and an execution note at the end of each saying what was
-built, what the audit got wrong, and what broke on the way.
-`docs/README.md` is the index.
+The specs this was built from, and the record of what happened when the
+product was measured against them, are kept outside this repository.

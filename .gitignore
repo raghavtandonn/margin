@@ -26,3 +26,7 @@ books.txt
 # Annotated screenshots dropped in during design review. Working material,
 # not templates — views/ holds .ejs and nothing else.
 views/*.png
+
+# The written specs, audits, plans and design mockups. Working material and
+# not source, kept out of the repository deliberately.
+docs/
