@@ -1,0 +1,39 @@
+<%- include('partials/head', { title: title }) %>
+<%- include('partials/spine', { nav: 'shelves' }) %>
+<main class="sheet">
+  <div class="block pt-20" id="block">
+    <div class="eyebrow mono"><span class="tag">REPORT</span></div>
+    <h1 class="d2 mb-8">Report this</h1>
+    <%# §11 — "Goodreads' central failure is not that it lacks a report
+        button — it is that reports go nowhere." Saying where it goes is the
+        first half of not being that. %>
+    <p class="auth-lede">A person reads these. You will see the outcome either way.</p>
+
+    <form method="post" action="/report" class="auth-form measure">
+      <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+      <input type="hidden" name="target_type" value="<%= targetType %>">
+      <input type="hidden" name="target_ref" value="<%= targetRef %>">
+
+      <fieldset class="choice-set">
+        <legend class="field-label mono-s">WHAT IS WRONG WITH IT</legend>
+        <% categories.forEach(function(c, i) { %>
+          <label class="choice">
+            <input type="radio" name="category" value="<%= c %>" <%= i === 0 ? 'checked' : '' %>>
+            <span class="choice-mark" aria-hidden="true"></span>
+            <span class="choice-text">
+              <span class="choice-name"><%= c.replace(/_/g, ' ').replace(/^./, function(m){return m.toUpperCase();}) %></span>
+            </span>
+          </label>
+        <% }) %>
+      </fieldset>
+
+      <label class="field">
+        <span class="field-label mono-s">ANYTHING ELSE · OPTIONAL</span>
+        <textarea name="detail" rows="3" class="note-input" maxlength="2000"></textarea>
+      </label>
+
+      <% if (error) { %><p class="field-error mono-s"><%= error %></p><% } %>
+      <button class="auth-action" type="submit">SEND IT →</button>
+    </form>
+  </div>
+<%- include('partials/foot') %>

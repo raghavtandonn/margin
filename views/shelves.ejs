@@ -1,0 +1,66 @@
+<%- include('partials/head', { title: 'Shelves' }) %>
+<%- include('partials/spine', { nav: 'shelves' }) %>
+
+<main class="sheet" data-key="shelves">
+  <span class="crop tl" aria-hidden="true"></span>
+  <span class="crop tr" aria-hidden="true"></span>
+  <span class="crop bl" aria-hidden="true"></span>
+  <span class="crop br" aria-hidden="true"></span>
+
+  <div class="block pt-20" id="block">
+
+    <%- include('partials/desk', { deskQuery: '' }) %>
+    <div class="eyebrow mono"><span class="tag">SHELVES</span></div>
+    <h1 class="d2">Shelves</h1>
+
+    <%#
+      THE WALL, REACHABLE.
+
+      /wall renders, works, packs its rows server-side, and has the nicest
+      hover in the product — a book lifting out of the shelf, with a stalled
+      one lifting further. It was linked from nowhere. The spine's own
+      comment says it belongs inside Shelves as a view toggle rather than as
+      a seventh nav item, which is right and had simply never been built.
+    %>
+    <nav class="shelf-views mono-s" aria-label="Shelf view">
+      <a class="is-on" href="/shelves">STRIPS</a>
+      <a href="/wall">THE WALL</a>
+    </nav>
+
+    <% shelves.forEach(function(s) { %>
+      <div class="shelf-strip-block">
+        <%# Each shelf opens a section, so it is a heading. It was a row of
+            10px tracked caps identical to every field label on the site. %>
+        <h2 class="sec shelf-strip-head">
+          <a class="no-underline inherit-color" href="/shelf/<%= s.slug %>"><%= h.sentence(s.name) %></a>
+          <% if (s.item_count) { %><span class="sec-note"><%= s.item_count %></span><% } %>
+        </h2>
+        <% if (s.item_count) { %>
+          <div class="shelf-strip scroll-x">
+            <% (previews[s.slug] || []).forEach(function(it) { %>
+              <a href="/work/<%= it.work_id %>" title="<%= it.title %>"><%- h.frame(it) %></a>
+            <% }) %>
+            <% if (s.item_count > (previews[s.slug] || []).length) { %>
+              <a class="shelf-strip-more mono-s dim" href="/shelf/<%= s.slug %>">+<%= s.item_count - (previews[s.slug] || []).length %><br>MORE</a>
+            <% } %>
+          </div>
+        <% } else { %>
+          <p class="note py-10">Nothing shelved.</p>
+        <% } %>
+      </div>
+    <% }) %>
+
+    <%# Every failure used to be silent. A name that already exists, or one
+        with no letters in it, now says so instead of redirecting to a shelf
+        that is not there. %>
+    <% if (locals.error) { %><p class="field-error mono-s mt-34"><%= error %></p><% } %>
+
+    <form method="post" action="/shelves" class="row <%= locals.error ? '' : 'mt-34' %>">
+      <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+      <input class="mono box-input" name="name" maxlength="60" required
+             value="<%= locals.name || '' %>" placeholder="NEW SHELF NAME">
+      <button class="btn" type="submit">CREATE</button>
+    </form>
+  </div>
+
+<%- include('partials/foot') %>

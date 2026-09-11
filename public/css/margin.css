@@ -1,0 +1,3951 @@
+/* ═══════════════════════════════════════════════════════════
+   "MARGIN" — READING, c/o THE READER
+   Design system. §03 color, §04 type, §06 grid, §07 motion.
+   ═══════════════════════════════════════════════════════════ */
+
+/* ── §03 COLOUR ─────────────────────────────────────────── */
+/*
+  Sourced entirely from the pressroom. Ink, paper stock, a proofing colour,
+  and the three CMYK registration colours.
+
+  This block used to be a fiction. A second :root eight hundred lines below
+  redefined the ground, the accent, the hairline and the display face, so
+  editing anything up here changed nothing on screen and the top of the file
+  described a design the app did not render. There is now one declaration
+  site per token, and it is this one.
+
+  The warm ground is kept — neutral near-black reads as a terminal, and
+  #191714 reads as unbleached paper photographed in low light.
+*/
+:root {
+  --chalk: #E8E4DC;
+  --stone: #8A837A;
+
+  --press-black: #191714;
+  --stock-white: #F4F1EA;
+  --stock-gray: #E2DDD2;
+  --dim: #686158;
+
+  /* One accent, used once per screen. */
+  --accent: #A8332F;
+
+  /* ── THE CLUBS ACCENT ──────────────────────────────────
+     A section colour, so a club page is identifiable before a word of it
+     is read. It is NOT the product accent: the accent is red and is spent
+     once per screen on the one thing to do, and a section mark that
+     competed with it would break that rule everywhere clubs appear.
+
+     The reference sets it at #6FBFA0, which is 8.21:1 on the dark stock
+     and 1.93:1 on the light one — unusable in a product that ships both.
+     Solved per ground instead: this green is 5.55:1 here, the reference's
+     own on the dark side below. `--club-open` is the same problem for the
+     orange that marks a club taking members. */
+  --club: #2F6B55;
+  --club-open: #9A4418;
+
+  /* ── THE ON-PRESS ACCENT ───────────────────────────────
+     Same rule as the clubs mark: a section colour, not the product accent,
+     which stays red and stays spent once per screen. The reference sets it
+     at #5B8FD6 — 5.40:1 on the dark stock, 2.93:1 on the light one — so it
+     is solved per ground again. `--press-stale` marks a book that has
+     actually stopped moving; it is the only warm thing on the sheet. */
+  --press-accent: #2C5FA8;
+  --press-stale: #9A4418;
+
+  /* ── OVER A JACKET ─────────────────────────────────────
+     The page plate on the front page sits on top of an arbitrary cover, so
+     these three do NOT invert with the theme: what is behind them is a
+     photograph, not the sheet. A light-mode swap here would put pale type
+     on a pale scrim over a pale jacket.
+
+     The scrim is 0.90 rather than the reference's 0.86 because the small
+     label fails against it: over a white cover, 0.86 leaves the label at
+     4.03:1 and 0.90 lifts it to 4.61. The large number passes either way —
+     it is the 8pt line that decides the value. */
+  --plate-scrim: rgba(23, 21, 15, .90);
+  --bone-fixed: #E8E4DC;
+  --stone-fixed: #9A948A;
+
+  /*
+    THE STARS ARE GOLD.
+
+    They were `--press-black`, and the histogram's legend stars were
+    `.orange` — which is the accent, and the accent is red. A rating drawn
+    in the same colour as an error is the one place a neutral palette should
+    break, and gold is what a star has been since long before software.
+
+    Solved against WCAG 1.4.11's 3:1 non-text floor rather than 4.5:1: a
+    star row is `role="img"` carrying its own aria-label, so the value
+    reaches assistive tech as text and the glyphs are a graphic. At 4.5:1
+    the light-mode answer is a dark bronze that does not read as gold at
+    all — which would be meeting a number at the cost of the thing the
+    number protects.
+
+    Light  #A4761E  3.01 on the worst ground (a raised panel)
+    Dark   #D9A441  6.16 on the same
+  */
+  --gold: #A4761E;
+  --proof-orange: #A8332F;
+
+  --reg-cyan: #00AEEF;
+  --reg-magenta: #EC008C;
+  --reg-yellow: #FFED00;
+
+  /*
+    TWO RULE WEIGHTS, BOTH VISIBLE.
+
+    Rules were the only structural device in this system — no panels, no
+    tints, no cards, no grounds — and they ran at 1.19:1 against the ground.
+    When the sole thing carrying your structure is imperceptible, the
+    structure is not there.
+
+    --hair   a quiet divider between fields inside one section
+    --rule   a section boundary, at WCAG's 3:1 floor for non-text
+  */
+  --hairline: #B8B0A5;
+  --rule: #8F8980;
+
+  /*
+    ── SURFACES ──────────────────────────────────────────
+
+    Sixty-one rules in this file painted a background, and every use of the
+    one tint token was an image placeholder or a hover state. There was not
+    one panel, card or section ground in the product: every band on every
+    page sat directly on the page, separated from the next by a one-pixel
+    line. That is the whole of "sleek but no substance" — nothing on the
+    screen has a body, so nothing has a place to sit, and there is nothing
+    between the reader and the ground.
+
+    Three steps and three is the limit. A fourth is a shadow system, and a
+    shadow system is a different product.
+
+      --ground    the page itself
+      --surface   a panel on the page          ~1.14 against the ground
+      --raised    a panel on a panel, or hover ~1.30
+
+    Deliberately quiet. These are the weight of paper laid on paper, not
+    cards floating over a canvas: enough to give a block a body, not enough
+    to make it an object in its own right.
+  */
+  --ground: #F4F1EA;
+  --surface: #EBE7DF;
+  --raised: #E2DED4;
+
+  --f-display: "Instrument Serif", "Literata", Georgia, serif;
+  --f-read: "Literata", Charter, Georgia, serif;
+  --f-mono: "Martian Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+  --f-id: "Courier Prime", "OCR B Std", Courier, monospace;
+
+  --spine-w: 56px;
+  --margin-w: 300px;
+}
+
+/* §03 — dark mode is not an inversion. It is the negative: the film
+   separation stage of platemaking. Registration colors hold their hue
+   exactly, because on a lightbox they would.
+
+   THE ACCENT IS NOT THE SAME COLOUR IN BOTH MODES. #A8332F measures 5.86:1
+   on the light ground and 2.71:1 on the dark one — and it is the colour that
+   marks the active nav item and the word OPEN, so the one word telling you
+   where you are was the least legible thing on a dark screen. The pressroom
+   orange was always the dark-mode answer; it just got flattened away. */
+:root[data-theme="dark"],
+:root:not([data-theme="light"]) {
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --press-black: #E8E4DC;
+    --stock-white: #191714;
+    --stock-gray: #221F1B;
+    --dim: #9A9289;
+    --accent: #FF4E1A;
+    --proof-orange: #FF4E1A;
+    --gold: #D9A441;
+    --club: #6FBFA0;
+    --club-open: #E2794A;
+    --press-accent: #5B8FD6;
+    /* The reference's #C4622E is 4.37:1 here, and this text is 9px. */
+    --press-stale: #CE6F3A;
+    --hairline: #494641;
+    --rule: #68635D;
+    --ground: #191714;
+    --surface: #24211D;
+    --raised: #302C27;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --press-black: #E8E4DC;
+  --stock-white: #191714;
+  --stock-gray: #221F1B;
+  --dim: #9A9289;
+  --accent: #FF4E1A;
+  --proof-orange: #FF4E1A;
+  --gold: #D9A441;
+  --club: #6FBFA0;
+  --club-open: #E2794A;
+  --press-accent: #5B8FD6;
+  --press-stale: #CE6F3A;
+  --hairline: #494641;
+  --rule: #68635D;
+  --ground: #191714;
+  --surface: #24211D;
+  --raised: #302C27;
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html { -webkit-text-size-adjust: 100%; }
+
+body {
+  background: var(--stock-white);
+  color: var(--press-black);
+  font-family: var(--f-display);
+  font-size: 16px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ── §04 TYPE SCALE ─────────────────────────────────────── */
+/* Caps only in Helvetica and Diatype. Literata is never set in caps —
+   it is the author's voice and the author does not shout. */
+
+.h1 { line-height: 1.2; }
+.b1 { font-family: var(--f-read); font-size: 19px; line-height: 1.65; max-width: 66ch; }
+.b2 { font-size: 16px; font-weight: 400; }
+
+.mono { font-family: var(--f-mono); font-size: 13px; letter-spacing: .07em; text-transform: uppercase; }
+/*
+  THE LABEL REGISTER, AT A SIZE A PERSON READS.
+
+  10px tracked capitals is the densest setting in this file and it carried
+  roughly two thirds of every page. Not because too many things are labels —
+  on a profile the mono leaves are stat names, figures, season codes and a
+  chart axis, and all of those genuinely belong in this voice — but because
+  the voice itself was set below reading size.
+
+  11px with less tracking is the whole change: the same words, the same job,
+  legible. Letterboxd's equivalent register is 12px sans; this is 11px mono
+  caps, which at Martian Mono's x-height reads about the same.
+*/
+.mono-s { font-family: var(--f-mono); font-size: 11px; letter-spacing: .1em; text-transform: uppercase; }
+
+/*
+  ── THE MIDDLE REGISTER ──────────────────────────────────
+
+  The scale ran 10px → 12px → nothing → 19px → 40px. Every page was a
+  headline sitting on top of fine print with no paragraph-level voice
+  between them, and every band on the page carried identical weight because
+  section openers and field labels were set in the same 10px tracked caps.
+  REVIEWS and FORMAT looked the same, though one opens a section and the
+  other names a value.
+
+  A section opener is now a real <h2> in the display serif, at the size the
+  scale was missing. Sentence case, no tracking: it is a heading, not a
+  manifest line. Field labels keep the mono caps, and keeping them is what
+  makes them read as labels again.
+
+  This also gives the document the outline it did not have — every page
+  checked had one <h1>, zero <h2> and zero <h3>, so a screen reader was
+  handed a single undifferentiated run of text per page.
+*/
+.sec {
+  font-family: var(--f-display);
+  font-weight: 400;
+  font-size: 21px;
+  letter-spacing: 0;
+  line-height: 1.2;
+  text-transform: none;
+  margin-bottom: 14px;
+}
+/* A section that carries a control or a count on the right. */
+.sec-row {
+  display: flex; align-items: baseline; justify-content: space-between;
+  gap: 12px; flex-wrap: wrap; margin-bottom: 14px;
+}
+.sec-row .sec { margin-bottom: 0; }
+.sec-note { font-family: var(--f-mono); font-size: 11px; letter-spacing: .1em;
+            text-transform: uppercase; color: var(--dim); }
+.desk-h1 { margin: 18px 0 20px; }
+.settings-h1 { margin-bottom: 20px; }
+
+/*
+  ── THE PROSE REGISTER ───────────────────────────────────
+
+  The best writing in this product was set in the same type as its metadata.
+  "Nobody has said anything yet." was written as a sentence, given
+  `.field-note mono-s`, and rendered NOBODY HAS SAID ANYTHING YET. — so a
+  line somebody wrote with care came out as a status code.
+
+  `.note` is where that copy goes. Same size, same colour, the reading face,
+  no tracking, and — the whole point — not uppercased.
+
+  The test for which register a line belongs in: a LABEL names a value and
+  is read at a glance (FORMAT, PUBLISHER, ISBN). A NOTE is a sentence
+  addressed to a person. Sentences go here.
+*/
+.note {
+  display: block;
+  margin-top: 8px;
+  font-family: var(--f-read);
+  font-size: 14px;
+  line-height: 1.55;
+  letter-spacing: 0;
+  text-transform: none;
+  color: var(--dim);
+  max-width: 62ch;
+}
+.note-lg { font-size: 16px; }
+
+/*
+  ── THE PANEL ────────────────────────────────────────────
+
+  A block with a body. Fill AND hairline, because a panel with only a fill
+  is a web card and a panel with only a rule is what this product had.
+
+  Applied deliberately and not everywhere. Feed entries stay on the ground —
+  twenty cards in a column is the dashboard this front page was rebuilt to
+  stop being — and shelf strips stay on the ground, because there the covers
+  are the surface.
+*/
+.panel {
+  background: var(--surface);
+  border: 1px solid var(--hairline);
+  padding: 20px 22px;
+}
+.panel + .panel { margin-top: 14px; }
+
+/* A run of panels with nothing between them but their own edges. */
+
+@media (max-width: 700px) {
+  .panel { padding: 16px 15px; }
+}
+
+/* §04 — OCR-B is reserved exclusively for identifiers. Using it correctly,
+   and only for identifiers, is the most precise detail in this system. */
+.id { font-family: var(--f-id); font-size: 13px; letter-spacing: .02em; }
+
+.dim { color: var(--dim); }
+.orange { color: var(--proof-orange); }
+
+/* §04 — book excerpts are justified with real hyphenation, because that is
+   how the printed page they came from was set. */
+.reading {
+  font-family: var(--f-read);
+  font-size: 19px;
+  line-height: 1.65;
+  max-width: 66ch;
+  text-align: justify;
+  hyphens: auto;
+}
+/* §11 — justified text without hyphenation produces rivers. */
+@supports not (hyphens: auto) { .reading { text-align: left; } }
+body[data-ragged="1"] .reading { text-align: left; hyphens: manual; }
+
+/* ── §02 P4 — TYPE IS THE INTERFACE ────────────────────── */
+/* There is almost no chrome. Buttons are text with rules. */
+
+a { color: inherit; }
+.credit {
+  color: var(--proof-orange);
+  text-decoration: none;
+  border-bottom: 1px solid currentColor;
+}
+.credit:hover { border-bottom-width: 2px; }
+
+.tag {
+  display: inline-block;
+  font-family: var(--f-mono);
+  font-size: 12px;
+  text-transform: uppercase;
+}
+
+.btn {
+  font-family: var(--f-mono);
+  font-size: 12px;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  background: none;
+  color: inherit;
+  border: 1px solid var(--press-black);
+  padding: 9px 14px;
+  cursor: pointer;
+  transition: border-width 120ms, background 120ms;
+  min-height: 40px;
+}
+
+/* §11 — focus is visible and orange, 2px, offset 2px, on every interactive
+   element. */
+:focus-visible { outline: 2px solid var(--proof-orange); outline-offset: 2px; }
+
+.hair { border-top: 1px solid var(--hairline); }
+
+/* ── §08 "THE SPINE" — global navigation ────────────────── */
+/* Reading the nav requires tilting your head, which is precisely what you do
+   to read a bookshelf. */
+.spine {
+  position: fixed; left: 0; top: 0; bottom: 0; width: var(--spine-w);
+  border-right: 1px solid var(--press-black);
+  display: flex; flex-direction: column; align-items: center;
+  justify-content: flex-start; padding: 20px 0; z-index: 20;
+  background: var(--stock-white);
+  overflow-y: auto;
+}
+/* The spine once had three children — wordmark, nav, cover chips. The chips
+   went, then the wordmark, so the nav is now the only one and the auto
+   margins simply centre it. */
+.spine-nav { margin: auto 0; }
+.spine-nav { display: flex; flex-direction: column; gap: 26px; align-items: center; }
+.spine-nav a {
+  writing-mode: vertical-rl; text-decoration: none;
+  font-family: var(--f-mono); font-size: 11px; letter-spacing: .14em; text-transform: uppercase;
+  border-left: 2px solid transparent; padding-left: 5px;
+}
+
+/* Import is the one item in the rail that does something rather than going
+   somewhere. The rule above it and the lighter ink keep the list reading as
+   six destinations plus an action, instead of as seven destinations. In the
+   rotated rail a "rule above" is a rule to the left, which is why this is a
+   border-block-start and not a border-top. */
+.spine-do {
+  color: var(--dim);
+  border-block-start: 1px solid currentColor;
+  padding-block-start: 20px;
+  margin-block-start: -6px;
+}
+.spine-do[aria-current] { color: var(--proof-orange); }
+
+/* ── §06 SHEET + CROP MARKS ─────────────────────────────── */
+.sheet { margin-left: var(--spine-w); padding: 56px 64px 0; position: relative; max-width: 1440px; }
+
+/* §06 — the only pure decoration in the system, permitted because they encode
+   something true: the trim edge of the content. */
+.crop { position: absolute; pointer-events: none; }
+.crop::before, .crop::after { content: ""; position: absolute; }
+.crop.tl { top: 28px; left: 36px; }
+.crop.tr { top: 28px; right: 36px; }
+.crop.tr::before, .crop.tr::after { right: 0; }
+
+.page-fade { animation: fadeup .32s ease-out both; }
+@keyframes fadeup { from { opacity: 0; } to { opacity: 1; } }
+
+/* ── §06 THE GRID ───────────────────────────────────────── */
+/* The margin column is always present and always occupied. This is the direct
+   inversion of the modern web layout, where the right rail is the ad slot. */
+.spread { display: grid; grid-template-columns: minmax(0, 1fr) var(--margin-w); gap: 56px; padding-top: 20px; }
+.block { min-width: 0; }
+/* The rule down the left edge is what makes the column read as a margin
+   rather than as a second body of text. Hairline weight, not the 1px black
+   it was written at — at full ink it competes with the content it annotates. */
+.margin-col {
+  border-left: 1px solid var(--rule);
+  padding-left: 20px;
+  align-self: start;
+  position: sticky; top: 40px;
+}
+
+/* ── §08 "THE STAMP" ────────────────────────────────────── */
+.stamp {
+  display: inline-block; border: 2px solid currentColor; padding: 4px 10px;
+  font-family: var(--f-mono); font-size: 11px; letter-spacing: .1em; text-transform: uppercase;
+  transform: rotate(var(--rot, -2deg)); transform-origin: center;
+}
+.stamp-READING { color: var(--proof-orange); }
+.stamp-FINISHED { color: var(--press-black); }
+.stamp-WAITING { color: var(--dim); border-style: solid; opacity: .8; }
+.stamp-ABANDONED { color: var(--press-black); position: relative; }
+/* A single rule struck through it. Abandoning is a first-class action. */
+.stamp-ABANDONED::after {
+  content: ""; position: absolute; left: 0; right: 0; top: 50%;
+  border-top: 1px solid currentColor;
+}
+/* §07 — the stamp presses on, 4° rotation, and settles. */
+@keyframes press {
+  from { transform: rotate(var(--rot, -2deg)) scale(1.7); opacity: 0; }
+  to { transform: rotate(var(--rot, -2deg)) scale(1); opacity: 1; }
+}
+
+/* ── §08 "THE PICK TICKET" ──────────────────────────────── */
+/* 48px tall, hairline rule below, no card, no shadow, no radius. Dense by
+   default — 20 fit on a screen and all 20 are scannable. */
+.ticket {
+  display: grid;
+  gap: 14px; align-items: center;
+  padding: 8px 0; border-bottom: 1px solid var(--hairline);
+  text-decoration: none; min-height: 48px;
+}
+.ticket-main { min-width: 0; }
+.ticket-meta { display: flex; gap: 10px; align-items: baseline; flex-wrap: wrap; }
+.ticket-right { display: flex; align-items: center; gap: 14px; justify-self: end; }
+
+/* ── "THE CONTACT SHEET" (v0.2 A2) ──────────────────────── */
+/* A photographic contact sheet is already the exact object we need: a grid of
+   images, each annotated with a frame number, marked up by the person
+   choosing. An industrial artifact whose entire job is looking at pictures —
+   which resolves the tension between the concept and the request completely. */
+
+.sheet-head { display: flex; justify-content: space-between; gap: 14px; margin-bottom: 14px; flex-wrap: wrap; }
+
+.contact { display: grid; }
+@media (min-width: 1440px) { .contact { } }
+
+.contact a { text-decoration: none; display: block; }
+
+/* Covers are NEVER cropped. The frame takes the edition's true trim aspect
+   and the cover letterboxes within it, so a mass market paperback is
+   genuinely narrower than a hardcover. The ragged right edge of the grid is
+   real information about what kind of reader you are. */
+.frame {
+  display: block; position: relative; width: 100%;
+  aspect-ratio: var(--trim, .647);
+  overflow: hidden;
+}
+/* Layered over the typographic fallback, which shows through if the cover
+   fails to load. */
+.frame img {
+  position: absolute; inset: 0; z-index: 1;
+  width: 100%; height: 100%; object-fit: contain;
+  display: block; background: var(--stock-gray);
+}
+.contact a:hover .frame { border-width: 2px; }
+.frame-sm { width: 40px; aspect-ratio: .647; flex: 0 0 40px; }
+.frame-sm img, .ed .frame img { object-fit: contain; }
+
+/* The typographic fallback — never a broken image icon, never a generic book
+   glyph. A designed blank galley cover, which is exactly what an uncovered
+   edition is. */
+.frame-fallback {
+  position: absolute; inset: 0;
+  display: flex; flex-direction: column; justify-content: space-between;
+  background: var(--stock-gray);
+}
+.frame-fallback::before {
+  content: ""; position: absolute;
+  border-top: 1px solid var(--press-black); opacity: .5;
+}
+.frame-fallback-title { letter-spacing: -.01em;
+  overflow: hidden; display: -webkit-box; -webkit-box-orient: vertical;
+}
+.frame-fallback-author {
+  font-family: var(--f-mono);
+  text-transform: uppercase; opacity: .6;
+}
+
+/* Beneath each frame: the chip as a 4px full-width strip, then the frame
+   number. Numbers renumber on re-sort, exactly as a contact sheet is
+   reprinted. */
+.frame-foot { display: flex; align-items: center; gap: 7px; margin-top: 7px; }
+.frame-chip {
+  display: block; height: 4px; flex: 1 1 auto; min-width: 0;
+  background: var(--stock-gray);
+  border: 1px solid color-mix(in srgb, var(--press-black) 40%, transparent);
+}
+@supports not (color: color-mix(in srgb, red 40%, blue)) {
+  .frame-chip { border-color: rgba(11, 11, 11, .4); }
+}
+.frame-chip-blank { background: none; }
+.frame-no { font-family: var(--f-mono); font-size: 11px; letter-spacing: .1em; opacity: .55; }
+.frame-title { font-family: var(--f-mono); font-size: 11px; letter-spacing: .03em;
+  margin-top: 4px; opacity: 0; transition: opacity 120ms;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.contact a { position: relative; }
+.contact .frame-title { display: none; }
+.contact .frame-foot {
+  position: absolute; left: 0; right: 0; bottom: 0;
+  display: flex; justify-content: space-between; align-items: flex-end;
+  gap: 6px; padding: 5px 6px;
+  background: linear-gradient(to top, rgba(0,0,0,.72), rgba(0,0,0,0));
+  color: #F4F1EA;
+  opacity: 0;
+  transition: opacity 160ms;
+}
+.contact a:hover .frame-foot, .contact a:focus-visible .frame-foot { opacity: 1; }
+@media (prefers-reduced-motion: reduce) { .contact .frame-foot { transition: none; } }
+
+/* ── B2 "SCAN" ──────────────────────────────────────────── */
+/* The crop-mark frame from §06 as the reticle. No chrome, no shutter
+   button — it fires on a confident decode. */
+.scanner { position: relative; background: var(--press-black); margin-bottom: 20px; max-width: 640px; }
+.scanner video { width: 100%; display: block; }
+.reticle { position: absolute; inset: 12%; pointer-events: none; }
+.reticle i { position: absolute; width: 22px; height: 22px; }
+.reticle i::before, .reticle i::after { content: ""; position: absolute; background: var(--proof-orange); }
+.reticle i::before { width: 22px; height: 2px; }
+.reticle i::after { width: 2px; height: 22px; }
+.reticle .r-tl { top: 0; left: 0; }
+.reticle .r-tr { top: 0; right: 0; }
+.reticle .r-tr::before, .reticle .r-tr::after { right: 0; }
+.reticle .r-bl { bottom: 0; left: 0; }
+.reticle .r-bl::before { bottom: 0; }
+.reticle .r-br { bottom: 0; right: 0; }
+.reticle .r-br::before { bottom: 0; right: 0; }
+.reticle .r-br::after { right: 0; }
+.scan-foot {
+  position: absolute; left: 0; right: 0; bottom: 0;
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 10px 12px; background: rgba(11, 11, 11, .7); color: #FDFDFC;
+}
+.scan-foot .btn { border-color: #FDFDFC; color: #FDFDFC; }
+
+/* ── B3 — the spine's currently-reading chips ───────────── */
+/* Two taps from any screen in the product to a logged session. */
+
+/* ── LAYOUT UTILITIES ───────────────────────────────────── */
+.row { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.between { display: flex; align-items: baseline; justify-content: space-between; gap: 14px; flex-wrap: wrap; }
+.stack > * + * { margin-top: 10px; }
+.eyebrow { display: flex; align-items: center; gap: 10px; margin-bottom: 14px; flex-wrap: wrap; }
+
+.foot {
+  border-top: 1px solid var(--press-black); margin-top: 40px;
+  padding: 14px 0 34px; display: flex; justify-content: space-between; gap: 16px; flex-wrap: wrap;
+}
+
+.empty { padding: 40px 0; }
+.notice { border: 1px solid var(--proof-orange); color: var(--proof-orange); padding: 11px 14px; margin: 14px 0; }
+
+/* Wide content scrolls inside its own container; the body never scrolls
+   horizontally. */
+/*
+  A horizontally scrolling row used to end by slicing a book in half at the
+  right edge, with nothing to say it continued — so the page appeared to
+  stop mid-cover, which reads as a rendering fault rather than as a row you
+  can push.
+
+  The mask fades the last few pixels out instead of cutting them, and it is
+  applied only while the row actually overflows, so a shelf of three books
+  is not given a phantom edge. `animation-timeline: scroll()` is doing no
+  animation here — it is the one way to know, in CSS alone, whether an
+  element is scrolled and by how much.
+*/
+.scroll-x {
+  overflow-x: auto;
+  scrollbar-width: thin;
+  scroll-snap-type: x proximity;
+  -webkit-overflow-scrolling: touch;
+  mask-image: linear-gradient(to right, #000 calc(100% - 34px), transparent 100%);
+}
+/* The row also gets scroll-snap, so pushing it lands on a cover rather than
+   halfway through one — the same reason the fade is here. */
+.scroll-x > * { scroll-snap-align: start; }
+
+/* ── §06 BREAKPOINTS ────────────────────────────────────── */
+/* Named after stages of book production. The names appear in the CSS, in dev
+   tools, and in the footer of the page — P2 applied to the responsive
+   system itself. */
+
+/* TRIM — 1024–1439: margin narrows to 2 cols. */
+@media (max-width: 1439px) {
+  :root { --margin-w: 240px; }
+  .sheet { padding: 48px 40px 0; }
+}
+
+/* GALLEY — 768–1023: margin becomes a right-edge collapsible drawer. */
+@media (max-width: 1023px) {
+  .spread { grid-template-columns: minmax(0, 1fr); gap: 34px; }
+  .margin-col {
+    border-left: none; border-top: 2px solid var(--press-black);
+    padding-left: 0; padding-top: 18px;
+  }
+  .patch { width: 100%; height: 96px; }
+  .crop { display: none; }
+  .sheet { padding: 44px 26px 0; }
+}
+
+/* POCKET — <768: spine unrotates into a bottom bar, because head-tilting on
+   a phone is a joke, not a feature. */
+@media (max-width: 767px) {
+  .spine {
+    width: 100%; height: 50px; bottom: auto; flex-direction: row;
+    border-right: none; border-bottom: 1px solid var(--press-black);
+    padding: 0 16px; justify-content: space-between;
+  }
+  .spine-nav a { writing-mode: horizontal-tb; }
+  /* Eight items in a row is wider than a small phone. At 324px the bar was
+     590px of content in a 324px window with no scrollbar, no fade and no
+     cue — three of the destinations were simply unreachable. It scrolls
+     now, and the same edge fade the shelf strips use says so. */
+  .spine-nav {
+    flex-direction: row; gap: 16px;
+    flex: 1 1 auto; min-width: 0;
+    overflow-x: auto;
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+    mask-image: linear-gradient(to right, #000 calc(100% - 24px), transparent 100%);
+  }
+  .spine-nav::-webkit-scrollbar { display: none; }
+  .spine-nav a { flex: 0 0 auto; }
+  .spine-nav a { border-left: none; border-bottom: 2px solid transparent; padding: 0 0 2px; }
+  .sheet { margin-left: 0; padding: 70px 18px 0; }
+  /* §11 — 44px minimum target on POCKET. */
+  .btn, .ticket { min-height: 44px; }
+}
+
+/* §07 — no exceptions, no "reduced" half-measures. */
+@media (prefers-reduced-motion: reduce) {
+  .stamp-press { animation: none; }
+  .page-fade { animation: none; }
+  *, *::before, *::after { transition: none !important; animation-duration: .001ms !important; }
+}
+
+@media print {
+  .spine, .crop { display: none; }
+  .sheet { margin: 0; }
+}
+
+/* ═══════════════════════════════════════════════════════════
+   v0.5.1 — COVERS CARRY THE VISUAL SYSTEM · RATINGS ARE STARS
+   ═══════════════════════════════════════════════════════════ */
+
+/* ── §2 RATING ──────────────────────────────────────────── */
+/* Stars, never a colour. Unrated renders nothing at all. */
+.stars { letter-spacing: .04em; line-height: 1; white-space: nowrap; }
+.star-text { font-size: 11px; letter-spacing: .06em; }
+
+.star-picker { display: flex; flex-wrap: wrap; gap: 4px; align-items: center; }
+.star-picker input { position: absolute; opacity: 0; pointer-events: none; }
+.star-picker label {
+  font-family: var(--f-mono); font-size: 11px; letter-spacing: .06em;
+  border: 1px solid var(--press-black); padding: 7px 9px; cursor: pointer; min-width: 34px;
+  text-align: center;
+}
+.star-picker input:checked + label { background: var(--press-black); color: var(--stock-white); }
+.star-picker input:focus-visible + label { outline: 2px solid var(--proof-orange); outline-offset: 2px; }
+.star-picker .star-none { border-style: dashed; }
+
+/* Marks — hairline boxes, jittered so a stack reads as stamped not tiled.
+   They filter the shelf and never compute into a score. */
+/* The MARKS block that was here is gone with the feature: ten one-tap
+   facets that no template ever rendered a control for, and zero rows in
+   the database. `.mark-glyph` below is unrelated — it is the icon set. */
+.rate-box { border: 1px solid var(--press-black); padding: 20px; margin-top: 14px; }
+
+/* ── §1.4 / §3.1 COVERS ON EVERY SURFACE ────────────────── */
+.ticket { grid-template-columns: 40px minmax(0, 1fr) auto; }
+.ticket-cover { width: 40px; }
+
+/* A scanned row. The grid used to be set from JavaScript as an inline style;
+   it is a fixed value and belongs here. */
+.scan-row { grid-template-columns: 44px minmax(0, 1fr) auto; }
+
+/* §4 — reader home. The cover is the visual anchor; the status stamp
+   demotes to a small mark at the right edge. */
+.progress-row {
+  display: grid; grid-template-columns: 56px minmax(0, 1fr) auto;
+  gap: 18px; align-items: start;
+  padding: 16px 0; border-bottom: 1px solid var(--hairline); text-decoration: none;
+}
+.progress-cover { width: 56px; }
+.progress-stamp { padding-top: 4px; white-space: nowrap; }
+
+/* Shelves as scrolling cover strips — the whole point of having 411 books
+   is to see them. */
+/* The view toggle. Same treatment as the criticism tabs, because it does
+   the same job: two ways of looking at one set of books. */
+.shelf-views { display: flex; gap: 18px; margin: 14px 0 30px; }
+.shelf-views a {
+  text-decoration: none; color: var(--dim);
+  padding-bottom: 4px; border-bottom: 1px solid transparent;
+}
+.shelf-views a.is-on { color: var(--key, var(--press-black)); border-bottom-color: var(--key, var(--press-black)); }
+.shelf-views a:hover { color: var(--press-black); }
+
+.shelf-strip-block { margin-bottom: 26px; }
+.shelf-strip-head { display: inline-block; text-decoration: none; margin-bottom: 10px; }
+.shelf-strip { display: flex; align-items: flex-start; padding-bottom: 6px; }
+.shelf-strip > a { text-decoration: none; }
+.shelf-strip-more { display: flex; align-items: center; justify-content: center;
+  text-align: center; border: 1px solid var(--hairline); aspect-ratio: .647;
+}
+
+/* ── §5 "THE WALL" ──────────────────────────────────────── */
+.wall { display: flex; flex-direction: column; gap: 0; }
+.wall-row {
+  display: flex; align-items: flex-end; gap: 2px;
+  padding-bottom: 0; min-height: 40px;
+}
+.spine-book { display: block; text-decoration: none;
+  border: 1px solid rgba(11, 11, 11, .35);
+  transition: transform 120ms; flex: 0 0 auto;
+}
+.spine-book:focus-visible { outline: 2px solid var(--proof-orange); outline-offset: 2px; }
+.spine-label { align-items: center; justify-content: center;
+  font-family: var(--f-display); font-weight: 500;
+  letter-spacing: .01em;
+}
+/* Currently reading: laid flat on top of the row, spine facing out. */
+.spine-book.is-reading { align-self: flex-end; }
+/* Stalled: pulled out from the row, proud of the others. */
+.spine-book.is-stalled { transform: translateY(-12px); }
+.spine-book.is-stalled:hover { transform: translateY(-20px); }
+/* Abandoned: turned spine-in, so the fore-edge shows. */
+.spine-book.is-abandoned {
+  background:
+    repeating-linear-gradient(90deg,
+      #EFEADF 0, #EFEADF 3px,
+      rgba(11,11,11,.22) 3px, rgba(11,11,11,.22) 4px);
+}
+.spine-book.is-abandoned .spine-label { display: none; }
+/* No page count on record: a hairline dash at the foot rather than a guess. */
+.spine-book.no-extent::after {
+  content: ""; position: absolute; left: 25%; right: 25%; bottom: 3px;
+  border-bottom: 1px solid rgba(11, 11, 11, .5);
+}
+.wall-tip {
+  position: fixed; z-index: 40; pointer-events: none;
+  background: var(--stock-white); border: 1px solid var(--press-black);
+  padding: 7px 10px; max-width: 260px;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   FOUR FEATURES — derived, never typed in
+   ═══════════════════════════════════════════════════════════ */
+
+/* ── §2 HALF-STAR INPUT ─────────────────────────────────── */
+/* Half stars are drawn with a clip, not a separate glyph — a half-star
+   glyph at 13px is mush. */
+.star-input { display: inline-flex; align-items: center; gap: 12px; }
+.star-row {
+  position: relative; display: inline-block; line-height: 1;
+  font-size: 30px; letter-spacing: .06em; cursor: pointer;
+  color: var(--stock-gray); -webkit-user-select: none; user-select: none;
+}
+.star-row .star-empty { color: var(--stock-gray); }
+.star-row .star-fill {
+  position: absolute; inset: 0; overflow: hidden; white-space: nowrap; pointer-events: none; width: 0;
+}
+.star-range {
+  position: absolute; inset: 0; width: 100%; height: 100%;
+  opacity: 0; cursor: pointer; margin: 0;
+}
+.star-range:focus-visible + .star-row { outline: 2px solid var(--proof-orange); outline-offset: 3px; }
+.star-value { font-family: var(--f-mono); font-size: 12px; letter-spacing: .08em; min-width: 5ch; }
+
+/* ── §2 DISTRIBUTION ────────────────────────────────────── */
+.histogram {
+  display: flex; align-items: flex-end;
+  border-bottom: 1px solid var(--press-black); padding-bottom: 0;
+}
+.histo-bar {
+  flex: 1 1 0; display: flex; flex-direction: column; justify-content: flex-end;
+  align-items: center; height: 100%; text-decoration: none; position: relative;
+}
+.histo-fill { display: block; width: 100%; background: var(--press-black); }
+/* An empty bucket is a 2px stub, never nothing — the gap is information. */
+.histo-bar.empty .histo-fill { background: var(--hairline); }
+.histo-bar:hover .histo-fill { background: var(--proof-orange); }
+.histo-n { position: absolute; }
+
+/* ── §3 DELTAS ──────────────────────────────────────────── */
+.delta-row { text-decoration: none;
+}
+.delta-label { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.delta-rule { border-top: 1px solid var(--press-black); margin: 6px 0; }
+@media (max-width: 767px) {
+  .delta-row { grid-template-columns: minmax(0, 1fr) 42px 48px; }
+  .delta-row .mono-s { grid-column: 1 / -1; }
+}
+
+/* ── §4 WHEN YOU READ ───────────────────────────────────── */
+.months, .years { display: flex; align-items: flex-end; }
+.month, .year {
+  flex: 1 1 0; display: flex; flex-direction: column; justify-content: flex-end;
+  align-items: center; height: 100%; gap: 5px;
+}
+.month-bar, .year-bar { display: block; width: 100%; background: var(--press-black); }
+.month-label { line-height: 1; }
+
+/* ── §1 AT YOUR PACE ────────────────────────────────────── */
+/* Facts, not goals: no target line, no colour coding, no "behind" state. */
+.pace-note { font-family: var(--f-mono); font-size: 11px; letter-spacing: .09em; text-transform: uppercase; }
+
+/* ═══════════════════════════════════════════════════════════
+   RESTORED — rules removed with the v0.5.1 teardown that are
+   still in use. The teardown cut a contiguous span of the
+   stylesheet rather than only the dead rules.
+   ═══════════════════════════════════════════════════════════ */
+
+/* ── THE BOOK PAGE HEAD (§3.1) ──────────────────────────── */
+/* Cover 280px on PROOF and TRIM, above the title at 180 on smaller. */
+.work-head {
+  display: grid; align-items: start;
+}
+/* The title sits beside a 280px cover, so it cannot run at display scale. */
+
+/* ── EDITION FILMSTRIP (§09.1) ──────────────────────────── */
+.filmstrip { display: flex; gap: 12px; padding-bottom: 8px; align-items: flex-start; }
+.ed {
+  flex: 0 0 104px; width: 104px; border: 1px solid var(--press-black); padding: 8px;
+  background: none; text-align: left; cursor: pointer; font: inherit; color: inherit;
+  text-decoration: none;
+}
+.ed.on { border-width: 2px; padding: 7px; }
+.ed .frame { border-width: 1px; }
+
+/* ── WHERE TO GET IT (§09.1) ────────────────────────────── */
+.sources { display: grid; gap: 0; }
+.source {
+  display: flex; justify-content: space-between; align-items: center; gap: 14px;
+  padding: 11px 0; border-bottom: 1px solid var(--hairline);
+  text-decoration: none; min-height: 44px;
+}
+.source:hover { background: var(--stock-gray); }
+
+/* ── THE COLOPHON (§08) ─────────────────────────────────── */
+.colophon { border-top: 2px solid var(--press-black); margin-top: 44px; padding: 16px 0 40px; }
+.colo-grid {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(155px, 1fr));
+  gap: 16px 26px; margin-top: 14px;
+}
+.colo-grid dt { margin-bottom: 3px; }
+.colo-grid dd { font-size: 14px; font-weight: 500; }
+
+/* ── THE BARCODE (§08) ──────────────────────────────────── */
+.barcode {
+  display: inline-flex; flex-direction: column; gap: 4px;
+  background: none; border: none; padding: 0; cursor: pointer;
+}
+.barcode svg { display: block; }
+.barcode .id { text-align: center; }
+
+/* ── THE IMPRESSION COUNTER (B3) ────────────────────────── */
+.counter { margin-top: 14px; border-top: 1px solid var(--hairline); padding-top: 12px; }
+.counter-row { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.wheels {
+  font-family: var(--f-mono); font-size: 19px; font-weight: 600; letter-spacing: .06em;
+  width: 5.5ch; padding: 6px 8px; text-align: center;
+  border: 1px solid var(--press-black); background: var(--stock-white); color: inherit;
+  -moz-appearance: textfield;
+}
+.wheels::-webkit-outer-spin-button, .wheels::-webkit-inner-spin-button {
+  -webkit-appearance: none; margin: 0;
+}
+.counter-of { white-space: nowrap; }
+.counter-when {
+  font-family: var(--f-mono); font-size: 11px; letter-spacing: .09em; text-transform: uppercase;
+  padding: 7px; border: 1px solid var(--press-black); background: none; color: inherit;
+}
+.btn-sm { padding: 6px 10px; min-height: 32px; font-size: 11px; }
+
+/* ── THE READING SCREEN (B4) ────────────────────────────── */
+.reading-row {
+  display: grid;
+  border-top: 1px solid var(--press-black);
+}
+
+.progress { display: flex; height: 6px; border: 1px solid var(--press-black); }
+.progress span { background: var(--press-black); display: block; }
+
+/* The pace strip. Gaps render as gaps — no streaks, no flame. */
+.pace { display: flex; align-items: flex-end; gap: 1px; height: 44px; }
+.pace i { flex: 1 1 0; min-width: 2px; background: var(--press-black); display: block; }
+.pace i.stall { background: var(--hairline); height: 1px !important; align-self: flex-end; }
+.pace-flat i { flex: 1 1 auto; height: 3px !important; background: var(--hairline); align-self: center; }
+
+/* ── PRESSINGS (B5) ─────────────────────────────────────── */
+.pressing {
+  display: grid; grid-template-columns: 68px 92px minmax(0, 1fr) auto;
+  gap: 14px; align-items: center;
+  padding: 10px 0; border-bottom: 1px solid var(--hairline);
+}
+@media (max-width: 767px) {
+  .pressing { grid-template-columns: 60px minmax(0, 1fr); row-gap: 4px; }
+}
+
+/* ── THE RECEIPT (§08) ──────────────────────────────────── */
+.receipt {
+  font-family: var(--f-mono); letter-spacing: .04em;
+  background: var(--stock-white); border: 1px solid var(--press-black);
+  padding: 22px 20px; max-width: 380px;
+}
+.receipt-line { padding: 3px 0; }
+.receipt-rule { border-top: 1px dashed var(--press-black); margin: 10px 0; }
+.receipt-perf {
+  border-top: 2px dashed var(--press-black); margin-top: 14px; padding-top: 8px; text-align: center;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   DENSITY PASS — the screens were built at display scale and
+   read as posters rather than as working surfaces.
+   ═══════════════════════════════════════════════════════════ */
+
+/* ── The book page head ─────────────────────────────────── */
+/* 280px of jacket beside a 46px title dominated the page and pushed the
+   actual book data below the fold. */
+.work-head { grid-template-columns: 180px minmax(0, 1fr); gap: 26px; margin-bottom: 22px; }
+.work-cover { width: 180px; }
+.work-head h1 { line-height: 1.04; }
+@media (max-width: 1023px) {
+  .work-head { grid-template-columns: minmax(0, 1fr); gap: 14px; }
+  .work-cover { width: 132px; }
+}
+
+/* ── The reading screen ─────────────────────────────────── */
+/* Three books used to fill 1100px. A row is a working surface: you come here
+   to type a page number, not to admire it. */
+.reading-row {
+  grid-template-columns: 72px minmax(0, 1fr);
+  gap: 16px; padding: 14px 0 16px;
+}
+.reading-cover { width: 72px; }
+.reading-row .h1 { font-size: 19px; line-height: 1.25; }
+.reading-row .b2 { font-size: 14px; }
+.reading-row .pace { height: 26px; }
+.reading-row .counter { margin-top: 10px; padding-top: 10px; }
+.reading-row .counter-row { gap: 8px; }
+.reading-row .wheels { font-size: 16px; padding: 5px 7px; }
+.reading-row .progress { height: 5px; }
+@media (max-width: 767px) {
+  .reading-row { grid-template-columns: 56px minmax(0, 1fr); gap: 12px; }
+  .reading-cover { width: 56px; }
+}
+
+/* Page headings sat at poster scale on working screens. */
+
+/* ── The spine's currently-reading chips ────────────────── */
+/* At 26px the fallback's type is unreadable; the frame alone reads as a book. */
+
+/* An empty progress track must not read as a full one: at 5px a press-black
+   border fills the whole bar. */
+.progress { border-color: var(--hairline); background: var(--stock-gray); }
+.progress span { min-width: 2px; }
+
+/* ═══════════════════════════════════════════════════════════
+   THE ATMOSPHERE
+   Every element was wearing three signals at once. This turns
+   the volume down: one label treatment, one accent, a serif
+   that carries size at weight 400, and a cover wall that reads
+   as one body of work rather than as competing jackets.
+
+   The palette this section used to redefine now lives at the
+   top of the file, in §03, where the file says colour lives.
+   ═══════════════════════════════════════════════════════════ */
+
+/* ── (1) DISPLAY TYPE ───────────────────────────────────── */
+/* A serif at 400 outperforms a bold grotesque at any size. Nothing in the
+   product exceeds weight 500. */
+.d1, .d2, .d3, h1, h2, h3 {
+  font-family: var(--f-display);
+  font-weight: 400;
+  letter-spacing: 0;
+}
+.d1 { font-size: clamp(34px, 4vw, 52px); line-height: 1.04; }
+.d2 { font-size: clamp(28px, 3.2vw, 42px); line-height: 1.06; }
+.d3 { font-size: clamp(18px, 1.8vw, 24px); line-height: 1.18; }
+.h1, .ticket-title { font-family: var(--f-display); font-weight: 400; font-size: 19px; letter-spacing: 0; }
+.sheet > .block > h1.d2 { font-size: clamp(28px, 3.2vw, 42px); margin-bottom: 22px; }
+.work-head h1 { font-size: clamp(30px, 3vw, 44px); font-weight: 400; }
+.work-head .d3 { font-size: clamp(15px, 1.3vw, 19px); }
+b, strong { font-weight: 500; }
+
+/* ── (2) ONE LABEL TREATMENT ────────────────────────────── */
+/* The quotation marks are the strongest idea on the screen. Keep those;
+   drop the box, which was saying the same thing a second time. */
+.tag {
+  border: none; padding: 0;
+  color: var(--dim);
+  letter-spacing: .2em;
+}
+/* (4) One divider per section break, not a rule AND a boxed label. */
+/* A section boundary takes the heavier of the two weights. `.hair` stays on
+   the lighter one, so the page finally has two levels of separation rather
+   than one invisible level doing both jobs. */
+.rule { border-top: 1px solid var(--rule); margin: 30px 0 14px; padding-top: 12px; }
+
+/* ── (3) THE ACCENT, ONCE ───────────────────────────────── */
+/* Stars are chalk. Deltas are stone. The accent is reserved for the single
+   live thing on a screen. */
+.stars, .star-row .star-fill, .star-fill { color: var(--gold); }
+.delta-row .orange, .histo-n { color: var(--dim); }
+.strip-legend .orange { color: var(--dim); }
+
+/* ── (4) QUIETER RULES ──────────────────────────────────── */
+.hair, .ticket, .source, .delta-row, .pressing, .progress-row {
+  border-color: var(--hairline);
+}
+.colophon { border-top-width: 1px; }
+
+/* (9) Crop marks: all four corners, hairline weight, so they read as
+   printer's marks rather than as a HUD. */
+.crop { opacity: 1; width: 14px; height: 14px; }
+.crop::before, .crop::after { background: var(--hairline); }
+.crop::before { width: 14px; height: 1px; }
+.crop::after { width: 1px; height: 14px; }
+.crop.bl { bottom: 28px; left: 36px; }
+.crop.br { bottom: 28px; right: 36px; }
+.crop.bl::before { bottom: 0; }
+.crop.br::before, .crop.br::after { right: 0; }
+.crop.br::before { bottom: 0; }
+
+/* ── (5) THE STATS BLOCKS ───────────────────────────────── */
+/* One row per group: label left, figures right, hairline between. */
+.deltas { margin-top: 8px; }
+.delta-row {
+  display: grid; grid-template-columns: minmax(0, 1fr) auto auto auto;
+  gap: 18px; align-items: baseline;
+  padding: 12px 0; border-bottom: 1px solid var(--hairline);
+}
+.delta-label { letter-spacing: .12em; }
+.delta-row .mono { font-size: 12px; }
+
+.receipt-line { display: flex; justify-content: space-between; gap: 16px; }
+.receipt { font-size: 11px; line-height: 1.7; }
+
+/* ── (6) NEVER CUT A TITLE MID-WORD ─────────────────────── */
+.frame-fallback-title {
+  font-family: var(--f-display); font-weight: 400;
+}
+.spine-strip .frame-fallback-title { -webkit-line-clamp: 2; line-clamp: 2; }
+
+/* ── (7) UNIFY THE COVER WALL ───────────────────────────── */
+/* Margiela painted found objects one colour so they read as a collection.
+   Desaturating every jacket by the same amount does the same work: the
+   covers stop competing and the shelf becomes a body of work. */
+.frame { border: none; box-shadow: 0 0 0 .5px var(--hairline); background: var(--stock-gray); }
+.frame img { filter: saturate(.85); }
+.contact { gap: 2px; }
+.contact a:hover .frame { box-shadow: 0 0 0 1px var(--press-black); }
+.shelf-strip { gap: 4px; }
+
+/* ── (10) MOTION ────────────────────────────────────────── */
+/* One duration, one curve, no spring, no bounce, no scale. */
+* { transition-duration: 450ms !important; transition-timing-function: cubic-bezier(.2, .7, .3, 1) !important; }
+.btn:hover { border-width: 1px; padding: 9px 14px; background: var(--stock-gray); }
+.btn-sm:hover { padding: 6px 10px; }
+.ticket:hover, .progress-row:hover, .delta-row:hover { background: var(--stock-gray); }
+
+/*
+  THE ONE EXCEPTION TO "NO SCALE".
+
+  `@keyframes press` — a stamp coming down from scale(1.7) — was written,
+  then switched off here by a blanket motion rule, and so never once ran.
+
+  It runs now, in exactly one place: the moment a book is marked finished.
+  That is the most consequential action in the product and it used to
+  produce a page reload and a line of 10px grey type. The restraint the
+  blanket rule was defending is kept by the scope, not by the silence — this
+  fires on one event, on one element, for 240ms, and nowhere else.
+*/
+.stamp-press { animation: press 240ms cubic-bezier(.2, .9, .3, 1) both; }
+
+/* (3) The histogram's star anchors were a second accent on the same screen.
+   The one live thing here is the active view toggle. */
+.histogram + .between .orange { color: var(--dim); }
+
+/* (6) The galley plate is used at 26px in the spine and 180px on the book
+   page. One type size cannot serve both, which is why titles were being
+   guillotined mid-word. Container queries scale the plate to its frame. */
+.frame { container-type: inline-size; }
+
+.frame-fallback { padding: 8cqw; }
+.frame-fallback::before { top: 16cqw; left: 8cqw; right: 8cqw; }
+.frame-fallback-title {
+  margin-top: 14cqw;
+  /* §1.6 — the floor. This clamp bottomed out at 6px, and its sibling at
+     5px, which is where the audit's unaccounted-for tiny type was coming
+     from: container units, not a declared size. The plate still scales with
+     its frame; it just stops scaling below the size at which type is type. */
+  font-size: clamp(10px, 9.5cqw, 14px);
+  line-height: 1.28;
+  -webkit-line-clamp: 4; line-clamp: 4;
+  /* Break only between words; an ellipsis is honest, a severed word is not. */
+  overflow-wrap: normal; word-break: normal; hyphens: none;
+}
+.frame-fallback-author {
+  font-size: clamp(10px, 6cqw, 11px);
+  letter-spacing: .08em;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+/* Below the size that can carry 10px type, the plate carries no type at all
+   and reads as a closed book rather than as broken text. Raised from 44px in
+   step with the floor above: a plate too small for legible type should show
+   none, rather than show some at a size nobody can read. */
+@container (max-width: 58px) {
+  .frame-fallback-title, .frame-fallback-author { display: none; }
+  .frame-fallback::before { top: 24%; }
+}
+
+/* (2) The controls under a section heading were carrying the same boxed
+   treatment as the labels above them, so the top of every shelf read as a
+   field of boxes. Marks and view toggles keep a hairline; the section
+   label keeps only its quotation marks. */
+.btn { border-color: var(--hairline); }
+.btn.on, .btn[aria-pressed="true"] { background: none; border-color: var(--press-black); color: var(--press-black); }
+.btn-orange { border-color: var(--accent); color: var(--accent); }
+.btn-orange:hover { background: none; border-color: var(--accent); color: var(--accent); }
+
+/* (3) The accent survives in exactly one place: where you currently are. */
+
+/* ── THE WALL, revised ──────────────────────────────────── */
+.wall-controls {
+  display: flex; flex-wrap: wrap; gap: 22px; align-items: center;
+  padding-bottom: 16px; margin-bottom: 20px;
+  border-bottom: 1px solid var(--hairline);
+}
+
+/* Grouping breaks the wall into separate shelves. Seeing a short 2022 next
+   to a long 2026 says something no stat page can. */
+.wall-shelf { display: grid; grid-template-columns: 68px minmax(0, 1fr); gap: 14px; margin-bottom: 30px; }
+.wall-shelf:only-child { grid-template-columns: minmax(0, 1fr); }
+.wall-shelf-label { padding-top: 6px; text-align: right; line-height: 1.4; }
+.wall-rows { min-width: 0; }
+.wall-row { margin-bottom: 0; border-bottom: 3px solid var(--press-black); }
+.wall-shelf + .wall-shelf { margin-top: 0; }
+
+/* A blank thin spine is what a real shelf looks like. */
+.spine-label { font-size: 10px; }
+
+/* Pull-out on hover: the book rises out of the row the way you would tug one
+   halfway out to read it. */
+.spine-book { position: relative; }
+.spine-book:hover, .spine-book:focus-visible { transform: translateY(-8px); z-index: 3; }
+
+/* The caption rail fills in as you lean in. */
+.caption-rail {
+  min-height: 22px; padding: 6px 0 10px; margin-bottom: 6px;
+  border-bottom: 1px solid var(--hairline);
+  display: flex; gap: 16px; align-items: baseline; flex-wrap: wrap;
+}
+.caption-rail .rail-title { font-family: var(--f-display); font-size: 17px; letter-spacing: 0; text-transform: none; }
+.caption-rail .rail-author { text-transform: none; letter-spacing: .04em; }
+
+/* Charts read as reference, not as centrepieces. */
+.histogram { height: 88px; gap: 3px; }
+.months, .years { height: 58px; gap: 4px; }
+.histo-n { top: -15px; font-size: 11px; }
+
+/* A spine's title is clipped to the board, never allowed to run off the end
+   of it. Type is not scaled down to fit — the rail carries what does not. */
+.spine-book { overflow: hidden; }
+.spine-label {
+  position: absolute; inset: 0;
+  display: block; padding: 10px 0;
+  writing-mode: vertical-rl; text-orientation: mixed;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  text-align: left;
+}
+.spine-book.is-reading .spine-label {
+  writing-mode: horizontal-tb; padding: 0 10px;
+  display: flex; align-items: center;
+}
+
+/* ── "THE DESK" ─────────────────────────────────────────── */
+/* A single hairline input in the same place on every page. No box, no
+   radius, no fill, no icon, no button, no submit, no clear. */
+.desk { position: relative; margin: 0 0 26px; }
+.desk-field {
+  width: 100%;
+  font-family: var(--f-display);
+  font-size: 19px;
+  font-weight: 400;
+  color: var(--press-black);
+  background: none;
+  border: none;
+  border-bottom: 1px solid var(--hairline);
+  border-radius: 0;
+  padding: 6px 26px 8px 0;
+  outline: none;
+  caret-color: var(--accent);
+}
+.desk-field:focus { border-bottom-color: var(--dim); }
+/* The placeholder names the field, and gets out of the way the moment
+   there is a cursor in it — at which point the field is self-evidently a
+   field, and the label would just be something to type over. */
+.desk-field::placeholder { color: var(--dim); }
+.desk-field:focus::placeholder { color: transparent; }
+.desk-hint {
+  position: absolute; right: 0; bottom: 10px;
+  color: var(--dim); pointer-events: none;
+}
+.desk-field:focus + .desk-hint { opacity: 0; }
+
+/* The only permitted indicator that a tier-3 call is in flight: the rule
+   shifts. No spinner, no skeleton, no shimmer. */
+.desk.is-working .desk-field { border-bottom-color: var(--dim); }
+.desk.is-working .desk-field { caret-color: transparent; }
+
+/* One line. Italic serif, stone, fifteen words at most, often absent. */
+.desk-caption {
+  font-family: var(--f-display);
+  font-style: italic;
+  font-size: 15px;
+  color: var(--dim);
+  margin: 22px 0 18px;
+}
+
+/* Results fade in. Opacity only — no translate, no stagger. */
+.desk-results { animation: deskfade 450ms cubic-bezier(.2, .7, .3, 1) both; }
+@keyframes deskfade { from { opacity: 0; } to { opacity: 1; } }
+
+/* §7 — the reader's own sentence, verbatim, visually identical to any other
+   result. No badge, no icon, no "from your notes" label. */
+.note-excerpt {
+  font-family: var(--f-display);
+  font-size: 14px;
+  color: var(--stone, var(--dim));
+  display: block;
+  margin-top: 4px;
+}
+@media (prefers-reduced-motion: reduce) {
+  .desk-results { animation: none; }
+}
+
+/* ── "THE GAP" ──────────────────────────────────────────── */
+/* One book on an otherwise empty page. */
+.gap-book { display: grid; grid-template-columns: 240px minmax(0, 1fr); gap: 40px; align-items: start; margin-top: 40px; max-width: 860px; }
+.gap-cover { width: 240px; }
+.gap-anchor { font-family: var(--f-display); font-style: italic; font-size: 17px; color: var(--dim); line-height: 1.5; max-width: 44ch; }
+.gap-anchor a { color: var(--press-black); font-style: normal; text-decoration: none; border-bottom: 1px solid var(--hairline); }
+@media (max-width: 767px) {
+  .gap-book { grid-template-columns: minmax(0, 1fr); gap: 22px; }
+  .gap-cover { width: 160px; }
+}
+
+/* ═══════════════════════════════════════════════════════════
+   THE BOOK PAGE AS A SPREAD
+   Left is the object, right is the reader. The page had no
+   composition — every section was a full-width band with a
+   small object in it and leftover space to the right.
+   ═══════════════════════════════════════════════════════════ */
+
+/* §3.3 — THE JACKET, AT A SIZE WORTH LOOKING AT.
+   This product credits the jacket designer by name, in a field directly
+   under the cover, and then never showed the cover above 240px on the one
+   page that is about the book. The cached jackets are 300–340px wide; they
+   were being drawn at two thirds of the pixels that exist. */
+.spread-book {
+  display: grid; grid-template-columns: 320px minmax(0, 1fr);
+  gap: 56px; align-items: start; margin-top: 18px;
+}
+.book-object { width: 320px; }
+.book-object .work-cover { width: 320px; }
+.jacket-credit { margin-top: 10px; letter-spacing: .12em; }
+
+/* The colophon is a caption under the object it describes, not its own
+   section four screens down. */
+.colophon-caption {
+  margin-top: 18px; padding-top: 14px;
+  font-family: var(--f-read);
+  border-top: 1px solid var(--hairline);
+  display: grid; gap: 5px;
+}
+.colophon-caption > div {
+  display: flex; justify-content: space-between; align-items: baseline; gap: 14px;
+}
+.colophon-caption dt { flex: 0 0 auto; padding-top: 2px; }
+.colophon-value {
+  font-family: var(--f-read); font-size: 14px; line-height: 1.35;
+  text-align: right; color: var(--press-black);
+}
+
+.editions-strip { margin-top: 22px; padding-top: 16px; border-top: 1px solid var(--hairline); }
+.editions-strip .ed { flex: 0 0 62px; width: 62px; border: none; padding: 0; }
+.editions-strip .ed.on { padding: 0; }
+.editions-strip .ed.on .frame { box-shadow: 0 0 0 1px var(--press-black); }
+
+.book-object .barcode { margin-top: 22px; opacity: .55; }
+.book-object .barcode:hover { opacity: 1; }
+
+/* ── The reader's column ────────────────────────────────── */
+.book-reader { min-width: 0; }
+.book-reader h1 { margin-bottom: 4px; }
+.book-author { margin-bottom: 26px; }
+
+.book-status {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 20px; flex-wrap: wrap;
+  padding-bottom: 16px; border-bottom: 1px solid var(--hairline);
+}
+/* No container, no CLEAR, no SAVE. Clicking a star is the save. */
+.stars-inline { display: flex; align-items: center; gap: 12px; }
+.book-status .star-row { color: var(--hairline); }
+.book-status .star-fill { color: var(--gold); }
+.book-state { white-space: nowrap; }
+
+/* Both voices present, same serif. Stone for the publisher, chalk for the
+   reader — the eye lands on the reader's sentence without anything hidden. */
+.description { margin: 24px 0 4px; }
+.description-body {
+  font-family: var(--f-display); font-size: 17px; line-height: 1.55; max-width: 58ch;
+}
+.description-source { margin-top: 10px; letter-spacing: .1em; }
+
+.notes { margin: 26px 0 4px; }
+.note-body {
+  font-family: var(--f-display); font-size: 19px; line-height: 1.5; max-width: 54ch; margin: 8px 0 4px;
+}
+/* No box. A rule, and only while it is being used. */
+.note-form { align-items: flex-end; gap: 12px; margin-top: 8px; max-width: 54ch; }
+.note-input {
+  flex: 1; font-family: var(--f-display); font-size: 17px; line-height: 1.5;
+  color: var(--press-black); background: none;
+  border: none; border-bottom: 1px solid transparent;
+  padding: 4px 0; resize: none; outline: none;
+}
+.note-input::placeholder { color: var(--dim); }
+.note-input:focus { border-bottom-color: var(--hairline); }
+
+/* Actions are text with an arrow, not buttons in boxes. */
+.more-link {
+  background: none; border: none; padding: 0; cursor: pointer;
+  font-family: var(--f-mono); font-size: 11px; letter-spacing: .1em;
+  text-transform: uppercase; color: var(--dim); text-decoration: none;
+}
+.more-link:hover { color: var(--press-black); }
+
+/*
+  ── COLOUR ON THE THINGS YOU TOUCH ───────────────────────
+
+  The accent marked WHERE YOU ARE — the active nav item, the word OPEN — and
+  nothing else. That is one of the two jobs a colour does in an interface and
+  the product was only doing it. Nothing on a page said "this is the thing
+  you came here to do"; every action was a 10px grey link with an arrow after
+  it, indistinguishable from a field label except for the arrow.
+
+  `.btn-do` is the primary action, and there is at most ONE per screen. It
+  takes the accent as a FILL rather than as a border, because a filled
+  control is the only element on these pages with a saturated ground and
+  that is precisely what makes it findable.
+
+  Stars stay chalk. A rating is a value, not an action, and spending the
+  accent on it was already rejected once, correctly.
+*/
+.btn-do {
+  display: inline-flex; align-items: center; gap: 8px;
+  font-family: var(--f-mono); font-size: 12px; letter-spacing: .09em;
+  text-transform: uppercase;
+  background: var(--accent);
+  color: var(--stock-white);
+  border: 1px solid var(--accent);
+  padding: 10px 16px;
+  text-decoration: none; cursor: pointer;
+  min-height: 38px;
+}
+.btn-do:hover, .btn-do:focus-visible { background: var(--press-black); border-color: var(--press-black); color: var(--stock-white); }
+.btn-do[disabled] { opacity: .5; cursor: default; }
+
+/* The second of a pair. Same size and same colour, carried in outline, so
+   two controls read as two doors into one room rather than as a decision
+   about which is more important. */
+.btn-do--quiet {
+  background: none;
+  color: var(--accent);
+  border-color: var(--accent);
+}
+.btn-do--quiet:hover, .btn-do--quiet:focus-visible {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--stock-white);
+}
+.btn-do-sm { padding: 6px 11px; min-height: 30px; font-size: 11px; }
+
+/* The marks. Sized and coloured by the text they sit in, nudged onto the
+   baseline of tracked capitals, which sit high in their own box. */
+.mark-glyph {
+  display: inline-block;
+  vertical-align: -0.12em;
+  margin-right: .35em;
+  opacity: .8;
+}
+/* The controls were a run of loose links with a rule above them. They are
+   the one place on this page where the reader acts, so they get a body. */
+/* No box. The primary action is already the loudest thing on the page — it
+   is the one accent colour on the sheet — and framing it in a grey panel
+   made it look like a widget dropped onto the page rather than part of it. */
+.book-actions { margin-top: 26px; }
+
+.pressings { margin-top: 26px; padding-top: 16px; border-top: 1px solid var(--hairline); }
+.pressing-row { display: grid; grid-template-columns: 68px 84px minmax(0, 1fr); gap: 14px; align-items: baseline; padding: 6px 0; }
+
+
+/* Binder holes run evenly down the left edge: a page in a ring binder,
+   rather than two clusters at the top that read as a HUD. */
+.holes {
+  position: fixed; left: calc(var(--spine-w) + 16px); top: 0; bottom: 0;
+  width: 9px; display: flex; flex-direction: column;
+  justify-content: space-evenly; align-items: center;
+  padding: 8vh 0; pointer-events: none; z-index: 1;
+}
+.holes i {
+  display: block; width: 9px; height: 9px; border-radius: 50%;
+  background: var(--hairline);
+}
+@media (max-width: 1023px) { .holes { display: none; } }
+
+@media (max-width: 1023px) {
+  .spread-book { grid-template-columns: minmax(0, 1fr); gap: 26px; }
+  /* On one column the jacket is no longer competing with the text for
+     width, so it gets more of it, not less. */
+  .book-object, .book-object .work-cover { width: 216px; }
+}
+
+/* The source line carries two things; they need air between them. */
+.description-source { display: flex; gap: 18px; align-items: baseline; flex-wrap: wrap; }
+
+/* Stone for the publisher's words, chalk for the reader's. Both always
+   present — the eye lands on the reader's sentence because of colour, not
+   because anything was hidden. */
+.description-body { color: var(--stone-text, var(--dim)); }
+.note-body { color: var(--press-black); }
+/* The note is the thing with content and feeling; the stars are metadata. */
+.book-status .star-row { font-size: 18px; }
+
+/* The note field IS the note: same serif, same chalk, grows with its text,
+   and carries no box and no resize grabber. */
+.note-form { display: block; position: relative; }
+textarea.note-body {
+  width: 100%; max-width: 54ch; display: block;
+  font-family: var(--f-display); font-size: 19px; line-height: 1.5;
+  color: var(--press-black); background: none;
+  border: none; border-bottom: 1px solid transparent;
+  padding: 8px 0 4px; margin: 4px 0 0;
+  resize: none; overflow: hidden; outline: none;
+}
+textarea.note-body:focus { border-bottom-color: var(--hairline); }
+.note-save { display: block; margin-top: 8px; opacity: 0; pointer-events: none; }
+.note-form:focus-within .note-save { opacity: 1; pointer-events: auto; }
+
+/* ── CSP UTILITIES ────────────────────────────────────────
+   §13.1 asks for a nonce-based policy with no 'unsafe-inline'. A nonce
+   cannot be attached to a style ATTRIBUTE — only to a <style> element — so
+   `style="margin-top:8px"` is not something a strict policy can be talked
+   into allowing. These classes are what those attributes became.
+   Genuinely dynamic values (a bar's width) are emitted in a nonced <style>
+   block by views/partials/dynamic-style.ejs instead. */
+.mt-4{margin-top:4px}    .mt-6{margin-top:6px}    .mt-7{margin-top:7px}
+.mt-8{margin-top:8px}    .mt-10{margin-top:10px}  .mt-12{margin-top:12px}
+.mt-14{margin-top:14px}  .mt-18{margin-top:18px}  .mt-30{margin-top:30px}
+.mt-34{margin-top:34px}  .mt-44{margin-top:44px}
+.mb-4{margin-bottom:4px} .mb-6{margin-bottom:6px} .mb-8{margin-bottom:8px}
+.mb-10{margin-bottom:10px} .mb-14{margin-bottom:14px} .mb-16{margin-bottom:16px}
+.mb-20{margin-bottom:20px} .mb-24{margin-bottom:24px} .mb-30{margin-bottom:30px}
+.my-block{margin:18px 0 26px}
+.ml-8{margin-left:8px}   .ml-auto{margin-left:auto}
+.ml-auto-6{margin-left:auto;gap:6px}
+.pt-20{padding-top:20px} .pb-14{padding:0 0 14px}
+.py-10{padding:10px 0}   .py-14{padding:14px 0}   .py-20{padding:20px 0}
+.gap-6{gap:6px}          .gap-8{gap:8px}          .gap-14{gap:14px}
+.d-block{display:block}
+.d-block-mb6{display:block;margin-bottom:6px}
+.d-block-mb8{display:block;margin-bottom:8px}
+.d-block-mt5{display:block;margin-top:5px}
+.no-underline{text-decoration:none}
+.inherit-color{color:inherit}
+.link-orange{color:var(--proof-orange);text-decoration:none}
+.w-0{min-width:0}
+.w-52{min-width:52px}
+.measure{max-width:66ch}
+.measure-mt10{max-width:66ch;margin-top:10px}
+.weight-500{font-weight:500}
+.leading-loose{margin-top:12px;line-height:1.8}
+.centered-mb12{text-align:center;margin-bottom:12px}
+.truncate-flex{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.bare-input{font-size:14px;border:none;padding:0}
+.ruled-row{padding:11px 0;border-bottom:1px solid var(--hairline)}
+.ruled-row-click{padding:11px 0;border-bottom:1px solid var(--hairline);cursor:pointer}
+.row-block{display:block;padding:11px 0}
+.box-input{padding:9px;border:1px solid var(--press-black);background:none;color:inherit}
+.box-input-wide{width:100%;padding:9px;border:1px solid var(--press-black);background:none;color:inherit}
+.check-lg{width:20px;height:20px;accent-color:var(--accent)}
+.check-lg-orange{width:20px;height:20px;accent-color:var(--proof-orange)}
+
+/* The skip link moved off inline onfocus/onblur handlers, which a strict
+   script-src forbids just as firmly as an inline <script>. :focus does it
+   in CSS, which is where it always belonged. */
+.skip-link{position:absolute;left:-9999px;top:0;z-index:99}
+.skip-link:focus{left:60px}
+
+/* An active tab is a state, not a computed colour. */
+.tab{text-decoration:none;border-bottom:2px solid transparent}
+.tab.on{border-bottom-color:var(--press-black)}
+
+/* ── §17 — THE AUTH SCREENS ───────────────────────────────
+   A table of eight rules in the spec, and the reason it exists is stated
+   in its first line: scaffolding tools generate ugly forms. Every value
+   below is the one §17 names. */
+.auth-sheet { display: grid; place-items: center; min-height: 100vh; padding: 40px 24px; }
+
+.auth-block { width: 100%; max-width: 380px; }
+
+.auth-mark {
+  display: block; margin-bottom: 54px;
+  color: var(--stone, #7C766C); text-decoration: none; letter-spacing: .2em;
+}
+
+/* Section label — mono 10px, 0.2em tracking, stone, in quotes. */
+.auth-label {
+  font-size: 11px; letter-spacing: .17em; color: #7C766C;
+  margin-bottom: 14px;
+}
+
+/* Page title — serif, 38px, weight 400, chalk. The weight is the point:
+   there is no bold anywhere in this product. */
+.auth-title {
+  font-family: var(--f-read); font-size: 38px; font-weight: 400;
+  line-height: 1.1; letter-spacing: -0.01em;
+  color: #EDEAE3; margin-bottom: 10px;
+}
+
+.auth-lede {
+  font-family: var(--f-read); font-size: 15px; line-height: 1.55;
+  color: #9A948A; margin-bottom: 30px; max-width: 34ch;
+}
+
+.auth-form { margin-top: 34px; }
+
+.field { display: block; margin-bottom: 26px; }
+
+/* Field label — mono 9px, 0.18em tracking, stone. */
+.field-label {
+  display: block; font-size: 11px; letter-spacing: .14em;
+  color: var(--dim); margin-bottom: 7px;
+}
+
+/* Field — no box. A bottom rule only, and serif 17px input text. */
+.field input {
+  width: 100%; display: block;
+  font-family: var(--f-read); font-size: 17px; font-weight: 400;
+  color: #EDEAE3; background: none;
+  border: none; border-bottom: 1px solid #3A342D;
+  padding: 7px 0; outline: none;
+  transition: border-color 450ms cubic-bezier(.2,.7,.3,1);
+}
+/* Focus — the rule to stone. No glow, no ring, no colour shift. */
+.field input:focus { border-bottom-color: #7C766C; }
+
+/* Chrome paints its own tint over an autofilled field, which would put a
+   pale blue box back on a design whose whole premise is that there is no
+   box. A long inset shadow is the only way to overrule it. */
+.field input:-webkit-autofill,
+.field input:-webkit-autofill:focus {
+  -webkit-text-fill-color: #EDEAE3;
+  -webkit-box-shadow: 0 0 0 60px #191714 inset;
+  caret-color: #EDEAE3;
+}
+
+.field-prefixed { display: flex; align-items: baseline; border-bottom: 1px solid #3A342D; }
+.field-prefixed:focus-within { border-bottom-color: #7C766C; }
+.field-prefixed input { border-bottom: none; }
+.field-prefix { font-family: var(--f-read); font-size: 17px; color: #7C766C; }
+
+.field-note {
+  display: block; margin-top: 8px; font-size: 11px; letter-spacing: .09em;
+  line-height: 1.7; color: var(--dim);
+}
+
+.code-input { letter-spacing: .35em; font-family: var(--f-id); }
+
+/* Error — one line, mono 10px, the one red, beneath the field.
+   No icon, no box, no toast. */
+.field-error {
+  font-size: 11px; letter-spacing: .09em; line-height: 1.6;
+  color: #A8332F; margin: -14px 0 24px;
+}
+
+/* Success — one line, serif italic, stone. */
+.field-success {
+  font-family: var(--f-read); font-style: italic; font-size: 15px;
+  color: #9A948A; margin-bottom: 20px;
+}
+
+/* Primary action — text with a bottom rule, not a filled button.
+   Chalk on ink. The accent is never spent on a utility control. */
+.auth-action {
+  display: inline-block; margin-top: 8px;
+  font-family: var(--f-mono); font-size: 11px; letter-spacing: .15em;
+  color: #EDEAE3; background: none; text-decoration: none;
+  border: none; border-bottom: 1px solid #EDEAE3;
+  padding: 0 0 5px; cursor: pointer;
+  transition: opacity 450ms cubic-bezier(.2,.7,.3,1);
+}
+.auth-action:hover { opacity: .62; }
+
+.auth-aside {
+  margin-top: 40px; font-family: var(--f-read); font-size: 14px;
+  color: #7C766C; line-height: 1.8;
+}
+.auth-aside a { color: #9A948A; text-decoration: none; border-bottom: 1px solid #3A342D; }
+.auth-aside a:hover { color: #EDEAE3; }
+
+.auth-em { color: #EDEAE3; }
+
+@media (max-width: 480px) {
+  .auth-title { font-size: 30px; }
+  .auth-mark { margin-bottom: 36px; }
+}
+
+/* The three trim ratios, as classes. A style attribute cannot carry a nonce,
+   so a computed --trim was the last inline style in the product. */
+.frame.trim-mass  { --trim: 0.619; }   /* 4.25 × 6.87in — mass market */
+.frame.trim-trade { --trim: 0.647; }   /* 5.5  × 8.5in  — trade paperback */
+.frame.trim-hard  { --trim: 0.667; }   /* 6    × 9in    — hardcover */
+
+/* ── FORM CONTROLS ────────────────────────────────────────
+   A native radio is system blue, a native checkbox is a grey box, and a
+   native <select> is OS chrome. All three were sitting on a soot-black page
+   looking like a different product had leaked into it. The accent is spent
+   once per screen and never on a utility control, so none of these are red
+   either — a chosen option is simply the one that is chalk. */
+.choice-set { border: none; padding: 0; margin: 0 0 30px; }
+.choice-set legend { padding: 0; margin-bottom: 16px; }
+
+.choice {
+  display: grid;
+  grid-template-columns: 14px 1fr;
+  gap: 0 14px;
+  align-items: start;
+  padding: 11px 0;
+  cursor: pointer;
+}
+.choice + .choice { border-top: 1px solid var(--hairline); }
+.choice input { position: absolute; opacity: 0; width: 0; height: 0; }
+
+.choice-mark {
+  width: 13px; height: 13px;
+  margin-top: 5px;
+  border: 1px solid var(--stone, #7C766C);
+  border-radius: 50%;
+  transition: border-color 450ms cubic-bezier(.2,.7,.3,1);
+}
+.choice-check .choice-mark { border-radius: 2px; }
+
+/* Checked: a filled centre in chalk, drawn with an inset shadow so there is
+   no extra element to position. */
+.choice input:checked ~ .choice-mark {
+  border-color: var(--chalk, #EDEAE3);
+  box-shadow: inset 0 0 0 3px var(--chalk, #EDEAE3);
+}
+.choice input:focus-visible ~ .choice-mark { outline: 1px solid var(--stone); outline-offset: 3px; }
+.choice input:disabled ~ .choice-mark { opacity: .35; }
+.choice input:disabled ~ .choice-text { opacity: .4; }
+
+.choice-text { display: block; }
+.choice-name {
+  display: block;
+  font-family: var(--f-read); font-size: 16px; line-height: 1.3;
+  color: var(--stone, #9A948A);
+  transition: color 450ms cubic-bezier(.2,.7,.3,1);
+}
+.choice input:checked ~ .choice-text .choice-name { color: var(--chalk, #EDEAE3); }
+.choice-note { display: block; margin-top: 4px; font-size: 11px; letter-spacing: .09em; color: var(--dim); }
+.choice-blocked { margin: 10px 0 0; }
+.save-privacy { margin-top: 24px; }
+
+/* A select with the OS chrome taken off, and a hairline caret of our own. */
+.select-wrap { position: relative; display: inline-flex; align-items: center; }
+.select-wrap::after {
+  content: ''; position: absolute; right: 2px; top: 50%;
+  width: 5px; height: 5px; margin-top: -4px;
+  border-right: 1px solid var(--stone); border-bottom: 1px solid var(--stone);
+  transform: rotate(45deg); pointer-events: none;
+}
+select.bare-select {
+  appearance: none; -webkit-appearance: none;
+  background: none; border: none;
+  border-bottom: 1px solid var(--hairline);
+  color: var(--press-black);
+  font-family: var(--f-mono); font-size: 11px; letter-spacing: .12em;
+  padding: 5px 18px 5px 0;
+  cursor: pointer; outline: none;
+  transition: border-color 450ms cubic-bezier(.2,.7,.3,1);
+}
+select.bare-select:focus { border-bottom-color: var(--stone); }
+/* The dropdown list itself is drawn by the OS; these are the only two
+   properties it honours, and without them it renders white-on-white. */
+select.bare-select option { background: var(--stock-white); color: var(--press-black); }
+
+/* Four columns that line up down the page. */
+.shelf-privacy {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 48px 190px auto;
+  align-items: center;
+  gap: 18px;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--hairline);
+  max-width: 620px;
+}
+.shelf-name {
+  font-family: var(--f-read); font-size: 15px; color: var(--press-black);
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.shelf-count { text-align: right; }
+
+@media (max-width: 620px) {
+  .shelf-privacy { grid-template-columns: minmax(0, 1fr) auto; gap: 8px 14px; }
+  .select-wrap, .shelf-privacy button { grid-column: 1 / -1; justify-self: start; }
+}
+
+/* ── SETTINGS ROWS ────────────────────────────────────────
+   A name on the left, its state on the right, an action after it. Without
+   an explicit grid these three ran together — "Two-factorOFF SET IT UP". */
+.settings-list { max-width: 620px; }
+
+.settings-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto auto;
+  align-items: baseline;
+  gap: 20px;
+  text-decoration: none;
+  color: inherit;
+}
+.settings-row:hover .settings-name { opacity: .68; }
+
+.settings-name {
+  font-family: var(--f-read); font-size: 16px;
+  color: var(--press-black);
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  transition: opacity 450ms cubic-bezier(.2,.7,.3,1);
+}
+.settings-row form { display: contents; }
+
+/* ── RECOVERY CODES ───────────────────────────────────────
+   Shown once, then only ever as an Argon2 hash. Set in the identifier face
+   at a size meant to be read off a screen and typed, or printed. */
+.recovery-list {
+  list-style: none; margin: 22px 0 0; padding: 0;
+  display: grid; grid-template-columns: repeat(2, max-content); gap: 10px 40px;
+}
+.recovery-list li {
+  font-family: var(--f-id); font-size: 15px; letter-spacing: .08em;
+  color: var(--press-black);
+}
+
+.totp-secret { margin: 26px 0 10px; }
+.totp-code {
+  display: block;
+  font-family: var(--f-id); font-size: 17px; letter-spacing: .18em;
+  color: var(--press-black);
+  padding: 10px 0; border-bottom: 1px solid var(--hairline);
+  max-width: 34ch; word-break: break-all;
+}
+
+/* ── PROFILE ──────────────────────────────────────────────
+   §9 — display name, username, bio, avatar, and the public shelves.
+   Nothing else is passed to the template, so nothing else can appear. */
+.profile-head { display: flex; align-items: center; gap: 22px; margin-bottom: 20px; }
+
+.avatar-lg {
+  width: 96px; height: 96px;
+  object-fit: cover;
+  border: 1px solid var(--hairline);
+}
+.avatar-lg.avatar-plate--blank { filter: none; }
+img.avatar-lg { background: var(--stock-gray); filter: saturate(.85); }
+
+.profile-bio {
+  font-family: var(--f-read); font-size: 17px; line-height: 1.55;
+  color: var(--press-black);
+  margin-top: 14px;
+}
+
+.profile-shelves { max-width: 620px; }
+
+.import-title { margin-bottom: 26px; }
+
+/* ── §12 — IMPORT ─────────────────────────────────────────
+   A dashed hairline and nothing else. No icon, no illustration, no cloud
+   with an arrow through it — the whole page is already about a file, and a
+   picture saying so again is decoration pretending to be instruction. */
+/* The form holds both ways in, so the dashed rule belongs to the zone
+   rather than to the form. It also must not be the positioning context:
+   the file input is absolutely placed to cover the zone, and against the
+   form it would cover the textarea too and swallow every click into it. */
+.drop { display: block; }
+
+.drop-zone {
+  position: relative;
+  display: block;
+  border: 1px dashed #3A342D;
+  padding: 54px 24px;
+  text-align: center;
+  transition: border-color 450ms cubic-bezier(.2,.7,.3,1);
+}
+.drop.over .drop-zone { border-color: var(--stone, #7C766C); }
+
+/* The input covers the zone so the whole area is the target, but it is
+   still a real focusable input underneath. */
+.drop-zone input[type="file"] {
+  position: absolute; inset: 0;
+  width: 100%; height: 100%;
+  opacity: 0; cursor: pointer;
+}
+.drop-label {
+  font-family: var(--f-read); font-size: 17px;
+  color: var(--stone, #9A948A);
+  cursor: pointer;
+}
+.drop.over .drop-label { color: var(--press-black); }
+
+/* The one line naming the services. Body copy, and the only place they
+   appear anywhere in the interface. */
+.drop-note { margin-top: 14px; line-height: 1.8; }
+
+/* ── THE SECOND WAY IN ──────────────────────────────────────
+   A list somebody types is the one import that needs no export first, and
+   for a long time it was the only one the product would not take. It sits
+   in the same form as the file, under a ruled OR, because it is an
+   alternative and not a second feature. */
+.drop-or {
+  display: flex; align-items: center; gap: 16px;
+  margin: 32px 0 26px;
+  color: var(--dim);
+}
+.drop-or::before,
+.drop-or::after { content: ""; flex: 1; height: 1px; background: var(--hairline); }
+
+.paste-field { margin-bottom: 0; }
+
+/* The same rule-and-nothing-else as .field input, in the same reading face,
+   so a list looks like a list of books and not like a code editor. */
+.paste-box {
+  width: 100%; display: block; resize: vertical;
+  font-family: var(--f-read); font-size: 17px; line-height: 1.62;
+  color: #EDEAE3; background: none;
+  border: none; border-bottom: 1px solid #3A342D;
+  padding: 7px 0; outline: none;
+  transition: border-color 450ms cubic-bezier(.2,.7,.3,1);
+}
+.paste-box:focus { border-bottom-color: #7C766C; }
+.paste-box::placeholder { color: #5A554D; }
+
+.paste-note { max-width: 62ch; }
+.paste-go { margin-top: 24px; }
+
+/* ── WHICH FILE ─────────────────────────────────────────────
+   Folded shut by default. Somebody holding the CSV never needs it, and
+   somebody holding 44 zips needs the whole thing, so it is a disclosure
+   rather than a paragraph everybody has to read past. */
+.import-help { margin-top: 26px; border-top: 1px solid var(--hairline); padding-top: 14px; }
+.import-help > summary {
+  cursor: pointer; letter-spacing: .14em; text-transform: uppercase;
+  color: var(--dim); list-style: none;
+}
+.import-help > summary::-webkit-details-marker { display: none; }
+.import-help > summary::before { content: "+ "; }
+.import-help[open] > summary::before { content: "\2212 "; }
+.import-help[open] > summary { color: var(--press-black); }
+.import-help-body { margin-top: 14px; max-width: 62ch; }
+.import-help-body > p + p { margin-top: 10px; }
+
+/* The four files, named. A monospace file name against what it holds. */
+.import-files { margin: 16px 0; }
+.import-file {
+  display: grid; grid-template-columns: 150px minmax(0, 1fr); gap: 12px;
+  padding: 7px 0; border-top: 1px solid var(--hairline);
+}
+.import-file dt { letter-spacing: .1em; }
+
+/* The one file in the folder that is the library. Marked rather than
+   explained: the other three are legible as supplements once this one is
+   obviously not. */
+.import-file-first dt { color: var(--press-black); }
+.import-file-mark {
+  margin-left: 10px; font-size: 9px; letter-spacing: .16em;
+  /* 5.91 on the light ground, 5.41 on the dark. This sits on the page
+     ground and never on a raised panel, where it would not clear 4.5. */
+  color: var(--proof-orange);
+}
+.import-file dd { margin: 0; }
+
+/* A supplement's rows: what will be attached, and to which book. */
+.import-rows { list-style: none; margin: 18px 0 0; padding: 0; }
+.import-row {
+  display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 4px 18px;
+  align-items: baseline;
+  padding: 9px 0; border-top: 1px solid var(--hairline);
+}
+.import-row-title { font-family: var(--f-read); font-size: 16px; }
+/* The note itself runs under both columns, in the reading face, because it
+   is the thing being moved and not a label for it. */
+.import-row-note {
+  grid-column: 1 / -1; font-family: var(--f-read); font-size: 15px;
+  color: var(--dim); line-height: 1.5;
+}
+
+/* The preview's leading line: 412 rows · 71 finished · 336 waiting … */
+.import-summary {
+  font-family: var(--f-read); font-size: 19px; line-height: 1.5;
+  color: var(--press-black);
+  margin-bottom: 4px;
+}
+
+/* Their word, the count, the arrow, our word. Four columns that line up so
+   the arrow reads as a column of its own down the page. */
+.map-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 44px 16px 170px;
+  align-items: center;
+  gap: 16px;
+  padding: 11px 0;
+  border-bottom: 1px solid var(--hairline);
+}
+.map-from {
+  font-family: var(--f-read); font-size: 15px;
+  color: var(--press-black);
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.map-count { text-align: right; }
+.map-arrow { text-align: center; }
+
+/* During, and after: one line, mono, that changes only where the number is.
+   The .mono class uppercases, which is right for a readout — IMPORTING ·
+   214 / 412 — and wrong for the sentence that replaces it. "412 in. 1
+   without a match." is something the product says, not something it
+   reports, so the finished state keeps its own case. */
+.import-line {
+  font-size: 13px; letter-spacing: .1em;
+  color: var(--press-black);
+  margin: 20px 0 0;
+}
+.import-line.done { text-transform: none; letter-spacing: .04em; font-size: 15px; }
+.import-after { display: flex; gap: 22px; margin-top: 16px; }
+
+.unmatched-row { display: grid; gap: 4px; }
+.unmatched-raw {
+  font-family: var(--f-read); font-size: 14px; color: var(--stone, #9A948A);
+  overflow-wrap: anywhere;
+}
+
+.export-section {
+  margin-top: 72px;
+  padding-top: 30px;
+  border-top: 1px solid var(--hairline);
+}
+.export-title { margin: 6px 0 8px; }
+
+/* .auth-action sets its own margin-top and is defined after the spacing
+   utilities, so `.auth-action.mt-30` loses on source order at equal
+   specificity. Two classes beat one. */
+.auth-action.mt-14 { margin-top: 14px; }
+.auth-action.mt-30 { margin-top: 30px; }
+
+/* The confirm action and the note about what did not match are different
+   kinds of thing and were sitting on top of each other. */
+.import-confirm { margin-top: 34px; }
+.import-unmatched-link { margin-top: 22px; }
+
+/* ═══════════════════════════════════════════════════════════
+   "ON PRESS"
+   The page had collapsed into a form: two native <select>s, a
+   date input with its own calendar icon, four buttons, and a
+   pace strip that announced its own emptiness three times.
+   Native widgets bring their own font, metrics and focus ring
+   and are immune to everything else in this stylesheet, so
+   none survive here.
+
+   What is left is the one interaction the page actually has:
+   say what page you are on.
+   ═══════════════════════════════════════════════════════════ */
+/* The rows are the page, so they get a measure. Without one they ran the
+   full width of the sheet — on a wide display the title and the number
+   ended up a foot apart with nothing between them. */
+.press-rows { max-width: 1180px; }
+
+.press-kicker {
+  display: flex; align-items: center; gap: 14px;
+  letter-spacing: .24em; color: var(--dim); margin-bottom: 18px;
+}
+.press-kicker i { display: block; width: 22px; height: 2px; background: var(--press-accent); }
+
+.press-row {
+  display: grid;
+  grid-template-columns: 96px minmax(0, 1fr) 156px;
+  gap: 0 30px;
+  align-items: start;
+  padding: 30px 0;
+  border-bottom: 1px solid var(--hairline);
+}
+.press-row:first-of-type { border-top: 1px solid var(--hairline); }
+
+.press-cover { width: 96px; display: block; text-decoration: none; }
+
+.press-body { min-width: 0; }
+
+/* Titles are not underlined. The size and the face are already saying it
+   is the thing on the row. */
+/* Two lines, then stop. A single line with text-overflow cut "…Settler
+   Colonialism and R…" mid-word, which is the same failure as cropping a
+   cover through a word. */
+.press-title {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  font-family: var(--f-read); font-size: clamp(24px, 2.2vw, 32px); font-weight: 400;
+  line-height: 1.12; letter-spacing: -0.004em;
+  color: var(--press-black); text-decoration: none;
+  transition: opacity 450ms cubic-bezier(.2,.7,.3,1);
+}
+.press-title:hover { opacity: .66; }
+
+.press-meta { margin-top: 6px; line-height: 1.6; }
+
+/* The gap, given the weight it earns: the number in the reading face at the
+   size of a fact, the label in mono beside it. */
+.press-gap { display: flex; align-items: baseline; gap: 9px; margin-top: 16px; }
+.press-gap b {
+  font-family: var(--f-read); font-weight: 400; font-size: 21px;
+  color: var(--press-black); font-variant-numeric: tabular-nums;
+}
+.press-gap span { letter-spacing: .15em; color: var(--dim); }
+.press-gap.is-stale b { color: var(--press-stale); }
+
+/* One hairline, one red mark — the treatment the home screen already uses.
+   Not a filled bar: a fill is a score, and a mark is just where you are. */
+.press-track {
+  position: relative;
+  height: 1px;
+  margin-top: 13px;
+  background: var(--hairline);
+}
+/* On the press the track sits alone in a 156px column and needs to be seen;
+   in the home rail it sits under a title and a hairline is enough. Scoped,
+   so restyling this page does not quietly restyle that one. */
+.press-row .press-track { background: var(--rule); }
+/* No extent means no line to be somewhere along. A broken rule says that
+   without a sentence, and the sentence under it says it anyway. */
+.press-track.is-unknown {
+  background: repeating-linear-gradient(90deg,
+    var(--rule) 0 4px, transparent 4px 8px);
+}
+.press-mark {
+  position: absolute; top: -4px;
+  /* One pixel of accent on a nine-pixel tick is invisible at any normal
+     viewing distance — the mark was rendering and simply could not be
+     seen, which reads as the same bug as not rendering it. */
+  width: 2px; height: 9px;
+  margin-left: -1px;
+  background: var(--accent);
+}
+
+/* ── The number ───────────────────────────────────────────
+   It is the input. No border, no label, no button: click it,
+   type, and blurring saves. */
+.press-count {
+  display: block;
+  text-align: right;
+  min-width: 0;
+  padding-top: 2px;
+}
+.press-unit { letter-spacing: .14em; margin-top: 8px; }
+.press-pct { letter-spacing: .14em; margin-top: 8px; }
+.press-adds { justify-content: flex-end; margin-top: 12px; }
+
+.press-number {
+  font-family: var(--f-read); font-size: 42px; font-weight: 400;
+  line-height: .9; letter-spacing: -0.02em;
+  font-variant-numeric: tabular-nums;
+  color: var(--press-black);
+  background: none; border: none;
+  border-bottom: 1px solid transparent;
+  padding: 2px 0; margin: 0;
+  width: 4.5ch; text-align: right;
+  outline: none;
+  transition: border-color 450ms cubic-bezier(.2,.7,.3,1);
+  -moz-appearance: textfield;
+}
+.press-number::-webkit-outer-spin-button,
+.press-number::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+
+/* A book with nothing logged shows an em-dash, not a zero. Zero is a score;
+   a dash is a blank. */
+.press-number::placeholder { color: var(--stone, var(--dim)); opacity: 1; }
+.press-number:hover { border-bottom-color: var(--hairline); }
+.press-number:focus { border-bottom-color: var(--stone, var(--dim)); }
+.press-number.saved { border-bottom-color: var(--accent); }
+
+/* Plain mono text. No boxes, and only on the row you are in — three of these
+   on every row permanently is three times the furniture and none of the use. */
+.press-adds {
+  display: flex; gap: 12px;
+  opacity: 0; pointer-events: none;
+  transition: opacity 450ms cubic-bezier(.2,.7,.3,1);
+}
+.press-row:focus-within .press-adds,
+.press-row:hover .press-adds { opacity: 1; pointer-events: auto; }
+
+.press-add {
+  background: none; border: none; padding: 0;
+  font-family: var(--f-mono); font-size: 11px; letter-spacing: .1em;
+  color: var(--stone, var(--dim));
+  cursor: pointer;
+  transition: color 450ms cubic-bezier(.2,.7,.3,1);
+}
+.press-add:hover { color: var(--press-black); }
+
+.press-stall, .press-due { margin-top: 12px; }
+
+@media (max-width: 860px) {
+  .press-row { grid-template-columns: 72px minmax(0, 1fr); gap: 0 20px; }
+  .press-cover { width: 72px; }
+  /* The figure drops under the body rather than squeezing beside it, and
+     lies down: at this width a right-aligned column of four stacked items
+     is taller than the book it describes. */
+  .press-count {
+    grid-column: 1 / -1; text-align: left;
+    display: flex; align-items: baseline; flex-wrap: wrap; gap: 0 16px;
+    margin-top: 18px;
+  }
+  .press-figure { justify-content: flex-start; }
+  .press-number { font-size: 32px; }
+  .press-track { display: none; }
+  .press-unit, .press-pct, .press-adds { margin-top: 0; }
+}
+
+/* The one red on this screen is the progress mark. `.accent` is here for an
+   overdue loan, which is a fact and not a goal — and a row can only ever
+   have one of the two. */
+.accent { color: var(--accent); }
+
+@media (max-width: 640px) {
+  .press-row { grid-template-columns: 56px minmax(0, 1fr); gap: 0 16px; }
+  .press-cover { width: 56px; }
+  .press-title { font-size: 21px; white-space: normal; }
+  .press-count { grid-column: 2; justify-items: start; margin-top: 14px; }
+  .press-number { text-align: left; }
+  .press-adds { opacity: 1; pointer-events: auto; }
+  .press-stall, .press-due { grid-column: 1 / -1; }
+}
+
+/* ── Shelf covers, half again as big ──────────────────────
+   411 books is worth looking at. */
+@media (min-width: 1440px) { .contact { } }
+
+/* ── A LOAN, NOT A GOAL ───────────────────────────────────
+   Folded away until it is relevant, and set as text rather than through
+   <input type="date">, which arrives with its own font, metrics, focus ring
+   and calendar icon and ignores everything here. */
+.loan { margin-top: 26px; }
+.loan summary {
+  cursor: pointer; list-style: none;
+  display: inline-block; padding-bottom: 4px;
+  border-bottom: 1px solid transparent;
+  transition: border-color 450ms cubic-bezier(.2,.7,.3,1);
+}
+.loan summary::-webkit-details-marker { display: none; }
+.loan summary:hover { border-bottom-color: var(--hairline); }
+.loan-form { display: flex; align-items: baseline; gap: 18px; margin-top: 14px; }
+.loan-date {
+  font-family: var(--f-id); font-size: 14px; letter-spacing: .06em;
+  color: var(--press-black); background: none;
+  border: none; border-bottom: 1px solid var(--hairline);
+  padding: 5px 0; width: 12ch; outline: none;
+  transition: border-color 450ms cubic-bezier(.2,.7,.3,1);
+}
+.loan-date:focus { border-bottom-color: var(--stone, var(--dim)); }
+.loan-date::placeholder { color: var(--stone, var(--dim)); opacity: .6; }
+
+/* ═══════════════════════════════════════════════════════════
+   SEASONS AND THE LOOKBOOK
+   §9, using existing tokens only. No boxes, no cards, no
+   shadows, and no progress bar anywhere in the feature.
+   ═══════════════════════════════════════════════════════════ */
+
+/* §9 — the OPEN marker is the only red in the whole feature. */
+.season-open { color: var(--accent); letter-spacing: .18em; }
+
+.season-title {
+  font-family: var(--f-read); font-size: 40px; font-weight: 400;
+  line-height: 1.05; letter-spacing: -0.015em;
+  color: var(--press-black);
+  margin: 10px 0 26px;
+}
+
+/* §8 / §9 — 10px tall, flush, no gaps, no radius. */
+.season-strip { display: flex; height: 10px; width: 100%; margin-bottom: 40px; }
+.season-strip i { flex: 1 1 0; display: block; }
+
+.season-note {
+  font-family: var(--f-read); font-size: 16px; line-height: 1.7;
+  color: var(--stone-text, #C4BEB2);
+  max-width: 52ch;
+}
+/* The lookbook and the poster, as the controls they are. Wraps rather than
+   squeezing on a narrow screen, and the gap is the gap between two buttons
+   and not between two words. */
+.season-controls { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 22px; }
+.season-range { margin-top: 10px; }
+
+/* ── Movements ───────────────────────────────────────────── */
+.movement { margin-top: 54px; }
+.movement-head {
+  display: flex; align-items: baseline; justify-content: space-between;
+  gap: 20px; flex-wrap: wrap;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--hairline);
+}
+.movement-name {
+  font-family: var(--f-read); font-size: 20px; font-weight: 400;
+  color: var(--press-black); margin: 0;
+}
+.movement-numeral { color: var(--stone, var(--dim)); }
+.movement-meta { letter-spacing: .18em; color: var(--stone, var(--dim)); text-align: right; }
+
+/* §6 — the empty movement. A name, a range, a count of nothing, and a
+   hairline. It is not dimmed into an apology and it is not collapsed:
+   the silence is part of the season, and this is what it looks like. */
+.movement-empty .movement-head { border-bottom-style: solid; }
+.movement-empty { margin-bottom: 54px; }
+
+/* ── Frames ──────────────────────────────────────────────── */
+.frames { margin-top: 4px; }
+
+.frame-row {
+  display: grid;
+  grid-template-columns: 34px 60px minmax(0, 1fr);
+  gap: 0 20px;
+  align-items: start;
+  padding: 22px 0;
+  border-bottom: 1px solid var(--hairline);
+}
+.frame-index { color: var(--stone, var(--dim)); letter-spacing: .16em; padding-top: 4px; }
+.frame-cover { width: 60px; display: block; text-decoration: none; }
+.frame-body { min-width: 0; }
+
+/* NOT .frame-title: that name was already taken by the contact sheet's
+   caption, which is declared opacity:0 and revealed on hover — so a season
+   frame's title inherited the invisibility and rendered as a blank line
+   above the author. */
+.lb-title {
+  display: block;
+  font-family: var(--f-read); font-size: 19px; font-weight: 400;
+  line-height: 1.25; color: var(--press-black); text-decoration: none;
+}
+.lb-title:hover { opacity: .68; }
+.frame-meta { margin-top: 5px; display: flex; align-items: baseline; gap: 0; flex-wrap: wrap; }
+.frame-author { font-family: var(--f-read); font-size: 14px; color: var(--dim); }
+
+/* §7 — the reader's own line, verbatim. */
+.frame-caption {
+  font-family: var(--f-read); font-size: 15px; line-height: 1.6;
+  color: var(--stone-text, #C4BEB2);
+  margin-top: 10px; max-width: 52ch;
+}
+.frame-controls { margin-top: 10px; opacity: 0; transition: opacity 450ms cubic-bezier(.2,.7,.3,1); }
+.frame-row:hover .frame-controls, .frame-row:focus-within .frame-controls { opacity: 1; }
+
+/* ── Absences ────────────────────────────────────────────── */
+.absence {
+  display: grid; grid-template-columns: minmax(0, 1fr) auto auto;
+  gap: 18px; align-items: baseline;
+  padding: 11px 0; border-bottom: 1px solid var(--hairline);
+  max-width: 620px;
+}
+.absence-title { font-family: var(--f-read); font-size: 15px; color: var(--press-black); }
+
+/* ── The colophon ────────────────────────────────────────── */
+/* §7.6 — two-column label/value pairs. No charts, no bars, no graphs. */
+/*
+  THE COLOPHON, AT A SIZE YOU CAN READ.
+
+  Label and value were both 11px tracked capitals, so the credits page of a
+  season — the longest book, the shortest, the writer read most — came out as
+  a block of fine print in a single undifferentiated voice. A title set in
+  caps at 11px is also the worst possible treatment for the one field here
+  that is a book's actual name.
+
+  Same split as the book page: the LABEL keeps the label register, the VALUE
+  takes the reading face at a size a person reads. Nothing about the layout
+  changes.
+*/
+.season-colophon { max-width: 720px; }
+.season-colophon > div {
+  display: grid; grid-template-columns: 168px minmax(0, 1fr);
+  gap: 22px; padding: 11px 0;
+  align-items: baseline;
+}
+.season-colophon dt {
+  font-family: var(--f-mono); font-size: 11px; letter-spacing: .14em;
+  text-transform: uppercase; color: var(--dim);
+}
+.season-colophon dd {
+  margin: 0;
+  font-family: var(--f-read); font-size: 17px; line-height: 1.4;
+  letter-spacing: 0; text-transform: none;
+  color: var(--press-black);
+}
+
+@media (max-width: 700px) {
+  .season-colophon > div { grid-template-columns: minmax(0, 1fr); gap: 4px; }
+  .season-colophon dd { font-size: 16px; }
+}
+
+/* ── The index ───────────────────────────────────────────── */
+/* §3.2 — the row became two rows: the line of type it always was, and the
+   books underneath it. A page whose entire subject is thirteen seasons of
+   reading had no picture on it. */
+.season-row {
+  display: block;
+  padding: 18px 0 20px; border-bottom: 1px solid var(--hairline);
+  text-decoration: none; color: inherit;
+}
+.season-row-head {
+  display: grid;
+  grid-template-columns: 72px minmax(0, 1fr) 180px 90px;
+  gap: 20px; align-items: center;
+}
+.season-row:hover .season-row-title { opacity: .68; }
+
+/* The jackets. Overlapped, because a season is a stack of books somebody
+   got through and not a row of separate products in a catalogue — and
+   because the poster, the best object in this product, overlaps too. */
+.season-row-plates {
+  display: flex; align-items: flex-end;
+  margin-top: 14px; padding-left: 92px;
+  min-height: 84px;
+}
+.season-plate {
+  display: block;
+  width: 56px; height: auto;
+  object-fit: cover;
+  background: var(--stock-gray);
+  border: 1px solid var(--hairline);
+  margin-right: -12px;                /* the overlap */
+  transition: transform 220ms cubic-bezier(.2,.7,.3,1);
+}
+/* A season lifts as one object, not book by book: the row is the link, so
+   the whole stack is what the pointer is over. */
+.season-row:hover .season-plate { transform: translateY(-4px); }
+.season-plate:last-child { margin-right: 0; }
+
+@media (max-width: 700px) {
+  .season-row-plates { padding-left: 0; min-height: 66px; }
+  .season-plate { width: 44px; margin-right: -10px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .season-plate { transition: none; }
+  .season-row:hover .season-plate { transform: none; }
+}
+.season-row-code { color: var(--stone, var(--dim)); letter-spacing: .16em; }
+.season-row-title {
+  font-family: var(--f-read); font-size: 17px; color: var(--press-black);
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.season-row-strip { display: flex; height: 10px; }
+.season-row-strip i { flex: 1 1 0; display: block; }
+.season-row-count { text-align: right; }
+
+@media (max-width: 700px) {
+  .season-title { font-size: 30px; }
+  .frame-row { grid-template-columns: 28px 48px minmax(0, 1fr); gap: 0 14px; }
+  .frame-cover { width: 48px; }
+  .season-row-head { grid-template-columns: 64px minmax(0, 1fr) 70px; }
+  .season-row-strip { display: none; }
+  .season-colophon > div { grid-template-columns: 120px minmax(0, 1fr); gap: 12px; }
+}
+
+/* ═══════════════════════════════════════════════════════════
+   COMMUNITY
+   §2.1 — counts are shown but never celebrated. No large
+   numerals, no badges, no verified checks, and nothing
+   anywhere that ranks one reader against another.
+   ═══════════════════════════════════════════════════════════ */
+.profile-counts { margin-top: 12px; letter-spacing: .12em; }
+.profile-actions { display: flex; flex-wrap: wrap; gap: 18px; align-items: baseline; margin-top: 18px; }
+.inline-form { display: inline; }
+
+/* ── Ratings (§5) ─────────────────────────────────────────
+   A distribution and a median. Not a single number, because a single
+   number is both less informative and easier to fake. */
+.ratings { margin-top: 54px; }
+.ratings-body { display: flex; align-items: flex-end; gap: 34px; }
+.ratings-bars { display: flex; align-items: flex-end; gap: 8px; height: 56px; }
+.ratings-bar { display: flex; flex-direction: column; align-items: center; gap: 5px; width: 22px; height: 100%; justify-content: flex-end; }
+.ratings-bar i { display: block; width: 100%; min-height: 1px; background: var(--press-black); }
+.ratings-figure { display: flex; flex-direction: column; gap: 4px; padding-bottom: 18px; }
+.ratings-median { font-family: var(--f-read); font-size: 30px; line-height: 1; color: var(--press-black); }
+
+/* ── Reviews (§4) ─────────────────────────────────────── */
+.reviews { margin-top: 54px; }
+/* The padding and the border come from .panel now; a review keeps only its
+   measure. It was 22px of air between two hairlines on the page ground. */
+.review { max-width: 68ch; }
+.reviews .panel + .panel, .pf-sec .panel + .panel { margin-top: 14px; }
+.review-head { display: flex; align-items: flex-start; gap: 14px; margin-bottom: 12px; }
+.review-avatar { flex: 0 0 44px; width: 44px; height: 44px; }
+.review-byline { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
+.review-who { font-family: var(--f-read); font-size: 17px; color: var(--press-black); text-decoration: none; }
+.review-meta { letter-spacing: .1em; }
+.reply-avatar { flex: 0 0 26px; width: 26px; height: 26px; }
+.review-who:hover { opacity: .68; }
+.review-body { font-family: var(--f-read); font-size: 16px; line-height: 1.65; color: var(--press-black); }
+.review-body p { margin: 0 0 12px; }
+.review-body p:last-child { margin-bottom: 0; }
+.review-body blockquote {
+  margin: 12px 0; padding-left: 16px;
+  border-left: 1px solid var(--hairline); color: var(--stone, var(--dim));
+}
+.review-body a { color: inherit; border-bottom: 1px solid var(--hairline); text-decoration: none; }
+
+/* §6 — masked text is the same ground with no blur. Blur is heavy and is
+   defeated by screenshot sharpening; a closed disclosure is neither. */
+.review-spoiler summary {
+  cursor: pointer; list-style: none;
+  color: var(--stone, var(--dim)); letter-spacing: .1em;
+  padding: 10px 0; border-top: 1px solid var(--hairline); border-bottom: 1px solid var(--hairline);
+}
+.review-spoiler summary::-webkit-details-marker { display: none; }
+.review-spoiler summary::after { content: ' — TAP TO READ'; opacity: .6; }
+.review-spoiler[open] summary::after { content: ''; }
+.review-spoiler[open] summary { border-bottom: none; }
+.review-spoiler .review-body { padding-top: 12px; }
+
+.review-foot { display: flex; gap: 20px; align-items: baseline; margin-top: 12px; }
+.review-report { opacity: 0; transition: opacity 450ms cubic-bezier(.2,.7,.3,1); }
+.review:hover .review-report, .review:focus-within .review-report { opacity: 1; }
+
+.review-body.note-input { min-height: 220px; }
+.spoiler-field { margin-bottom: 0; }
+
+/* ── §8 — LATEST ──────────────────────────────────────────
+   A feed that ends. No like counts, no reshare, no ranking — and
+   therefore no affordance for any of them to hang on. */
+.latest-entry { padding: 20px 0; border-bottom: 1px solid var(--hairline); max-width: 62ch; }
+.latest-meta { margin-bottom: 8px; letter-spacing: .12em; }
+.latest-meta a { color: inherit; }
+.latest-line { font-family: var(--f-read); font-size: 17px; line-height: 1.45; color: var(--dim); }
+.latest-title { color: var(--press-black); text-decoration: none; }
+.latest-title:hover { opacity: .68; }
+.latest-stars { margin-left: 8px; }
+.latest-strip { display: flex; gap: 10px; margin-top: 12px; }
+.latest-strip > a { flex: 0 0 52px; width: 52px; text-decoration: none; }
+.latest-end { margin-top: 40px; letter-spacing: .12em; }
+
+/* ── §9 — CLUBS ───────────────────────────────────────────
+   The warmest surface in the product, which in this typography means
+   ordinary paragraph text at a readable size rather than more mono. Mono
+   stays where it is everywhere else: on labels only.
+
+   Every colour here is a token, so the whole feature inverts with the
+   theme instead of going white-on-white the first time somebody switches. */
+.club-sec { letter-spacing: .18em; margin-bottom: 10px; }
+
+/* ── THE CLUBS INDEX ──────────────────────────────────────
+   A directory row, not a list item. Four columns: emblem, name and
+   purpose, the book on display, size and your standing.
+
+   The section accent appears exactly twice on this page — the kicker's
+   bar and a head's standing — because it is a wayfinding mark, not
+   decoration. The product accent is untouched and still belongs to the
+   one thing to do. */
+.clubs-kicker {
+  display: flex; align-items: center; gap: 14px;
+  letter-spacing: .24em; color: var(--dim); margin-bottom: 22px;
+}
+.clubs-kicker i { display: block; width: 22px; height: 2px; background: var(--club); }
+
+.clubs-dek {
+  font-family: var(--f-read); font-size: 17px; line-height: 1.55;
+  color: var(--dim); max-width: 46ch; margin: 16px 0 0;
+}
+
+.clubs-sect { margin-top: 58px; }
+.clubs-h2 {
+  display: flex; align-items: baseline; gap: 12px;
+  font-size: 26px; font-weight: 400; margin: 0 0 8px;
+}
+.clubs-h2 span { letter-spacing: .1em; color: var(--dim); }
+.clubs-rule { border-bottom: 1px solid var(--rule); margin-bottom: 6px; }
+
+.clubs-row {
+  display: grid; grid-template-columns: 54px minmax(0, 1fr) minmax(0, 210px) 104px;
+  gap: 22px; align-items: center;
+  padding: 17px 0; border-bottom: 1px solid var(--hairline);
+  text-decoration: none; color: inherit;
+}
+.clubs-row:hover { background: var(--surface); }
+
+.clubs-thumb { width: 54px; height: 54px; border: 1px solid var(--rule); overflow: hidden; }
+.clubs-thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.clubs-thumb .grp-emblem-blank { width: 100%; height: 100%; }
+
+/* A grid cell defaults to min-content, not zero, so without this the
+   name column refuses to shrink and the sub-line never ellipses. */
+.clubs-id { min-width: 0; }
+.clubs-nm { display: block; overflow-wrap: anywhere; font-family: var(--f-read); font-size: 21px; color: var(--press-black); }
+.clubs-sub {
+  display: block; letter-spacing: .13em; color: var(--dim); margin-top: 6px;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.clubs-row:hover .clubs-nm { opacity: .68; }
+
+/* Same reason as .clubs-id: the track is minmax(0,…) but the ITEM's
+   automatic minimum is its longest word, so an unbroken title or a long
+   author name pushes the member count off the row rather than wrapping. */
+.clubs-disp {
+  min-width: 0; overflow-wrap: anywhere;
+  font-family: var(--f-read); font-size: 15px; line-height: 1.35; color: var(--dim);
+}
+.clubs-disp b {
+  display: block; font-weight: 400; letter-spacing: .16em;
+  color: var(--rule); margin-bottom: 5px;
+}
+
+.clubs-meta { text-align: right; }
+.clubs-n { display: block; font-family: var(--f-read); font-size: 20px; color: var(--press-black); }
+.clubs-st { display: block; letter-spacing: .15em; color: var(--dim); margin-top: 5px; }
+.clubs-st.is-head { color: var(--club); }
+.clubs-st.is-open { color: var(--club-open); }
+
+.clubs-empty { margin: 18px 0 0; font-family: var(--f-read); font-size: 15px; color: var(--dim); }
+.clubs-start { margin: 46px 0 0; }
+.clubs-go { color: var(--club); letter-spacing: .17em; }
+
+/* Below the fold of a laptop the on-display column is the first to go:
+   it is the richest cell but the only one that repeats what the club
+   page says in full one tap away. */
+@media (max-width: 900px) {
+  .clubs-row { grid-template-columns: 44px minmax(0, 1fr) 96px; gap: 16px; }
+  .clubs-disp { display: none; }
+  .clubs-thumb { width: 44px; height: 44px; }
+  .clubs-nm { font-size: 18px; }
+}
+
+
+.club-row {
+  display: flex; align-items: baseline; gap: 14px;
+  padding: 13px 0; border-bottom: 1px solid var(--hairline);
+  max-width: 620px; text-decoration: none; color: inherit;
+}
+.club-row.is-static { cursor: default; }
+a.club-row:hover .club-name { opacity: .68; }
+.club-name { flex: 1; font-family: var(--f-read); font-size: 17px; color: var(--press-black); }
+.club-desc { display: block; font-size: 13px; color: var(--dim); margin-top: 3px; }
+.club-meta { flex: 0 0 auto; letter-spacing: .12em; }
+
+.club-blurb { margin: 14px 0 0; font-size: 16px; line-height: 1.55; max-width: 62ch; }
+.club-actions { margin: 18px 0 0; letter-spacing: .12em; }
+.club-actions .inline-form { display: inline; }
+
+/* The pick — the one thing on the page with a cover, because it is the one
+   thing everybody is holding. */
+.club-pick { display: flex; gap: 22px; margin: 40px 0 34px; align-items: flex-start; }
+.club-pick-cover { flex: 0 0 96px; width: 96px; text-decoration: none; }
+.club-pick-body { flex: 1; min-width: 0; }
+.club-pick-title { font-family: var(--f-read); font-size: 25px; font-weight: 400; margin: 6px 0 2px; }
+.club-pick-title a { color: var(--press-black); text-decoration: none; }
+.club-pick-author { font-size: 14px; color: var(--dim); margin: 0 0 12px; }
+.club-inout { margin-top: 14px; display: flex; gap: 20px; }
+.club-inout .is-on { color: var(--press-black); }
+
+/* Checkpoints. A shut one stays present and legible — knowing a thread is
+   coming is half of why the cadence works. */
+.club-cp {
+  display: flex; align-items: baseline; gap: 14px;
+  padding: 12px 0; border-bottom: 1px solid var(--hairline);
+  max-width: 620px; text-decoration: none; color: inherit;
+}
+.club-cp-label { flex: 1; font-family: var(--f-read); font-size: 16px; color: var(--press-black); }
+.club-cp-meta { flex: 0 0 auto; letter-spacing: .12em; }
+.club-cp.is-shut .club-cp-label { color: var(--dim); }
+
+/* Discussion. Same measure as a review, because it is the same act. */
+.club-post { padding: 20px 0; border-bottom: 1px solid var(--hairline); max-width: 62ch; }
+.club-post.is-announcement { border-left: 2px solid var(--hairline); padding-left: 18px; }
+/* The byline became a row the moment it grew a face. Baseline alignment
+   would hang the plate off the text baseline, so the line is centred on the
+   plate and the name sits beside it. */
+.club-post-head {
+  display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+  letter-spacing: .12em; margin-bottom: 8px;
+}
+.club-post-head a { color: inherit; }
+.club-post-face { flex: 0 0 28px; width: 28px; height: 28px; }
+/* A reply is subordinate to the post it answers, and its face says so. */
+.club-reply .club-post-face { flex-basis: 22px; width: 22px; height: 22px; }
+.club-post-body { font-family: var(--f-read); font-size: 16px; line-height: 1.65; color: var(--press-black); }
+.club-post-body p { margin: 0 0 .8em; }
+.club-post-body p:last-child { margin-bottom: 0; }
+.club-post-foot { margin: 10px 0 0; letter-spacing: .12em; }
+.club-react { display: flex; flex-wrap: wrap; gap: 16px; margin-top: 12px; letter-spacing: .12em; }
+
+.club-composer { max-width: 62ch; margin-top: 30px; }
+.club-textarea {
+  width: 100%; display: block; resize: vertical;
+  font-family: var(--f-read); font-size: 16px; line-height: 1.65;
+  color: var(--press-black); background: none;
+  border: none; border-bottom: 1px solid var(--hairline);
+  padding: 7px 0; outline: none;
+}
+.club-textarea:focus { border-bottom-color: var(--press-black); }
+
+.club-choice label { display: block; font-size: 15px; margin: 8px 0; }
+.club-gate { margin: 24px 0; }
+
+/* §9.6 — the archive is a lookbook, so it borrows the season renderer's
+   contact sheet rather than inventing a second one. */
+.club-archive { display: flex; flex-wrap: wrap; gap: 20px; margin-top: 24px; }
+.club-arch { flex: 0 0 72px; width: 72px; text-decoration: none; color: inherit; }
+.club-arch-title {
+  display: block; margin-top: 7px; font-size: 11px; line-height: 1.4; color: var(--dim);
+}
+
+/* §10 — notification preferences. Plain sentences with checkboxes; the only
+   design decision is that they are readable at a glance and that the list of
+   what is never sent sits beside them. */
+.opt-row { display: flex; align-items: baseline; gap: 12px; margin: 12px 0; font-size: 15px; }
+.opt-row input { flex: 0 0 auto; accent-color: var(--press-black); }
+.never-list { margin: 10px 0 0; padding-left: 18px; color: var(--dim); font-size: 14px; line-height: 1.8; }
+
+/* ── SOURCE MATERIAL — the board editor ───────────────────
+   §04's third mitigation is the product: readers build their own boards.
+   The form is a grid of short fields rather than a wall of textareas,
+   because the thing being collected is a list of objects, not an essay. */
+.board-lede { margin: 16px 0 0; font-size: 16px; line-height: 1.6; color: var(--dim); }
+.board-sec { letter-spacing: .18em; margin-bottom: 6px; }
+/* Four fields to a row, so the form needs more than a reading measure.
+   At 66ch the source column truncates mid-word and the board stops being
+   checkable at a glance, which is the only thing it is for. */
+.board-form { max-width: 900px; }
+.board-line {
+  display: flex; align-items: flex-end; gap: 16px;
+  padding-top: 6px;
+}
+.board-no {
+  flex: 0 0 3ch; padding-bottom: 20px;
+  letter-spacing: .16em; white-space: nowrap;
+}
+.board-who { flex: 0 0 auto; padding-bottom: 20px; letter-spacing: .16em; }
+.board-field { flex: 1; min-width: 0; margin-bottom: 14px; }
+.board-field--year { flex: 0 0 74px; }
+.board-field--source { flex: 1.4; }
+
+@media (max-width: 720px) {
+  .board-line { flex-wrap: wrap; }
+  .board-field { flex: 1 1 100%; }
+  .board-field--year { flex: 0 0 84px; }
+}
+
+/* ── HOME — THE FRONT PAGE ────────────────────────────────
+   The page was a single column with most of the screen left over, which is
+   the one place negative space was not working: the eye read it as content
+   pushed against the left edge rather than as air. A lead and a rail use
+   the width the way a front page does. */
+.masthead {
+  display: flex; align-items: baseline; justify-content: space-between;
+  gap: 24px; padding-bottom: 14px; margin-bottom: 30px;
+  border-bottom: 1px solid var(--hairline);
+}
+.masthead-date {
+  font-family: var(--f-read); font-weight: 400;
+  font-size: clamp(28px, 3.6vw, 44px); line-height: 1.05;
+  letter-spacing: -.015em; margin: 0;
+}
+.masthead-who { letter-spacing: .14em; flex: 0 0 auto; }
+
+/* ── THE FRONT ────────────────────────────────────────────
+   Three bands, full width. The 300px rail is gone: it had become a column
+   of six unrelated things read top to bottom in a gutter narrower than the
+   covers it was showing. */
+.front-duo {
+  display: grid;
+  grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr);
+  gap: clamp(24px, 3.2vw, 52px);
+  align-items: start;
+  margin-top: 44px;
+  max-width: 1280px;
+}
+.front-col { min-width: 0; display: flex; flex-direction: column; }
+
+.front-h2 {
+  display: flex; justify-content: space-between; align-items: baseline; gap: 14px;
+  font-family: var(--f-mono); font-size: 12px; font-weight: 400;
+  letter-spacing: .2em; text-transform: uppercase; color: var(--dim);
+  border-bottom: 1px solid var(--rule); padding-bottom: 10px; margin-bottom: 24px;
+}
+.front-empty { margin: 0; }
+/* §8 — the feed ends, and it says so. Nothing loads when you reach it. */
+.entry-end { margin-top: 26px; letter-spacing: .14em; }
+
+/* ── on press: the jackets are the object ── */
+.press-shelf {
+  display: grid; grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: clamp(14px, 2vw, 28px);
+}
+.shelf-bk { display: flex; flex-direction: column; text-decoration: none; color: inherit; min-width: 0; }
+.shelf-jk {
+  position: relative; display: block;
+  transition: transform .3s ease;
+}
+.shelf-jk .frame { width: 100%; }
+/* The jacket lifts off the sheet, rather than dimming. A book you are about
+   to pick up moves toward you. */
+.shelf-bk:hover .shelf-jk,
+.shelf-bk:focus-visible .shelf-jk { transform: translateY(-4px); }
+
+/* The page number, on the jacket it describes. The plate behind it is
+   opaque enough to stay legible over a light cover and a dark one. */
+.shelf-page {
+  position: absolute; left: 0; right: 0; bottom: 0; z-index: 2;
+  display: flex; justify-content: space-between; align-items: baseline; gap: 8px;
+  padding: 8px 10px; background: var(--plate-scrim);
+}
+.shelf-page b {
+  font-family: var(--f-read); font-weight: 400; font-size: 19px;
+  font-variant-numeric: tabular-nums; color: var(--bone-fixed);
+}
+.shelf-page .mono-s { letter-spacing: .12em; color: var(--stone-fixed); }
+
+/* The jacket's base line: a 2px rule with the read portion filled.
+   Sits flush under the cover, so the bar reads as the bottom edge of the
+   object rather than as a separate widget under it. */
+.shelf-prog {
+  display: block; position: relative; height: 2px;
+  background: var(--rule);
+}
+.shelf-prog i {
+  position: absolute; inset: 0 auto 0 0;
+  background: var(--press-stale);
+}
+/* No extent, no line to be somewhere along. */
+.shelf-prog.is-unknown {
+  background: repeating-linear-gradient(90deg, var(--rule) 0 3px, transparent 3px 7px);
+}
+.shelf-t {
+  font-family: var(--f-read); font-size: 17px; line-height: 1.2;
+  color: var(--press-black); margin-top: 13px;
+}
+.shelf-by { display: block; letter-spacing: .13em; color: var(--dim); margin-top: 7px; }
+/* Warm, always — not only once a book has stalled. On the press page the
+   gap is one row among many and warmth is reserved for a real stall; here
+   there are three books and how long each has sat IS the story of the
+   shelf, so it carries the colour throughout. */
+.shelf-gap { display: block; letter-spacing: .13em; color: var(--press-stale); margin-top: 9px; }
+
+/* ── where you are ── */
+.where-card { padding: 18px 0; border-bottom: 1px solid var(--hairline); }
+.where-card:first-of-type { padding-top: 0; }
+.where-card:last-child { border-bottom: none; }
+.where-k {
+  display: flex; justify-content: space-between; align-items: baseline; gap: 10px;
+  letter-spacing: .17em; color: var(--dim);
+}
+.where-k em { font-style: normal; color: var(--club-open); }
+.where-k em.is-in { color: var(--club); }
+.where-sub { display: block; letter-spacing: .13em; color: var(--rule); margin-top: 11px; }
+
+.where-strip { display: flex; gap: 1px; height: 96px; margin-top: 14px; }
+.where-strip i { flex: 1; display: block; }
+
+.where-big { display: flex; align-items: baseline; gap: 12px; margin-top: 12px; color: inherit; }
+.where-v {
+  font-family: var(--f-read); font-size: 42px; line-height: .9;
+  font-variant-numeric: tabular-nums; color: var(--press-black);
+}
+.where-u { font-family: var(--f-read); font-size: 15px; color: var(--dim); }
+.where-spines { display: flex; gap: 3px; height: 40px; margin-top: 14px; }
+.where-spines i { flex: 1; display: block; border: 1px solid var(--hairline); }
+
+/* ── next from the pile ── */
+.pile-recos { display: flex; flex-direction: column; margin-top: 12px; }
+.pile-reco {
+  display: grid; grid-template-columns: 34px minmax(0, 1fr); gap: 12px;
+  align-items: start; padding: 11px 0; color: inherit; text-decoration: none;
+  border-bottom: 1px solid var(--hairline);
+}
+.pile-reco:last-child { border-bottom: none; }
+.pile-reco:hover .pile-n { opacity: .68; }
+.pile-cv {
+  width: 34px;
+  transition: transform .34s cubic-bezier(.2,.7,.3,1);
+}
+.pile-cv .frame { width: 34px; }
+.pile-reco:hover .pile-cv,
+.pile-reco:focus-visible .pile-cv { transform: translateY(-3px); }
+.pile-m { min-width: 0; }
+.pile-n {
+  display: block; font-family: var(--f-read); font-size: 15px; line-height: 1.25;
+  color: var(--press-black); overflow-wrap: anywhere;
+}
+.pile-a { display: block; letter-spacing: .13em; color: var(--rule); margin-top: 4px; }
+/* The reason, in reading type rather than mono: it is a sentence about two
+   books, not a label. The bold is the book names, which is the whole point
+   of the line. */
+/* The reason is folded away until you reach for the book.
+ *
+ * Three permanent explanations turn a card into a paragraph; revealed, each
+ * one answers a question you just asked by hovering. It is warm because it
+ * is the only interpretive line on the card — everything above it is a fact
+ * about the object.
+ *
+ * :focus-within is here and is NOT in the reference: a reveal that only
+ * responds to a mouse is invisible to anyone using a keyboard, and the
+ * reason is the whole point of the recommendation. */
+.pile-why {
+  display: block; font-family: var(--f-mono); font-size: 9px;
+  letter-spacing: .12em; text-transform: uppercase; color: var(--press-stale);
+  max-height: 0; opacity: 0; overflow: hidden;
+  transition: max-height .34s cubic-bezier(.2,.7,.3,1),
+              opacity .28s ease .06s,
+              margin-top .34s cubic-bezier(.2,.7,.3,1);
+}
+.pile-reco:hover .pile-why,
+.pile-reco:focus-within .pile-why,
+.pile-reco:focus-visible .pile-why { max-height: 34px; opacity: 1; margin-top: 7px; }
+.pile-why b { font-weight: 400; color: var(--press-black); }
+
+/* Motion off: the reason is simply always there. Hiding content behind a
+   hover that never animates would make it unreachable rather than calm. */
+@media (prefers-reduced-motion: reduce) {
+  .pile-why { max-height: 34px; opacity: 1; margin-top: 7px; transition: none; }
+  .pile-cv, .shelf-jk { transition: none; }
+  .pile-reco:hover .pile-cv, .shelf-bk:hover .shelf-jk { transform: none; }
+}
+.where-k em.is-quiet { color: var(--rule); }
+
+.where-club {
+  display: grid; grid-template-columns: 38px minmax(0, 1fr); gap: 12px;
+  align-items: center; margin-top: 13px; color: inherit;
+}
+.where-em { width: 38px; height: 38px; }
+.where-em img, .where-em .grp-emblem-blank { width: 38px; height: 38px; display: block; }
+.where-n { display: block; font-family: var(--f-read); font-size: 15px; color: var(--press-black); }
+.where-d { display: block; letter-spacing: .13em; color: var(--rule); margin-top: 3px; }
+
+/* ── latest, two up ── */
+.front-latest { margin-top: 56px; max-width: 1280px; }
+.front-evs {
+  display: grid; grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0 clamp(24px, 3.2vw, 52px);
+}
+.front-ev {
+  display: grid; grid-template-columns: 38px minmax(0, 1fr) auto; gap: 14px;
+  align-items: center; padding: 13px 0;
+  border-bottom: 1px solid var(--hairline);
+  text-decoration: none; color: inherit;
+}
+.front-ev:hover { background: var(--stock-gray); }
+.ev-mini { width: 38px; min-width: 0; }
+.ev-mini .frame { width: 38px; }
+.ev-face { width: 38px; height: 38px; }
+.ev-strip { display: flex; width: 38px; height: 57px; border: 1px solid var(--hairline); }
+.ev-strip i { flex: 1; display: block; }
+.ev-txt { font-family: var(--f-read); font-size: 15px; line-height: 1.4; color: var(--dim); min-width: 0; }
+.ev-txt b { font-weight: 400; color: var(--press-black); }
+.ev-txt i { font-style: normal; color: var(--press-black); }
+.ev-cap { display: block; font-size: 13.5px; color: var(--dim); margin-top: 4px; }
+.ev-when { letter-spacing: .13em; color: var(--rule); white-space: nowrap; }
+
+@media (max-width: 1000px) {
+  .front-duo { grid-template-columns: 1fr; gap: 44px; }
+  .front-evs { grid-template-columns: 1fr; }
+}
+@media (max-width: 560px) {
+  .press-shelf { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .shelf-bk:last-child { display: none; }
+}
+
+.grp-head { display: flex; gap: 26px; align-items: flex-start; margin-bottom: 44px; }
+.grp-id { flex: 1; min-width: 0; }
+.grp-name { margin: 4px 0 6px; }
+.grp-count { letter-spacing: .14em; margin: 0; }
+.grp-count a { color: inherit; }
+.grp-blurb { margin: 14px 0 0; font-size: 16px; line-height: 1.55; max-width: 58ch; }
+.grp-actions { margin-top: 18px; letter-spacing: .12em; }
+.grp-actions .inline-form { display: inline; }
+
+/* The emblem. Square, hard-edged, hairline-bounded — a stamp on a folder,
+   not an app icon. */
+.grp-emblem { flex: 0 0 128px; width: 128px; height: 128px; display: block; position: relative; }
+.grp-emblem img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.grp-emblem img.is-empty { display: none; }
+.grp-emblem-blank {
+  position: absolute; inset: 0;
+  border: 1px solid var(--hairline);
+  /* A quiet diagonal, so an emblemless club reads as "none set" rather
+     than as an image that failed to load. */
+  background: repeating-linear-gradient(
+    45deg, transparent 0 7px, var(--hairline) 7px 8px);
+}
+.grp-emblem--sm { flex: 0 0 96px; width: 96px; height: 96px; }
+.grp-emblem--xs { flex: 0 0 40px; width: 40px; height: 40px; }
+
+.emblem-edit { display: flex; gap: 20px; align-items: flex-start; }
+.emblem-pick { display: block; cursor: pointer; }
+.emblem-pick input { display: none; }
+
+.grp-sec { margin-top: 52px; }
+.grp-sec .eyebrow, .grp-sec .sec { margin-bottom: 18px; }
+
+/* The display case. The one book the club is gathered around. */
+.grp-case {
+  display: flex; gap: 24px; align-items: flex-start;
+  background: var(--surface);
+  border: 1px solid var(--hairline);
+  padding: 20px 22px;
+}
+.grp-case-cover { flex: 0 0 104px; width: 104px; text-decoration: none; }
+.grp-case-body { flex: 1; min-width: 0; }
+.grp-case-title { font-family: var(--f-read); font-size: 26px; font-weight: 400; margin: 0 0 3px; }
+.grp-case-title a { color: var(--press-black); text-decoration: none; }
+.grp-case-author { font-size: 14px; color: var(--dim); margin: 0 0 12px; }
+.grp-inout { margin-top: 14px; display: flex; gap: 20px; }
+.grp-inout .is-on { color: var(--press-black); }
+
+/* An announcement stands apart from the wall by position and by a rule on
+   its edge — never by a colour that would make it shout. */
+.grp-note {
+  border-left: 2px solid var(--club);
+  padding: 4px 0 4px 18px; margin-bottom: 22px; max-width: 62ch;
+}
+.grp-note-head { letter-spacing: .12em; margin-bottom: 8px; }
+.grp-note-head a { color: inherit; }
+.grp-note-take { margin-top: 10px; }
+
+@media (max-width: 720px) {
+  .grp-head { gap: 18px; }
+  .grp-emblem { flex: 0 0 84px; width: 84px; height: 84px; }
+  .grp-case { flex-direction: column; }
+}
+
+/* The club body: what it is doing, and who is in it.
+   The lead column is sized to the READING MEASURE rather than to the
+   remaining width. Posts and composers cap at 62ch whatever the column
+   does, so a 1fr lead just puts four hundred pixels of nothing between the
+   text and the rail — the columns have to be as wide as their contents or
+   they are not columns. */
+.grp-body {
+  display: grid;
+  /* The rail carries announcements and their composer now, not only a
+     roster of names, so it is no longer a 260px margin note. The reading
+     column keeps its 62ch measure; the rail takes what the reference gives
+     it, bounded so it never becomes a second column of prose. */
+  grid-template-columns: minmax(0, 62ch) minmax(260px, 340px);
+  gap: clamp(30px, 4.5vw, 68px);
+  justify-content: start;
+}
+.grp-lead { min-width: 0; }
+.grp-rail { min-width: 0; }
+.grp-rail .eyebrow, .grp-rail .sec { margin-bottom: 16px; }
+.grp-rail-sec { margin-top: 44px; }
+/* Whichever block leads EITHER column lines up with the other. What comes
+   first in each depends on viewer role and club state — the main column can
+   open on the pick or on a note saying there isn't one, the rail on
+   announcements or on the roster — so neither column may assume a fixed
+   section order. This replaced a hardcoded top margin on the no-pick note
+   that only looked right when something preceded it. */
+.grp-lead > :first-child,
+.grp-rail > :first-child { margin-top: 52px; }
+.grp-rail-more { display: inline-block; margin-top: 12px; }
+
+.grp-member {
+  display: flex; align-items: center; gap: 11px;
+  padding: 8px 0; text-decoration: none; color: inherit;
+}
+.grp-member:hover .grp-member-name { opacity: .68; }
+.grp-member-face { flex: 0 0 26px; width: 26px; height: 26px; }
+.grp-member-name {
+  flex: 1; min-width: 0; font-family: var(--f-read); font-size: 15px;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.grp-member-role { flex: 0 0 auto; letter-spacing: .12em; }
+.grp-member-role.is-head { color: var(--club); }
+
+/* The same section mark the index wears, so arriving from either direction
+   the page identifies itself before a word of it is read. */
+.grp-kicker {
+  display: flex; align-items: center; gap: 14px;
+  letter-spacing: .24em; color: var(--dim); margin-bottom: 20px;
+}
+.grp-kicker i { display: block; width: 22px; height: 2px; background: var(--club); }
+
+.grp-rail .season-strip { display: flex; height: 15px; margin-bottom: 14px; }
+.grp-rail .season-strip i { flex: 1; display: block; }
+.grp-rail .club-archive { gap: 12px; }
+.grp-rail .club-arch { flex: 0 0 52px; width: 52px; }
+
+@media (max-width: 1000px) {
+  .grp-body { grid-template-columns: 1fr; gap: 44px; }
+}
+
+/* ── THE DATA STRIP ───────────────────────────────────────
+   FOUR FEATURES §2, §3, §4 across the foot of the front page. Three panels
+   on one row: the charts were the best thing on the old home page and the
+   worst-sized, three of them full-width and stacked. */
+.strip {
+  display: grid; grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+  margin-top: 64px; padding-top: 26px;
+  border-top: 1px solid var(--hairline);
+}
+.strip-panel {
+  min-width: 0;
+  background: var(--surface);
+  border: 1px solid var(--hairline);
+  padding: 18px 20px 16px;
+}
+.strip-panel .eyebrow { display: flex; justify-content: space-between; gap: 12px; margin-bottom: 14px; }
+
+/* Three feet on the same baseline, so the panels line up along the bottom
+   however tall their charts happen to be. */
+.strip-panel { display: flex; flex-direction: column; }
+.strip-foot {
+  display: flex; justify-content: space-between; align-items: baseline;
+  gap: 10px; margin-top: auto; padding-top: 10px; letter-spacing: .1em;
+}
+.strip-foot span:nth-child(2) { text-align: center; }
+
+/* §2 — the histogram, at a third of the width and a fifth of the height.
+   The per-bar counts are gone; the shape and the link survive. */
+.mini-histo { display: flex; align-items: flex-end; gap: 2px; height: 48px; }
+.mini-bar {
+  flex: 1; height: 100%; display: flex; align-items: flex-end;
+  text-decoration: none; min-width: 0;
+}
+.mini-fill { display: block; width: 100%; background: var(--press-black); min-height: 1px; }
+.mini-bar.is-empty .mini-fill { background: var(--hairline); height: 1px !important; }
+.mini-bar:hover .mini-fill { opacity: .68; }
+
+/* §3 — three rows, label / mean / delta. The delta carries the accent
+   because the absolute number means nothing without it. */
+.mini-delta {
+  display: flex; align-items: baseline; gap: 10px;
+  padding: 7px 0; border-bottom: 1px solid var(--hairline);
+  text-decoration: none; color: inherit;
+}
+.mini-delta:hover .mini-delta-label { opacity: .68; }
+.mini-delta-label {
+  flex: 1; min-width: 0;
+  font-family: var(--f-read); font-size: 14px; letter-spacing: 0;
+  text-transform: none;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  color: var(--press-black);
+}
+.mini-delta-n { flex: 0 0 auto; color: var(--press-black); font-variant-numeric: tabular-nums; }
+.mini-delta-d { flex: 0 0 2.6em; text-align: right; font-variant-numeric: tabular-nums; }
+
+/* §4 — twelve months and the years beneath them. */
+.mini-months, .mini-years { display: flex; align-items: flex-end; gap: 2px; }
+.mini-months { height: 46px; }
+.mini-years { height: 46px; margin-top: 16px; }
+.mini-month, .mini-year {
+  flex: 1; min-width: 0; display: flex; flex-direction: column;
+  justify-content: flex-end; height: 100%;
+}
+.mini-month-bar, .mini-year-bar {
+  display: block; width: 100%; background: var(--press-black); min-height: 1px;
+}
+.mini-month-label {
+  display: block; text-align: center; margin-top: 4px;
+  font-size: 11px; letter-spacing: 0;
+}
+
+@media (max-width: 1000px) {
+  .strip { grid-template-columns: 1fr; gap: 40px; }
+  .strip-foot { margin-top: 10px; }
+}
+
+/* ── THE PROFILE ──────────────────────────────────────────
+   Identity left, four numbers right, then a wide column of what the person
+   has been doing with a rail of where to find more. */
+.pf-head {
+  display: flex; align-items: flex-start; justify-content: space-between;
+  gap: 40px; flex-wrap: wrap;
+}
+.pf-identity { display: flex; gap: 24px; align-items: flex-start; flex: 1 1 380px; min-width: 0; }
+.pf-who { flex: 1; min-width: 0; }
+.pf-name { margin: 4px 0 5px; }
+.pf-handle { letter-spacing: .12em; margin: 0; }
+.pf-bio { margin: 14px 0 0; font-size: 16px; line-height: 1.55; max-width: 46ch; }
+.pf-link { margin: 10px 0 0; }
+
+/* Square, hairline-bounded. A circle is a social-network avatar; this is a
+   plate on a file. */
+.pf-avatar { flex: 0 0 112px; width: 112px; height: 112px; object-fit: cover; display: block; }
+
+/* §2.1 — counts shown, never celebrated. Set in the reading face at a
+   readable size, with no badge and no rank anywhere near them. */
+.pf-stats { display: flex; gap: 34px; margin: 6px 0 0; flex: 0 0 auto; }
+.pf-stat { text-align: right; }
+.pf-stat dt { letter-spacing: .14em; margin-bottom: 5px; }
+.pf-stat dd {
+  margin: 0; font-family: var(--f-read); font-size: 26px; line-height: 1;
+  font-variant-numeric: tabular-nums; color: var(--press-black);
+}
+.pf-stat dd a { color: inherit; text-decoration: none; }
+.pf-stat dd a:hover { opacity: .68; }
+
+.pf-actions { margin: 26px 0 0; letter-spacing: .12em; }
+.pf-actions .inline-form { display: inline; }
+
+/*
+  THE PAGE WAS PINNED TO ITS OWN LEFT-HAND SIDE.
+
+  `minmax(0, 62ch)` plus a 240px rail plus `justify-content: start` came to
+  about 920px of content, laid out inside a field of roughly 1790px — so a
+  third of every band was filled and the rules ran the whole way, which is
+  the difference between composed space and an unfilled slot. On a 1400px
+  window it read as a narrow column of small things with the page's own
+  furniture stretching past it.
+
+  The lead now takes the space that is there, and the measure is kept where
+  measure actually matters — on the prose, at the paragraph — rather than by
+  starving the whole grid. The rail widens with it.
+*/
+.pf-body {
+  display: grid; grid-template-columns: minmax(0, 1fr) minmax(240px, 320px);
+  gap: 72px;
+  margin-top: 44px; padding-top: 32px;
+  border-top: 1px solid var(--rule);
+}
+.pf-lead { min-width: 0; }
+.pf-rail { min-width: 0; }
+.pf-sec { margin-bottom: 52px; }
+.pf-sec .eyebrow { display: flex; justify-content: space-between; gap: 12px; margin-bottom: 16px; }
+.pf-sec .sec { margin-bottom: 16px; }
+
+/* Jackets at a size worth looking at. The spine chips were 24px, which is
+   why they went; a cover has to be big enough to recognise or it is a
+   coloured rectangle taking up room. */
+.pf-covers { display: flex; flex-wrap: wrap; gap: 16px; }
+/* 88px is a thumbnail of a jacket. With the column no longer starved there
+   is room to show the books at a size you can actually recognise. */
+.pf-cover { flex: 0 0 116px; width: 116px; text-decoration: none; }
+
+.pf-review { padding: 18px 0; border-bottom: 1px solid var(--hairline); }
+.pf-review-head { display: flex; align-items: baseline; justify-content: space-between; gap: 14px; flex-wrap: wrap; }
+.pf-review-title {
+  font-family: var(--f-read); font-size: 18px;
+  color: var(--press-black); text-decoration: none;
+}
+.pf-review-title:hover { opacity: .68; }
+.pf-review-body {
+  margin-top: 9px; font-family: var(--f-read); font-size: 15px;
+  line-height: 1.6; color: var(--dim);
+  max-width: 68ch;                 /* the measure, kept where it matters */
+}
+.pf-review-body p { margin: 0 0 .7em; }
+.pf-review-body p:last-child { margin-bottom: 0; }
+
+.pf-rail-sec { margin-bottom: 40px; }
+.pf-rail-row {
+  display: flex; align-items: baseline; justify-content: space-between; gap: 12px;
+  padding: 10px 0; border-bottom: 1px solid var(--hairline);
+  text-decoration: none; color: inherit;
+}
+.pf-rail-row:hover .pf-rail-name { opacity: .68; }
+.pf-rail-name {
+  flex: 1; min-width: 0; font-family: var(--f-read); font-size: 15px;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+
+/* The strip spans the whole measure. It is the one element on this page
+   that does, which is what makes the rest read as columns on a page rather
+   than as content that ran out. */
+.pf-strip { margin-top: 40px; }
+.pf-strip .strip { margin-top: 0; border-top-color: var(--rule); }
+
+@media (max-width: 1000px) {
+  .pf-body { grid-template-columns: 1fr; gap: 44px; }
+  .pf-cover { flex: 0 0 96px; width: 96px; }
+  .pf-stats { gap: 24px; }
+  .pf-stat dd { font-size: 21px; }
+}
+
+
+/* ── ROTATION AND STAR SIZES, AS CLASSES ──────────────────
+   §13.1 — a nonce attaches to a <style> ELEMENT and never to a style
+   ATTRIBUTE, so `style="--rot:1.4deg"` has no way to be permitted under a
+   strict policy. Three helpers were generating exactly that; under
+   MARGIN_CSP=enforce every stamp would have snapped to zero and every star
+   row would have fallen back to the inherited size.
+
+   The jitter is quantised to quarter-degree steps. Twelve buckets keep a
+   stack of stamps reading as hand-applied, which is all the jitter was for. */
+.rot-0 { --rot: 0.0deg; }
+.rot-1 { --rot: 0.25deg; }
+.rot-2 { --rot: 0.5deg; }
+.rot-3 { --rot: 0.75deg; }
+.rot-4 { --rot: 1.0deg; }
+.rot-5 { --rot: 1.25deg; }
+.rot-6 { --rot: 1.5deg; }
+.rot-7 { --rot: 1.75deg; }
+.rot-8 { --rot: 2.0deg; }
+.rot-9 { --rot: 2.25deg; }
+.rot-10 { --rot: 2.5deg; }
+.rot-11 { --rot: 2.75deg; }
+.rot-12 { --rot: 3.0deg; }
+
+.stars-11 { font-size: 11px; }
+.stars-12 { font-size: 12px; }
+.stars-13 { font-size: 13px; }
+.stars-16 { font-size: 16px; }
+
+/* Position over extent, as one figure on one line: 214 / 653.
+   .press-count is a grid, so without a wrapper the slash and the extent
+   each became their own row and the fraction read as three stacked things.
+
+   The extent is deliberately quieter than the number. It is set once a book
+   and then never touched again; the number is touched every day. */
+.press-figure { display: flex; align-items: baseline; justify-content: flex-end; }
+.press-of { margin: 0 4px; opacity: .5; }
+.press-extent {
+  width: 3.6em; background: none; border: none; padding: 0;
+  font-family: var(--f-mono); font-size: 11px; letter-spacing: .06em;
+  color: var(--dim); text-align: left; outline: none;
+  border-bottom: 1px solid transparent;
+}
+.press-extent:hover { color: var(--press-black); }
+.press-extent:focus { color: var(--press-black); border-bottom-color: var(--hairline); }
+.press-extent.saved { border-bottom-color: var(--accent); }
+
+/* ── SHELF JACKETS, 20% LARGER ────────────────────────────
+   198 → 238, 252 → 302, 96 → 115. The point of keeping 411 books is being
+   able to see them, and a contact sheet is only doing its job at a size
+   where a spine is recognisable across the room. */
+/*
+  ── DENSITY ──────────────────────────────────────────────
+
+  This grid was 238–302px tiles with 24px of air between them: six enormous
+  jackets to a screen, each an isolated object with a caption. Letterboxd's
+  equivalent renders seventy-two posters at 70×105, twelve across, edge to
+  edge, with no captions — and those posters are SMALLER than these were.
+
+  The difference is not scale, it is continuity. Filling the field and
+  letting the covers butt against each other makes the grid read as one
+  image; spacing them out makes it read as a database with pictures
+  attached. Raising the cover size, which is what I did in the last pass,
+  was the wrong axis entirely.
+
+  So: small, many, and nearly gapless. A 2px gutter keeps each jacket
+  legible as its own book without opening the field back up.
+*/
+.contact { grid-template-columns: repeat(auto-fill, minmax(104px, 1fr)); }
+@media (min-width: 1440px) { .contact { grid-template-columns: repeat(auto-fill, minmax(116px, 1fr)); } }
+@media (max-width: 700px)  { .contact { grid-template-columns: repeat(auto-fill, minmax(84px, 1fr)); } }
+
+/* §3.3 — the wall of jackets was rendered at 115px, which is a thumbnail of
+   a book rather than a book. The cached files are 300–340px wide; this is
+   still under half of them, and it is the difference between a page you
+   scan and a page you look at. */
+/* The index strips take the same lesson as the grid: more books, smaller,
+   closer. A shelf preview should look like a shelf. */
+.shelf-strip > a { flex: 0 0 96px; width: 96px; }
+.shelf-strip-more { flex: 0 0 96px; }
+@media (max-width: 767px) {
+  .shelf-strip > a, .shelf-strip-more { flex: 0 0 76px; width: 76px; }
+}
+
+/* What the desk understood the sentence to mean. */
+.desk-filters { margin: 0 0 16px; letter-spacing: .12em; }
+
+/* The one editable field in the colophon. Reads as the value it replaces
+   until you put a cursor in it. */
+.colophon-year {
+  width: 5ch; background: none; border: none; padding: 0;
+  font: inherit; color: inherit; outline: none;
+  border-bottom: 1px solid transparent;
+}
+.colophon-year:hover { border-bottom-color: var(--hairline); }
+.colophon-year:focus { border-bottom-color: var(--press-black); }
+
+/* ── SHELVES, ON A BOOK ───────────────────────────────────
+   Plain mono words that turn on. No checkboxes, no dropdown, no modal: the
+   whole interaction is "which of these is it on", and a list of words
+   answers that faster than any control with a box around it. */
+.shelf-set { margin-top: 26px; padding-top: 16px; border-top: 1px solid var(--hairline); }
+.shelf-set-label { letter-spacing: .18em; margin-bottom: 10px; }
+.shelf-set-row { display: flex; flex-wrap: wrap; gap: 8px 18px; align-items: baseline; }
+.shelf-set-row .inline-form { display: inline; }
+
+.shelf-chip {
+  background: none; border: none; padding: 0; cursor: pointer;
+  font-family: var(--f-mono); font-size: 11px; letter-spacing: .1em;
+  text-transform: uppercase; color: var(--dim);
+  border-bottom: 1px solid transparent;
+}
+.shelf-chip:hover { color: var(--press-black); }
+.shelf-chip.is-on { color: var(--press-black); border-bottom-color: var(--press-black); }
+
+/* Shelf membership was carried by brightness and a hairline, so telling at
+   a glance which shelves a book is on meant comparing greys. A mark is not
+   a comparison. */
+.shelf-chip::before {
+  content: ""; display: inline-block; vertical-align: baseline;
+  width: 6px; height: 6px; margin-right: 6px;
+  border: 1px solid var(--dim);
+}
+.shelf-chip.is-on::before { background: var(--press-black); border-color: var(--press-black); }
+
+/* WAITING, READING and FINISHED say what the reading state is. Toggling one
+   by hand would put the shelf and the state into disagreement, so they are
+   shown and not offered. */
+.shelf-chip.is-locked { cursor: default; opacity: .55; }
+.shelf-chip.is-locked:hover { color: var(--dim); }
+.shelf-chip.is-locked.is-on { color: var(--dim); border-bottom-color: var(--hairline); }
+
+.shelf-new-input {
+  width: 14ch; background: none; border: none; padding: 0;
+  font-family: var(--f-mono); font-size: 11px; letter-spacing: .1em;
+  text-transform: uppercase; color: var(--dim); outline: none;
+  border-bottom: 1px solid transparent;
+}
+.shelf-new-input:focus { color: var(--press-black); border-bottom-color: var(--hairline); width: 18ch; }
+
+/* Renaming a shelf, on the shelf. The field reads as the name until it has
+   a cursor in it, which is the same idiom as the page number and the year. */
+.shelf-admin { margin: 8px 0 18px; letter-spacing: .12em; }
+.shelf-admin .inline-form { display: inline; }
+.shelf-rename {
+  background: none; border: none; padding: 0; width: 16ch;
+  font-family: var(--f-mono); font-size: 11px; letter-spacing: .1em;
+  text-transform: uppercase; color: var(--dim); outline: none;
+  border-bottom: 1px solid transparent;
+}
+.shelf-rename:hover { color: var(--press-black); }
+.shelf-rename:focus { color: var(--press-black); border-bottom-color: var(--hairline); }
+.shelf-admin .field-note { display: inline; margin-left: 6px; }
+
+/* Where the once-per-book decisions live. Quiet, and only a link: putting
+   FINISHED back on this screen is what moved it off in the first place. */
+/* The three endings. Buttons, because they POST — the styling is what
+   makes them read as text, the same trick .press-add uses. The separators
+   are the quietest thing in the row so the three words stay three words
+   rather than becoming a sentence. */
+.press-acts {
+  display: flex; align-items: baseline; flex-wrap: wrap;
+  gap: 0 14px; margin-top: 20px;
+}
+.press-act {
+  background: none; border: none; padding: 0 0 2px; cursor: pointer;
+  font-family: var(--f-mono); font-size: 11px; letter-spacing: .16em;
+  text-transform: uppercase; color: var(--dim);
+  border-bottom: 1px solid transparent;
+  transition: color 450ms cubic-bezier(.2,.7,.3,1);
+}
+.press-act:hover { color: var(--press-black); border-bottom-color: var(--rule); }
+/* Discarding is the one of the three that destroys rather than records, so
+   it is the quietest and never the thing the eye lands on first. */
+.press-act-quiet { color: var(--rule); }
+.press-act-sep { color: var(--rule); opacity: .6; }
+.pressing-row .inline-form { display: inline; }
+
+/* The pigeonhole's unread mark. A dot, never a number: a count on a bell is
+   the first piece of the engagement toolkit the NEVER SENT list refuses.
+   Placed after the rotated label, which in a vertical rail means below it. */
+.spine-mark {
+  display: block;
+  width: 5px; height: 5px;
+  margin: 6px auto 0;
+  background: var(--proof-orange);
+}
+@media (max-width: 900px) {
+  .spine-mark { margin: 0 0 0 5px; display: inline-block; vertical-align: middle; }
+}
+
+/* The author on a book page. Underlined on hover only: the name is set at
+   display size and a permanent rule under it would read as emphasis rather
+   than as a link. */
+.book-author-link { color: inherit; text-decoration: none; }
+.book-author-link:hover, .book-author-link:focus-visible { text-decoration: underline; }
+
+/* ── NOTIFICATIONS ──────────────────────────────────────────
+   An inbox, kept deliberately plain. Requests sit above everything because
+   they are the only rows waiting on an answer. */
+/* The request row carries a face, so it gets a column for one. */
+.front-waiting .pigeon-row {
+  border: none; padding: 8px 0;
+  grid-template-columns: 30px minmax(0, 1fr) auto;
+  align-items: center;
+}
+.pigeon-face { flex: 0 0 30px; width: 30px; height: 30px; }
+.front-notices { margin-bottom: 26px; }
+.front-waiting { margin-bottom: 22px; }
+.pigeon-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto auto;
+  gap: 16px; align-items: baseline;
+}
+.pigeon-main { min-width: 0; }
+.pigeon-acts { display: flex; gap: 14px; align-items: baseline; }
+
+/* Unread is a mark in the margin, not a highlight on the row. A coloured
+   band across a row reads as urgency; a 3px rule reads as "this one is
+   new", which is all it is. */
+.pigeon-row.is-unread { position: relative; }
+.pigeon-row.is-unread::before {
+  content: ""; position: absolute; left: -14px; top: 50%;
+  width: 3px; height: 14px; margin-top: -7px;
+  background: var(--proof-orange);
+}
+
+/* ── THE ROLL ───────────────────────────────────────────────
+   A directory of people. Each row is a face, a name, and one line of why
+   this person is in front of you — never a follower count, which is the one
+   place a number beside a name reads as a score. */
+.roll-search {
+  display: grid; grid-template-columns: auto minmax(0, 1fr) auto;
+  gap: 12px; align-items: center; margin-bottom: 34px;
+  max-width: 620px;
+}
+.roll-search input {
+  font-family: var(--f-read); font-size: 16px;
+  padding: 9px 12px; border: 1px solid var(--hairline); background: none;
+  color: inherit;
+}
+.roll-sec { margin-bottom: 40px; }
+.roll-head {
+  display: flex; justify-content: space-between; align-items: baseline;
+  gap: 20px; padding-bottom: 8px; margin-bottom: 6px;
+  border-bottom: 1px solid var(--hairline);
+}
+
+.reader-row {
+  display: grid;
+  grid-template-columns: 34px minmax(0, 1fr) minmax(0, 1.1fr);
+  gap: 16px; align-items: center; color: inherit;
+}
+.reader-avatar { display: block; width: 34px; height: 34px; object-fit: cover; }
+
+.reader-who { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.reader-name {
+  font-family: var(--f-read); font-size: 16px;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.reader-why { text-align: right; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+@media (max-width: 700px) {
+  .roll-search { grid-template-columns: minmax(0, 1fr); }
+  .reader-row { grid-template-columns: 34px minmax(0, 1fr); }
+  .reader-why { display: none; }
+}
+
+/* ── ALONGSIDE ──────────────────────────────────────────────
+   Who else is on this book. The band that turned the most-visited page in
+   the product from a page you were alone on into a room. */
+.alongside {
+  margin: 46px 0 10px; padding-top: 22px;
+  border-top: 1px solid var(--hairline);
+}
+.alongside-counts {
+  display: flex; flex-wrap: wrap; gap: 22px;
+  margin: 14px 0 22px; line-height: 1.6;
+}
+.alongside-counts strong { font-weight: 500; }
+
+/* The same histogram the home page already draws for your own scores. Five
+   bars, no axis, no gridlines: the shape is the whole message and a median
+   printed beside it is the number. */
+.alongside-grades { display: flex; align-items: flex-end; gap: 16px; margin-bottom: 24px; }
+.grade-bars {
+  display: flex; align-items: flex-end; gap: 3px;
+  height: 34px; width: 68px;
+}
+.grade-bar { flex: 1; background: var(--press-black); min-height: 1px; }
+
+.alongside-rail { margin-bottom: 22px; }
+.alongside-row {
+  display: flex; gap: 10px; align-items: baseline; flex-wrap: wrap;
+  padding: 6px 0; border-top: 1px solid var(--hairline);
+  font-family: var(--f-read); font-size: 15px;
+}
+
+/* ── REVIEW REPLIES ─────────────────────────────────────────
+   One level, indented once. The composer is folded: an always-open box
+   under every review turns a book page into a comment section. */
+.review-replies { margin: 14px 0 0 22px; border-left: 1px solid var(--hairline); padding-left: 18px; }
+.review-reply + .review-reply { margin-top: 14px; }
+.review-reply-head { display: flex; gap: 10px; align-items: baseline; margin-bottom: 4px; }
+.review-reply-body { font-family: var(--f-read); font-size: 15px; line-height: 1.55; }
+.review-reply-body p { margin: 0 0 .5em; }
+
+.review-replybox { margin: 12px 0 0 22px; }
+.review-replybox > summary {
+  cursor: pointer; list-style: none; color: var(--dim);
+  letter-spacing: .14em; text-transform: uppercase;
+}
+.review-replybox > summary::-webkit-details-marker { display: none; }
+.review-replybox textarea {
+  display: block; width: 100%; max-width: 52ch; margin: 10px 0;
+  font-family: var(--f-read); font-size: 15px; padding: 10px;
+  border: 1px solid var(--hairline); background: none; color: inherit;
+}
+
+/* ── THE CRITICISM ──────────────────────────────────────────
+   Every review in the house, newest first. */
+.crit-tabs { display: flex; gap: 20px; margin-bottom: 30px; }
+.crit-tabs a { color: var(--dim); text-decoration: none; letter-spacing: .14em; }
+.crit-tabs a.is-on { color: var(--press-black); border-bottom: 2px solid var(--proof-orange); }
+/* Padding and edge come from .panel now. The criticism index is a list of
+   people's writing and it had neither a face nor a body on it. */
+.crit-head {
+  display: flex; align-items: center;
+  gap: 12px; margin-bottom: 10px; flex-wrap: wrap;
+}
+.crit-avatar { flex: 0 0 34px; width: 34px; height: 34px; }
+.crit-head .crit-who { flex: 1; min-width: 0; }
+.crit-who { font-family: var(--f-read); font-size: 16px; }
+.crit-book { font-style: italic; }
+.crit-body { font-family: var(--f-read); font-size: 16px; line-height: 1.6; max-width: 62ch; }
+.crit-body p { margin: 0 0 .6em; }
+
+/* ── CLUB WALL REPLIES ──────────────────────────────────────
+   One level, indented once, same as a review. The composer folds away so a
+   wall of five posts is not also a wall of five open textareas. */
+.club-replies { margin: 12px 0 0 20px; border-left: 1px solid var(--hairline); padding-left: 16px; }
+.club-reply + .club-reply { margin-top: 12px; }
+.club-replybox { margin-top: 10px; }
+.club-replybox > summary {
+  cursor: pointer; list-style: none; color: var(--dim);
+  letter-spacing: .14em; text-transform: uppercase; font-family: var(--f-mono); font-size: 11px;
+}
+.club-replybox > summary::-webkit-details-marker { display: none; }
+
+/* What the club made of a past pick. */
+.club-grade { font-family: var(--f-mono); font-size: 11px; color: var(--dim); letter-spacing: .05em; }
+
+/* An invitation link, shown once. Set in the data face at a size that can be
+   read aloud over a phone, because that is one of the ways it gets sent. */
+.invite-token {
+  display: block; margin: 22px 0 12px; padding: 14px;
+  border: 1px solid var(--hairline);
+  font-size: 13px; word-break: break-all; line-height: 1.6;
+}
+.join-head { display: flex; gap: 20px; align-items: center; margin: 18px 0 24px; }
+
+/* Publishing one artifact. Set apart from the season's own controls because
+   it is the only thing on the page that changes who can see something. */
+
+/* ── THE PROFILE AS A PORTRAIT ──────────────────────────────
+   Favourites, at plate size, at the top of the page. This was THE
+   STATEMENT — a separate list of hand-pinned works, on the theory that a
+   Favourites shelf is a filing decision rather than a claim. It is the
+   claim; it is just the one the reader already wrote. */
+.pf-favourites {
+  display: grid; grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 16px; margin: 14px 0 8px;
+}
+.pf-fav { display: block; }
+@media (max-width: 1200px) { .pf-favourites { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
+@media (max-width: 700px)  { .pf-favourites { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+
+/* Lately is one row of five, not a wrapping grid. It wrapped to a row and a
+   half, which reads as a grid that ran out rather than as a decision. */
+.pf-covers-row {
+  display: grid; grid-template-columns: repeat(5, minmax(0, 1fr));
+  flex-wrap: nowrap; gap: 16px;
+}
+.pf-covers-row .pf-cover { flex: none; width: 100%; }
+@media (max-width: 700px) { .pf-covers-row { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+
+/* The taste analysis, in the rail. Numbers tabular so the column of deltas
+   reads as a scale rather than as a ragged list. */
+
+/* Shared ground. The disagreement is set apart because it is the half worth
+   reading — two readers three stars apart have more to say to each other
+   than two who agree. */
+.pf-ground { font-family: var(--f-read); font-size: 15px; line-height: 1.5; margin: 8px 0; }
+.pf-argument { border-left: 2px solid var(--proof-orange); padding-left: 12px; }
+
+
+/* ═══════════════════════════════════════════════════════════
+   THE READER'S PLATE
+
+   The avatar slot when there is no photograph in it. Same idiom as the
+   galley plate that stands in for a missing jacket — a mark in the display
+   serif on a tinted ground — because a person with no picture and a book
+   with no jacket are the same problem, and the product already solved it
+   once, well.
+
+   Six tints, seeded from the handle, so a reader is the same colour
+   everywhere they appear and no two people in a list are reliably the same.
+   Fixed classes rather than a computed value: style-src forbids a style
+   attribute, and six possibilities do not warrant a nonced rule.
+   ═══════════════════════════════════════════════════════════ */
+.avatar-plate {
+  display: block;
+  object-fit: cover;
+  border: 1px solid var(--hairline);
+}
+.avatar-plate--blank {
+  display: grid;
+  place-items: center;
+  container-type: inline-size;
+  overflow: hidden;
+}
+.avatar-plate-mark {
+  font-family: var(--f-display);
+  font-weight: 400;
+  /* Scales with the plate, so one component serves 34px in a list and
+     112px on a profile without a second size rule. */
+  font-size: 42cqw;
+  line-height: 1;
+  letter-spacing: .01em;
+  color: var(--plate-ink, var(--press-black));
+  opacity: .82;
+}
+
+/* The tints sit a few percent off the paper stock — enough to read as a
+   chosen colour, not enough to compete with the jackets beside them. */
+.plate-t0 { background: #DCD6C8; --plate-ink: #4A4034; }
+.plate-t1 { background: #D3D8D2; --plate-ink: #38443A; }
+.plate-t2 { background: #E0D2CC; --plate-ink: #4E3A34; }
+.plate-t3 { background: #D2D5DE; --plate-ink: #363B4C; }
+.plate-t4 { background: #DFDBC6; --plate-ink: #474330; }
+.plate-t5 { background: #D9CFD5; --plate-ink: #443641; }
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .plate-t0 { background: #2E2A24; --plate-ink: #CDC4B2; }
+  :root:not([data-theme="light"]) .plate-t1 { background: #262C27; --plate-ink: #BECAC0; }
+  :root:not([data-theme="light"]) .plate-t2 { background: #322723; --plate-ink: #D6BDB4; }
+  :root:not([data-theme="light"]) .plate-t3 { background: #23262F; --plate-ink: #BCC2D2; }
+  :root:not([data-theme="light"]) .plate-t4 { background: #2F2C1F; --plate-ink: #CFC9AC; }
+  :root:not([data-theme="light"]) .plate-t5 { background: #2C2429; --plate-ink: #C9B7C2; }
+}
+:root[data-theme="dark"] .plate-t0 { background: #2E2A24; --plate-ink: #CDC4B2; }
+:root[data-theme="dark"] .plate-t1 { background: #262C27; --plate-ink: #BECAC0; }
+:root[data-theme="dark"] .plate-t2 { background: #322723; --plate-ink: #D6BDB4; }
+:root[data-theme="dark"] .plate-t3 { background: #23262F; --plate-ink: #BCC2D2; }
+:root[data-theme="dark"] .plate-t4 { background: #2F2C1F; --plate-ink: #CFC9AC; }
+:root[data-theme="dark"] .plate-t5 { background: #2C2429; --plate-ink: #C9B7C2; }
+
+
+/* ── THE WORK PAGE'S MARGIN ──────────────────────────────── */
+.book-margin {
+  padding: 18px 0 18px 20px;
+}
+
+/* The stamp sits on the jacket, across its lower third, the way one lands
+   on a flyleaf. */
+.work-cover { position: relative; }
+.work-stamp {
+  position: absolute; left: 50%; bottom: 16%;
+  transform: translateX(-50%);
+  z-index: 2; pointer-events: none;
+}
+/* The credit opens the column, so it does not need the top margin it had
+   when it sat under a cover. */
+.book-margin .jacket-credit { margin-top: 0; }
+.book-margin .colophon-caption { margin-top: 18px; }
+/* An edition filmstrip in a 240px column shows two jackets and a promise of
+   more, which is the right amount for a picker that is not the point of the
+   page. */
+.book-margin .editions-strip { margin-top: 22px; }
+.book-margin .filmstrip .frame { width: 64px; }
+.book-margin .barcode { margin-top: 24px; }
+
+@media (max-width: 1023px) {
+  /* Collapsed under the content, the column is a band rather than a rail,
+     so its contents run across it instead of stacking in a 240px strip. */
+  .book-margin { padding-top: 18px; }
+  .margin-col { position: static; }
+}
+
+
+/* ═══════════════════════════════════════════════════════════
+   §5.1 — KEYING THE SECTIONS
+
+   Seven colours were defined and four were ever used, so a season, a shelf,
+   a club and a work page were chromatically identical: you could not tell
+   where you were in the product from ten feet away, and no section had an
+   identity of its own.
+
+   The three registration colours had been referenced exactly once each in
+   the whole stylesheet, by a component that appeared on no route. They are
+   the obvious answer — they are already the product's own palette, they are
+   already CMYK, and they mean "a plate" rather than "a category".
+
+   ONE MARK PER SCREEN. The key is spent on the active nav item and on the
+   eyebrow of the page it names, and nowhere else. A section colour that
+   appears in six places is a theme, and a theme is what makes every page
+   look like a different product rather than a different chapter.
+
+   The nav mark carries the key; the accent stays the accent, reserved for
+   the single live thing on a screen (OPEN, a due date, an error). Those two
+   jobs are different and were being done by the same colour.
+   ═══════════════════════════════════════════════════════════ */
+/*
+  THE KEYS ARE NOT THE RAW PLATE COLOURS.
+
+  CMYK registration inks are chosen to be seen on white paper under a
+  loupe, not to be read as type: #00AEEF measures 2.24:1 on this stock and
+  #FFED00 measures 1.6:1. Using them straight would have put the active nav
+  item back at the contrast the accent was just rescued from, which is the
+  same bug with a better excuse.
+
+  So each key is its plate's hue, walked toward the ink until it clears
+  4.5:1, and walked the other way in dark mode. The hue is exactly the
+  plate's; only the value moves. Solved numerically, not by eye.
+*/
+.sheet { --key: var(--accent); }
+.sheet[data-key="reading"] { --key: #0076A3; }   /* cyan    4.52:1 */
+.sheet[data-key="shelves"] { --key: #D4007E; }   /* magenta 4.54:1 */
+.sheet[data-key="seasons"] { --key: #786F00; }   /* yellow  4.57:1 */
+.sheet[data-key="clubs"]   { --key: #2D7B59; }   /* green   4.55:1 */
+.sheet[data-key="profile"] { --key: var(--accent); }
+
+.spine-nav a[aria-current] { border-left-color: var(--key); color: var(--key); }
+@media (max-width: 767px) {
+  .spine-nav a[aria-current] { border-bottom-color: var(--key); }
+}
+/* The page says which plate it is on, in one 14px stroke above the title. */
+.sheet[data-key] .tag::before {
+  content: ""; display: inline-block; vertical-align: middle;
+  width: 14px; height: 2px; margin-right: 8px;
+  background: var(--key);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .sheet[data-key="reading"] { --key: #00AEEF; }  /* 7.07 */
+  :root:not([data-theme="light"]) .sheet[data-key="shelves"] { --key: #EE1F9A; }  /* 4.51 */
+  :root:not([data-theme="light"]) .sheet[data-key="seasons"] { --key: #FFED00; }  /* 14.79 */
+  :root:not([data-theme="light"]) .sheet[data-key="clubs"]   { --key: #478D6F; }  /* 4.52 */
+}
+:root[data-theme="dark"] .sheet[data-key="reading"] { --key: #00AEEF; }
+:root[data-theme="dark"] .sheet[data-key="shelves"] { --key: #EE1F9A; }
+:root[data-theme="dark"] .sheet[data-key="seasons"] { --key: #FFED00; }
+:root[data-theme="dark"] .sheet[data-key="clubs"]   { --key: #478D6F; }
+
+/* ── THE COLOUR SYSTEM ───────────────────────────────────
+   Four states. Three carry a colour and one is the absence of one.
+
+   The hairline is universal rather than conditional (amendment §7.7).
+   Eight of the twenty swatches fall under 3:1 against the light ground and
+   seven against the dark — different eight and seven, none on both — so a
+   per-colour exception list would be a rule someone forgets. Every band and
+   every swatch gets the rule; the fill never has to carry its own edge. */
+.band,
+.swatch {
+  display: block;
+  box-shadow: inset 0 0 0 1px var(--hairline);
+}
+
+/* §05 — no assignment.
+
+   This has to read as composed, not as a gap where a colour failed. A
+   season of four colours and three voids is a real season and should look
+   like one: the voids are quieter than the colours, at the same rhythm, and
+   they hold their share of the width rather than shrinking out of the way.
+
+   A fine hatch at low contrast does that where a coarse one did not. At 5px
+   the stripes read as a warning pattern — the visual language of roadworks
+   and missing textures — and drew the eye straight to the absences. At 3px
+   and a third of the hairline's weight it reads as unprinted stock: paper
+   the press did not reach, which is what it is. */
+.band--none,
+.swatch--none {
+  background:
+    repeating-linear-gradient(
+      45deg,
+      transparent 0 3px,
+      color-mix(in srgb, var(--hairline) 55%, transparent) 3px 4px
+    ),
+    color-mix(in srgb, var(--surface) 60%, transparent);
+}
+
+/* On a strip the voids keep the rhythm and lose the edge: a hairline around
+   every empty band turns three absences into three boxes, and the eye counts
+   boxes before it reads colour. */
+.band--none { box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--hairline) 40%, transparent); }
+
+/* Jacket colour, on its way out. Visibly not a derived colour and never
+   named: it is the old system still holding the wall until the book it
+   belongs to has been read properly. The hatch is the same one absence
+   uses, laid over the extracted hue, because that is what it is —
+   provisional, and about to be nothing or something. */
+.band--provisional,
+.swatch--provisional {
+  background-image: repeating-linear-gradient(
+    45deg,
+    rgba(0, 0, 0, 0) 0 5px,
+    rgba(0, 0, 0, .28) 5px 6px
+  );
+  opacity: .55;
+}
+
+/* The book page swatch. Large, per §04: the reader's own colour is the
+   thing on the page, not a chip beside a number. */
+/* A swatch, not a hero.
+ *
+ * This was width:100% at 3:2, which on the book page's column rendered a
+ * grey rectangle roughly a thousand pixels across — bigger than the jacket
+ * beside it, for a colour that is one fact about the book rather than the
+ * subject of the page. It is now a plate: large enough to read the colour
+ * off, small enough to sit beside its own name. */
+.swatch {
+  width: 132px;
+  height: 132px;
+  border-radius: 2px;
+  flex: none;
+}
+/* Name and hex sit beside the plate; everything else spans the full width.
+ *
+ * Stated structurally rather than by naming each child: the first attempt
+ * listed classes and missed `.colour-parts`, which dropped the whole
+ * component list into a 1fr column beside the swatch and wrapped the cited
+ * evidence at two words a line. Span by default, and let only the plate and
+ * its name opt out. */
+.colour-panel {
+  display: grid;
+  grid-template-columns: 132px minmax(0, 1fr);
+  gap: 14px 18px;
+  align-items: center;
+}
+.colour-panel > * { grid-column: 1 / -1; }
+.colour-panel > .swatch { grid-column: 1; }
+.colour-panel > .swatch + div { grid-column: 2; }
+
+.colour-word {
+  font-size: 20px;
+  line-height: 1.2;
+  letter-spacing: -.01em;
+}
+.colour-name {
+  font-family: var(--f-mono);
+  font-size: 11px;
+  letter-spacing: .18em;
+  text-transform: uppercase;
+  color: var(--dim);
+}
+/* The citation. Small, per the amendment, and set in the reading face
+   rather than the label face — it is a sentence someone can read, not a
+   tag. It is the only place provenance appears, and it never leaves this
+   page: the poster is one image and one idea. */
+.colour-evidence {
+  font-family: var(--f-read);
+  font-size: 13px;
+  line-height: 1.55;
+  color: var(--dim);
+  max-width: 46ch;
+}
+.colour-source {
+  font-family: var(--f-mono);
+  font-size: 10px;
+  letter-spacing: .16em;
+  text-transform: uppercase;
+  color: var(--dim);
+}
+
+/* The components. The exposed seam: how the blend was arrived at, in the
+   order of how much each one weighs. */
+.colour-parts {
+  list-style: none;
+  margin: 4px 0 0;
+  padding: 0;
+  display: grid;
+  gap: 14px;
+}
+.colour-part {
+  display: grid;
+  grid-template-columns: 34px minmax(0, 1fr);
+  gap: 12px;
+  align-items: start;
+}
+.colour-part-chip {
+  display: block;
+  width: 34px;
+  aspect-ratio: 1 / 1;
+  border-radius: 2px;
+  box-shadow: inset 0 0 0 1px var(--hairline);
+}
+.colour-part-head {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  margin-bottom: 3px;
+}
+.colour-part-name { font-size: 15px; }
+.colour-part .colour-evidence { margin: 0; }
+.colour-part .colour-source { margin-top: 3px; }
+

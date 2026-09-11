@@ -1,0 +1,27 @@
+<%- include('_open') %>
+  <div class="mono-s auth-label">SIGN UP</div>
+  <h1 class="auth-title">An account.</h1>
+
+  <form method="post" action="/signup" class="auth-form">
+    <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+
+    <label class="field">
+      <span class="field-label mono-s">EMAIL</span>
+      <input name="email" type="email" autocomplete="email" required autofocus
+             value="<%= values.email || '' %>">
+    </label>
+
+    <label class="field">
+      <span class="field-label mono-s">PASSWORD</span>
+      <input name="password" type="password" autocomplete="new-password" required
+             minlength="8" maxlength="256">
+      <span class="note">Eight characters or more.</span>
+    </label>
+
+    <% if (error) { %><p class="field-error mono-s"><%= error %></p><% } %>
+
+    <button class="auth-action" type="submit">CREATE THE ACCOUNT →</button>
+  </form>
+
+  <p class="auth-aside">Already have one? <a href="/signin">Sign in</a>.</p>
+<%- include('_close') %>

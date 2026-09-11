@@ -1,0 +1,20 @@
+<%#
+  "THE DESK" — one hairline field in the same fixed position on every page,
+  the way a folio sits in the same spot on every spread.
+
+  No box, no radius, no pill, no fill, no icon, no button, no placeholder.
+  One bottom rule. "/" focuses it, Esc restores the page underneath.
+%>
+<form class="desk" method="get" action="/desk" role="search">
+  <%# The entry point to the entire library was an unlabelled hairline with
+      a 10px dim slash at the far right of it. The rule and the slash both
+      stay — the discipline is right — but the field now says what it is
+      until you type in it, so nobody has to deduce that the line is a
+      search box. %>
+  <input class="desk-field" type="text" name="q" id="desk-field"
+         value="<%= locals.deskQuery || '' %>"
+         placeholder="Search the library"
+         autocomplete="off" autocapitalize="off" spellcheck="false"
+         aria-label="Search the library">
+  <span class="desk-hint mono-s" aria-hidden="true">/</span>
+</form>

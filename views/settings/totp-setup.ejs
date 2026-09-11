@@ -1,0 +1,21 @@
+<%- include('_open') %>
+  <div class="measure">
+    <p class="auth-lede">Scan this with an authenticator app, then type what it shows.</p>
+
+    <div class="totp-secret">
+      <div class="mono-s dim mb-6">SECRET</div>
+      <code class="totp-code"><%= secret.replace(/(.{4})/g, '$1 ').trim() %></code>
+    </div>
+
+    <form method="post" action="/settings/security/totp" class="auth-form">
+      <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+      <input type="hidden" name="secret" value="<%= secret %>">
+      <label class="field">
+        <span class="field-label mono-s">THE SIX DIGITS IT SHOWS</span>
+        <input name="code" inputmode="numeric" maxlength="7" required autofocus class="code-input">
+      </label>
+      <% if (locals.error) { %><p class="field-error mono-s"><%= error %></p><% } %>
+      <button class="auth-action" type="submit">CONFIRM →</button>
+    </form>
+  </div>
+<%- include('_close') %>

@@ -1,0 +1,63 @@
+<%- include('partials/head', { title: title, robots: 'noindex' }) %>
+<% if (locals.signedIn) { %><%- include('partials/spine', { nav: 'clubs' }) %><% } %>
+<main class="sheet">
+  <div class="block pt-20" id="block">
+    <div class="measure">
+      <%#
+        The club, BEFORE the decision.
+
+        An invitation that lands on a sign-in wall is an invitation nobody
+        accepts. This renders for a signed-out visitor — the emblem, the
+        name, what they are reading, how many are in — and routes through
+        sign-up only at the moment of joining. It is the one flow in the
+        product that can bring somebody in from outside.
+      %>
+      <div class="eyebrow mono"><span class="tag">YOU HAVE BEEN INVITED</span></div>
+
+      <div class="join-head">
+        <span class="grp-emblem">
+          <% if (invite.avatar_key) { %>
+            <img src="/avatar/<%= invite.avatar_key %>/256" alt="" width="72" height="72">
+          <% } else { %><span class="grp-emblem-blank" aria-hidden="true"></span><% } %>
+        </span>
+        <div>
+          <h1 class="d1"><%= invite.name %></h1>
+          <p class="mono-s dim"><%= memberCount %> IN<% if (invite.visibility !== 'public') { %> · <%= invite.visibility.toUpperCase() %><% } %></p>
+        </div>
+      </div>
+
+      <% if (invite.description) { %><p class="auth-lede"><%= invite.description %></p><% } %>
+
+      <% if (pick) { %>
+        <div class="ruled-row mt-20">
+          <span class="mono-s dim">ON DISPLAY</span>
+          <span><%= pick.title %></span>
+        </div>
+      <% } %>
+
+      <% if (already) { %>
+        <p class="auth-lede mt-30">You are already in.</p>
+        <p><a class="more-link" href="/clubs/<%= invite.slug %>">OPEN THE CLUB →</a></p>
+      <% } else if (locals.signedIn) { %>
+        <form method="post" action="/join/<%= token %>" class="mt-30">
+          <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+          <button class="auth-action" type="submit">ACCEPT →</button>
+        </form>
+        <p class="field-note mono-s mt-14">
+          <a class="more-link" href="/clubs">NO THANKS</a>
+        </p>
+      <% } else { %>
+        <%# Sign-up carries the invitation through, so the link is not spent
+            by the detour. %>
+        <p class="auth-lede mt-30">You need an account to accept.</p>
+        <p>
+          <a class="auth-action" href="/signup?next=<%= encodeURIComponent('/join/' + token) %>">MAKE ONE →</a>
+        </p>
+        <p class="field-note mono-s mt-14">
+          ALREADY HAVE ONE?
+          <a class="more-link" href="/signin?next=<%= encodeURIComponent('/join/' + token) %>">SIGN IN</a>
+        </p>
+      <% } %>
+    </div>
+  </div>
+<%- include('partials/foot') %>

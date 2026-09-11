@@ -1,0 +1,28 @@
+node_modules/
+data/
+*.log
+.DS_Store
+
+# The root key for note encryption. Losing it makes every note permanently
+# unreadable; committing it makes every note readable by anyone with the repo.
+secrets/
+*.key
+data/posters/
+
+# The API key. Everything in this project reads it from the environment, so
+# there is no reason for it ever to be in a file — but .env is where it will
+# end up if it ends up anywhere, and a key in a commit is a key on the
+# internet.
+.env
+.env.*
+
+# Personal data, not source. The Goodreads DSAR folder carries a home
+# address, account details, friend lists and years of request logs
+# alongside the library; books.txt is a scrape of a personal My Books page.
+# Both are inputs to an import, and neither belongs in a code repository.
+Goodreads/
+books.txt
+
+# Annotated screenshots dropped in during design review. Working material,
+# not templates — views/ holds .ejs and nothing else.
+views/*.png

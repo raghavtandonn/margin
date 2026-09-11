@@ -1,0 +1,66 @@
+<%- include('_open') %>
+  <nav class="settings-list">
+    <a class="ruled-row settings-row" href="/settings/profile">
+      <span class="settings-name">Profile</span>
+      <span class="mono-s dim"><%= user.username ? '@' + user.username : 'NO USERNAME' %></span>
+    </a>
+    <a class="ruled-row settings-row" href="/settings/privacy">
+      <span class="settings-name">Privacy</span>
+      <span class="mono-s dim"><%= user.profile_visibility.toUpperCase() %><%
+        if (user.profile_visibility === 'public' && !user.search_indexable) { %> · NOT INDEXED<% } %></span>
+    </a>
+    <a class="ruled-row settings-row" href="/settings/security">
+      <span class="settings-name">Security</span>
+      <span class="mono-s dim">
+        <%= totp ? 'TWO-FACTOR ON' : 'TWO-FACTOR OFF' %><%
+          if (passkeys) { %> · <%= passkeys %> PASSKEY<%= passkeys === 1 ? '' : 'S' %><% } %>
+      </span>
+    </a>
+    <a class="ruled-row settings-row" href="/settings/sessions">
+      <span class="settings-name">Signed in</span>
+      <span class="mono-s dim"><%= sessionCount %> DEVICE<%= sessionCount === 1 ? '' : 'S' %></span>
+    </a>
+    <%# §10 — notifications get their own row rather than living inside
+        Privacy, because the useful half of that page is the list of things
+        this product will never send you. %>
+    <a class="ruled-row settings-row" href="/settings/notifications">
+      <span class="settings-name">Notifications</span>
+      <span class="mono-s dim"><%= paused ? 'PAUSED' : '' %></span>
+    </a>
+    <a class="ruled-row settings-row" href="/settings/requests">
+      <span class="settings-name">Follow requests</span>
+      <span class="mono-s dim"><%= pendingRequests || '' %></span>
+    </a>
+    <a class="ruled-row settings-row" href="/settings/blocked">
+      <span class="settings-name">Blocked and muted</span>
+      <span class="mono-s dim"><%= blockedCount || '' %></span>
+    </a>
+    <a class="ruled-row settings-row" href="/settings/reports">
+      <span class="settings-name">Reports you filed</span>
+      <span class="mono-s dim"><%= openReports ? openReports + ' OPEN' : '' %></span>
+    </a>
+    <a class="ruled-row settings-row" href="/settings/email">
+      <span class="settings-name">Email</span>
+      <span class="mono-s dim"><%= user.email_verified_at ? 'CONFIRMED' : 'UNCONFIRMED' %></span>
+    </a>
+    <a class="ruled-row settings-row" href="/settings/password">
+      <span class="settings-name">Password</span><span class="mono-s dim">CHANGE</span>
+    </a>
+    <%# §12 — import and export are one page. A reader arriving from another
+        service is checking that their data is not hostage, and the shortest
+        way to answer that is to put the door out next to the door in. %>
+    <a class="ruled-row settings-row" href="/settings/import">
+      <span class="settings-name">Import</span>
+      <span class="mono-s dim">AND EXPORT</span>
+    </a>
+    <a class="ruled-row settings-row" href="/settings/delete">
+      <span class="settings-name">Delete the account</span>
+      <span class="mono-s dim"><%= user.purge_after ? 'SCHEDULED' : '' %></span>
+    </a>
+  </nav>
+
+  <form method="post" action="/signout" class="mt-34">
+    <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+    <button class="more-link mono-s" type="submit">SIGN OUT →</button>
+  </form>
+<%- include('_close') %>

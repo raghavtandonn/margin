@@ -1,0 +1,33 @@
+<%- include('_open') %>
+  <div class="mono-s auth-label">RESET</div>
+  <h1 class="auth-title">Choose a new one.</h1>
+
+  <form method="post" action="/reset/<%= token %>" class="auth-form">
+    <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+
+    <label class="field">
+      <span class="field-label mono-s">NEW PASSWORD</span>
+      <input name="password" type="password" autocomplete="new-password" required
+             minlength="8" maxlength="256" autofocus>
+      <span class="note">Eight characters or more.</span>
+    </label>
+
+    <%# §8 — a reset does not bypass two-factor. Otherwise whoever holds the
+        inbox holds the account, and the second factor is decorative. %>
+    <% if (locals.needsCode) { %>
+      <label class="field">
+        <span class="field-label mono-s">FROM YOUR AUTHENTICATOR</span>
+        <input name="code" type="text" inputmode="numeric" autocomplete="one-time-code"
+               maxlength="7" class="code-input">
+      </label>
+      <label class="field">
+        <span class="field-label mono-s">OR A RECOVERY CODE</span>
+        <input name="recovery_code" type="text" spellcheck="false" placeholder="XXXXX-XXXXX">
+      </label>
+    <% } %>
+
+    <% if (locals.error) { %><p class="field-error mono-s"><%= error %></p><% } %>
+
+    <button class="auth-action" type="submit">SET IT →</button>
+  </form>
+<%- include('_close') %>

@@ -1,0 +1,48 @@
+<%- include('_open') %>
+  <div class="measure">
+    <div class="ruled-row settings-row">
+      <span class="settings-name">Two-factor</span>
+      <span class="mono-s dim"><%= totp ? 'ON' : 'OFF' %></span>
+      <% if (totp) { %>
+        <form method="post" action="/settings/security/totp/disable">
+          <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+          <button class="more-link mono-s" type="submit">TURN OFF →</button>
+        </form>
+      <% } else { %>
+        <a class="more-link mono-s" href="/settings/security/totp">SET IT UP →</a>
+      <% } %>
+    </div>
+
+    <% if (totp) { %>
+      <div class="ruled-row settings-row">
+        <span class="settings-name">Recovery codes</span>
+        <span class="mono-s dim"><%= recovery %> LEFT</span>
+        <form method="post" action="/settings/security/recovery">
+          <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+          <button class="more-link mono-s" type="submit">NEW SET →</button>
+        </form>
+      </div>
+      <% if (recovery < 3) { %>
+        <%# §6 — below three, prompt to regenerate. Running out is how
+            "lost my phone" becomes a support ticket. %>
+        <p class="field-error mono-s">Running low. Generate a new set.</p>
+      <% } %>
+    <% } %>
+
+    <div class="mono-s dim mt-34 mb-8">PASSKEYS</div>
+
+    <% passkeys.forEach(function(k) { %>
+      <div class="ruled-row settings-row">
+        <span class="settings-name"><%= k.nickname %></span>
+        <span class="mono-s dim">ADDED <%= String(k.created_at).slice(0, 10) %></span>
+        <form method="post" action="/settings/security/passkey/<%= k.id %>/remove">
+          <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+          <button class="more-link mono-s" type="submit">REMOVE →</button>
+        </form>
+      </div>
+    <% }) %>
+
+    <button class="auth-action mt-14" type="button" id="add-passkey">ADD A PASSKEY →</button>
+    <p class="field-error mono-s" id="passkey-error" hidden></p>
+  </div>
+<%- include('_close') %>

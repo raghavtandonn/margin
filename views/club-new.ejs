@@ -1,0 +1,43 @@
+<%- include('partials/head', { title: title }) %>
+<%- include('partials/spine', { nav: 'clubs' }) %>
+<main class="sheet" data-key="clubs">
+  <span class="crop tl" aria-hidden="true"></span><span class="crop tr" aria-hidden="true"></span>
+  <span class="crop bl" aria-hidden="true"></span><span class="crop br" aria-hidden="true"></span>
+
+  <div class="block pt-20" id="block">
+    <div class="eyebrow mono"><span class="tag">NEW CLUB</span></div>
+    <h1 class="d2 mb-30">Start a club</h1>
+
+    <% if (error) { %><p class="field-error mono-s"><%= error %></p><% } %>
+
+    <form method="post" action="/clubs/new" class="auth-form measure">
+      <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+
+      <label class="field">
+        <span class="field-label mono-s">NAME</span>
+        <input name="name" maxlength="60" required autofocus value="<%= form.name || '' %>">
+      </label>
+
+      <label class="field">
+        <span class="field-label mono-s">WHAT IT IS</span>
+        <input name="description" maxlength="600" value="<%= form.description || '' %>">
+      </label>
+
+      <fieldset class="field club-choice">
+        <legend class="field-label mono-s">WHO CAN SEE IT</legend>
+        <label><input type="radio" name="visibility" value="public" checked> Public</label>
+        <label><input type="radio" name="visibility" value="unlisted"> Unlisted, link only</label>
+        <label><input type="radio" name="visibility" value="private"> Private, members only</label>
+      </fieldset>
+
+      <fieldset class="field club-choice">
+        <legend class="field-label mono-s">WHO CAN JOIN</legend>
+        <label><input type="radio" name="join_policy" value="open" checked> Anyone</label>
+        <label><input type="radio" name="join_policy" value="request"> By request</label>
+        <label><input type="radio" name="join_policy" value="invite_only"> By invitation</label>
+      </fieldset>
+
+      <button class="auth-action" type="submit">START IT →</button>
+    </form>
+  </div>
+<%- include('partials/foot') %>

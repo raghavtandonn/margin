@@ -1,0 +1,38 @@
+<%#
+  The colophon.
+
+  The tagline and the type specimen are gone. A line naming the four faces
+  on every page of the product is a note the designer wrote to themselves;
+  it is on the About page or it is nowhere.
+
+  What is left is what a footer is for: where the sync state appears, and
+  three destinations that have no other home in the navigation.
+%>
+<footer class="foot">
+  <div class="mono-s dim">MARGIN</div>
+  <div class="mono-s dim">
+    <%# B7 — sync state appears once, here. No toast, no banner, no spinner. %>
+    <span id="queue-state" class="orange"></span>
+    <a href="/api" class="inherit-color">READ API</a> ·
+    <a href="/export" class="inherit-color">EXPORT</a> ·
+    <a href="/settings" class="inherit-color">SETTINGS</a>
+  </div>
+</footer>
+</main>
+<%# §13.1 — every computed dimension and colour on this page, as real CSS
+    rules under the response nonce. Collected during render by h.rule(). %>
+<% if (locals.styleRules && styleRules.length) { %>
+<style nonce="<%= nonce %>"><%- styleRules.join('') %></style>
+<% } %>
+<script type="module" nonce="<%= nonce %>" src="/js/app.js?v=<%= v.js %>"></script>
+<script type="module" nonce="<%= nonce %>" src="/js/desk.js?v=<%= v.js %>"></script>
+<script type="module" nonce="<%= nonce %>" src="/js/blurb.js?v=<%= v.js %>"></script>
+<script type="module" nonce="<%= nonce %>" src="/js/scan.js?v=<%= v.js %>"></script>
+<script type="module" nonce="<%= nonce %>" src="/js/offline.js?v=<%= v.js %>"></script>
+<script type="module" nonce="<%= nonce %>" src="/js/wall.js?v=<%= v.js %>"></script>
+<script type="module" nonce="<%= nonce %>" src="/js/import.js?v=<%= v.js %>"></script>
+<script type="module" nonce="<%= nonce %>" src="/js/press.js?v=<%= v.js %>"></script>
+<script type="module" nonce="<%= nonce %>" src="/js/emblem.js?v=<%= v.js %>"></script>
+<script type="module" nonce="<%= nonce %>" src="/js/passkey.js?v=<%= v.js %>"></script>
+</body>
+</html>

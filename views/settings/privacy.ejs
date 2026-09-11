@@ -1,0 +1,137 @@
+<%- include('_open') %>
+  <form method="post" action="/settings/privacy" class="auth-form measure">
+    <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+
+    <fieldset class="choice-set">
+      <legend class="field-label mono-s">WHO CAN SEE YOUR PROFILE</legend>
+      <%
+        var levels = [
+          { v: 'public',  name: 'Anyone with the link',
+            note: '/@' + (values.username || 'you') + ' · THE DEFAULT' },
+          { v: 'members', name: 'Signed-in readers',    note: null },
+          { v: 'private', name: 'Nobody',
+            note: 'ALSO HIDES EVERY SHELF AND ENTRY SET TO “SAME AS PROFILE”' }
+        ];
+      %>
+      <% levels.forEach(function(l) { %>
+        <label class="choice">
+          <input type="radio" name="profile_visibility" value="<%= l.v %>"
+                 <%= values.profile_visibility === l.v ? 'checked' : '' %>
+                 <%= l.v === 'public' && !canPublic.ok ? 'disabled' : '' %>>
+          <span class="choice-mark" aria-hidden="true"></span>
+          <span class="choice-text">
+            <span class="choice-name"><%= l.name %></span>
+            <% if (l.note) { %><span class="choice-note mono-s"><%= l.note %></span><% } %>
+          </span>
+        </label>
+      <% }) %>
+      <% if (!canPublic.ok) { %>
+        <p class="field-error mono-s choice-blocked"><%= canPublic.reason %></p>
+      <% } %>
+    </fieldset>
+
+    <%# §10 — public and indexable are two different things, and Goodreads
+        conflates them. Public-but-not-indexed is a legitimate, common state. %>
+    <label class="choice choice-check">
+      <input type="checkbox" name="search_indexable"
+             <%= values.search_indexable ? 'checked' : '' %>>
+      <span class="choice-mark" aria-hidden="true"></span>
+      <span class="choice-text">
+        <span class="choice-name">Let search engines index it</span>
+        <span class="choice-note mono-s">
+          Off by default, and the one thing that is. Being findable by
+          readers here is what a public profile is for; being crawled by
+          Google is a separate decision about the open internet.
+        </span>
+      </span>
+    </label>
+
+    <%#
+      The desk's third tier and the season note both send data off this
+      machine when this is off. It is the switch the desk spec and §5.2 of
+      the seasons spec both refer to, and it was unreachable — the old
+      settings page that carried it is no longer rendered.
+    %>
+    <%#
+      ── WHAT YOU LIKE, MADE VISIBLE ────────────────────
+
+      The taste analysis is the most characterful thing this product
+      computes and it lived on a private home page where only its subject
+      could see it — a portrait, filed where the sitter is the only viewer.
+
+      It now ships ON, with the profile default, because a portrait filed
+      where the sitter is the only viewer is not a portrait. It reveals no
+      individual rating — only the directions a reader leans — and it is one
+      switch, here, for anyone who would rather it stayed in.
+    %>
+    <label class="choice">
+      <input type="checkbox" name="taste_public" <%= values.taste_public ? 'checked' : '' %>>
+      <span class="choice-mark" aria-hidden="true"></span>
+      <span class="choice-text">
+        <span class="choice-name">Show what you like on your profile</span>
+        <span class="choice-note mono-s">
+          On by default. The decades, lengths and subjects you rate above
+          your own average, shown to whoever can already see your profile.
+          No individual ratings are revealed.
+        </span>
+      </span>
+    </label>
+
+    <label class="choice choice-check">
+      <input type="checkbox" name="local_only"
+             <%= values.local_only ? 'checked' : '' %>>
+      <span class="choice-mark" aria-hidden="true"></span>
+      <span class="choice-text">
+        <span class="choice-name">Keep everything on this machine</span>
+        <span class="choice-note mono-s">
+          On by default. With it on, searches and season notes are written here
+          from your own data, and your notes never leave.
+        </span>
+      </span>
+    </label>
+
+    <%#
+      §05 of the lookbook spec — "Does Deadstock require opt-in? Some
+      readers will find it confronting rather than freeing."
+
+      It ships on, because the argument of that page is that abandonment is
+      not shameful and hiding it by default would concede the opposite. But
+      it is one switch, here, and turning it off costs nothing else.
+    %>
+    <label class="opt-row">
+      <input type="checkbox" name="deadstock" value="1" <%= values.deadstock_visible ? 'checked' : '' %>>
+      <span>Show abandoned books in the lookbook
+        <span class="note">
+          Under Deadstock. Nobody but you sees a private season either way.
+        </span>
+      </span>
+    </label>
+
+    <button class="auth-action save-privacy" type="submit">SAVE →</button>
+  </form>
+
+  <div class="measure mt-44">
+    <div class="mono-s dim mb-8">SHELVES</div>
+    <%# §10 — per-shelf visibility. Goodreads users have asked for this since
+        2011. A public profile with one private shelf is an ordinary case. %>
+    <%# A grid, so the four columns line up down the page instead of each
+        row starting wherever the previous label happened to end. %>
+    <% shelves.forEach(function(s) { %>
+      <form method="post" action="/settings/privacy/shelf/<%= s.id %>" class="shelf-privacy">
+        <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+        <span class="shelf-name"><%= s.name %></span>
+        <span class="mono-s dim shelf-count"><%= s.n %></span>
+        <span class="select-wrap">
+          <select name="visibility" class="bare-select">
+            <% ['inherit','public','members','private'].forEach(function(v) { %>
+              <option value="<%= v %>" <%= s.visibility === v ? 'selected' : '' %>>
+                <%= v === 'inherit' ? 'SAME AS PROFILE' : v.toUpperCase() %>
+              </option>
+            <% }) %>
+          </select>
+        </span>
+        <button class="more-link mono-s" type="submit">SET →</button>
+      </form>
+    <% }) %>
+  </div>
+<%- include('_close') %>

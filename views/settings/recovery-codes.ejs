@@ -1,0 +1,11 @@
+<%- include('_open') %>
+  <div class="measure">
+    <%# §6 — displayed once. Hashed with Argon2id exactly like a password,
+        so there is no way to show them again later. %>
+    <p class="auth-lede">Ten codes, each usable once. This is the only time they are shown.</p>
+
+    <ol class="recovery-list"><% codes.forEach(function(c) { %><li><%= c %></li><% }) %></ol>
+
+    <a class="auth-action mt-14" href="/settings/security">DONE →</a>
+  </div>
+<%- include('_close') %>

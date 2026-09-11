@@ -1,0 +1,391 @@
+<%- include('_open') %>
+
+  <%# §12 — three states, one page. %>
+
+  <div class="measure">
+
+    <%# The quoted mono label is printed by _open from `title`; this is the
+        serif heading under it. Export carries the same pair below. %>
+    <h1 class="d1 import-title">Import</h1>
+
+    <%# ── STATE ONE: before ────────────────────────────── %>
+    <% if (!job && !locals.supplement && !locals.askSource) { %>
+
+      <%#
+        Two ways in, said before either is offered.
+
+        The screen used to open with a disclosure about a folder of 44 zip
+        files — an edge case, expanded by default — and never said the one
+        thing somebody standing here needs, which is where the file comes
+        from. Somebody who has not exported their library before does not
+        have a file to drop and has no way to learn from this page that such
+        a file exists.
+      %>
+      <p class="auth-lede">
+        Bring the file your last service gave you, or just type the books
+        out. Both land on the same preview, and nothing is written until you
+        have seen it.
+      </p>
+
+      <%# The token rides in the query string: a multipart body is invisible
+          to the CSRF middleware, and one authoritative check beats a
+          per-route one. %>
+      <form method="post" action="/settings/import?_csrf=<%= encodeURIComponent(csrfToken) %>"
+            enctype="multipart/form-data" class="drop" id="drop">
+
+        <div class="drop-zone">
+          <input type="file" name="file" id="drop-file"
+                 accept=".csv,.tsv,.txt,.json,.zip,text/csv,text/plain,application/json,application/zip">
+          <label for="drop-file" class="drop-label">Drop a file, or choose one.</label>
+        </div>
+
+        <%#
+          The services are named exactly once, here, where knowing which
+          files work is genuinely useful. Never in the heading, never on a
+          button, never in the nav. A product that puts a competitor's name
+          on its own furniture is advertising for them.
+        %>
+        <p class="field-note mono-s drop-note">
+          CSV FROM GOODREADS, STORYGRAPH OR LIBRARYTHING · OR A LIST IN A TEXT FILE
+        </p>
+
+        <%# One form, one submit. A textarea and a file input in the same
+            submission means a pasted list gets the same preview, the same
+            mapping and the same confirm step, rather than a shortcut around
+            all three. %>
+        <div class="drop-or"><span class="mono-s">OR</span></div>
+
+        <label class="field paste-field">
+          <span class="field-label mono-s">TYPE THEM OUT, ONE A LINE</span>
+          <textarea name="pasted" id="paste" class="paste-box" rows="7"
+                    spellcheck="false" maxlength="200000"
+                    placeholder="The Secret History by Donna Tartt&#10;Stoner — John Williams&#10;Gilead"></textarea>
+        </label>
+
+        <p class="field-note paste-note">
+          A title on its own is enough. If you know the author, put it after
+          <b>by</b>, a dash, or a comma, and the book will be found more
+          often. Numbered lines and bullets are fine.
+        </p>
+
+        <button class="auth-action paste-go" type="submit">READ THE LIST →</button>
+      </form>
+
+      <%#
+        ── WHERE THE FILE COMES FROM ─────────────────────
+
+        Knowing what to bring is the whole difficulty of this screen, so it
+        belongs on it. Open by default, because the person who does not need
+        it loses one glance and the person who does would otherwise have to
+        guess that the answer is behind a disclosure triangle.
+      %>
+      <details class="import-help" open>
+        <summary class="mono-s">WHERE THAT FILE COMES FROM</summary>
+        <div class="import-help-body">
+          <dl class="import-files">
+            <div class="import-file">
+              <dt class="mono-s">GOODREADS</dt>
+              <dd class="field-note">
+                <a class="more-link" href="https://www.goodreads.com/review/import"
+                   rel="noopener noreferrer" target="_blank">goodreads.com/review/import</a>
+                → Export Library. It takes a minute to build, then the same
+                page offers <b>goodreads_library_export.csv</b>. That one
+                file is the whole thing.
+              </dd>
+            </div>
+            <div class="import-file">
+              <dt class="mono-s">STORYGRAPH</dt>
+              <dd class="field-note">
+                Under Manage Account, an export of your library. It arrives
+                as a CSV, by email.
+              </dd>
+            </div>
+            <div class="import-file">
+              <dt class="mono-s">LIBRARYTHING</dt>
+              <dd class="field-note">
+                Under Import/Export, export as CSV or tab-delimited. Either
+                reads.
+              </dd>
+            </div>
+          </dl>
+          <p class="field-note">
+            You do not have to know which one you have. The columns say where
+            a file came from, and you are only asked if they don't.
+          </p>
+        </div>
+      </details>
+
+      <%#
+        There are two different things called a Goodreads export and they
+        share no format. Somebody who used "Request my data" is holding a
+        folder of 44 zips, 40 of which are HTTP request logs, and the only
+        way to know which four matter is to open them.
+
+        Closed, now that the page leads with the ordinary path: this is the
+        answer to a question you only have if you are already holding the
+        folder, and the summary line is that question.
+      %>
+      <details class="import-help">
+        <summary class="mono-s">GOT A FOLDER OF ZIPS INSTEAD OF A CSV?</summary>
+        <div class="import-help-body">
+          <p class="field-note">
+            Then you used Request my data rather than Export library, and what
+            arrived is 44 files. Four of them hold reading, and only one of
+            those is your library. Drop them here one at a time, still zipped
+            — no need to unzip anything.
+          </p>
+          <%# Four names in a list is still four things to choose between,
+              and three of them do nothing until the first has been imported:
+              notes, dates and quotes attach to books that are already here
+              and cannot create one. So the library file is marked, and it is
+              first because FILES puts it first. %>
+          <dl class="import-files">
+            <% files.forEach(function(f) { %>
+              <div class="import-file<%= f.kind === 'library' ? ' import-file-first' : '' %>">
+                <dt class="mono-s">
+                  <%= f.file %><% if (f.kind === 'library') { %><span class="import-file-mark">START HERE</span><% } %>
+                </dt>
+                <dd class="field-note"><%= f.label %></dd>
+              </div>
+            <% }) %>
+          </dl>
+          <p class="field-note">
+            The other three attach to books that are already here, so they do
+            nothing until the library has gone in. Do that one first, then
+            come back for them in any order.
+          </p>
+          <p class="field-note">
+            Everything else in that folder is request logs, ad settings and
+            recommendation data. None of it is about books.
+          </p>
+          <p class="field-note">
+            One thing worth knowing before you start: that export carries no
+            author, no ISBN and no page count, so books are matched on title
+            alone. The CSV from Export library is the better file. If you can
+            still get it, use it, and keep these four for the notes and dates
+            the CSV has never carried.
+          </p>
+        </div>
+      </details>
+    <% } %>
+
+    <%#
+      ── A SUPPLEMENT ──────────────────────────────────────
+
+      Notes, dates and quotes attach to books that are already here. They
+      cannot create one, so there is no shelf mapping to confirm and no way
+      for this to double a library. What it can do is land a note on the
+      wrong book, so every row is named before anything is written, and so
+      is every row that will be skipped and why.
+    %>
+    <% if (locals.supplement) { %>
+      <% var sup = supplement; %>
+      <p class="auth-lede">
+        <% if (locals.done) { %>
+          <%= written %> added from <%= filename %>.
+        <% } else if (sup.applied.length) { %>
+          <%= filename %> has <%= sup.applied.length %>
+          <%= sup.kind === 'notes' ? (sup.applied.length === 1 ? 'note' : 'notes') : 'dates' %>
+          for books you already have.
+        <% } else { %>
+          Nothing in <%= filename %> attaches to anything here.
+        <% } %>
+      </p>
+
+      <% if (!locals.done && sup.applied.length) { %>
+        <ul class="import-rows">
+          <% sup.applied.forEach(function(a) { %>
+            <li class="import-row">
+              <span class="import-row-title"><%= a.title %></span>
+              <span class="mono-s dim"><%
+                if (a.field) { %><%= a.field.replace('_at', '').toUpperCase() %> <%= a.at %><%
+                } else { %><%= a.at %><% } %></span>
+              <% if (a.text) { %><span class="import-row-note"><%= a.text %></span><% } %>
+            </li>
+          <% }) %>
+        </ul>
+
+        <form method="post" action="/settings/import/<%= jobId %>" class="mt-18">
+          <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+          <button class="auth-action" type="submit">ADD THEM →</button>
+        </form>
+      <% } %>
+
+      <%# The skipped rows are the honest half, and they are the reason this
+          screen exists rather than a silent merge. %>
+      <% if (sup.skipped.length) { %>
+        <details class="import-help mt-18">
+          <summary class="mono-s"><%= sup.skipped.length %> NOT USED</summary>
+          <ul class="import-rows import-help-body">
+            <% sup.skipped.forEach(function(s) { %>
+              <li class="import-row">
+                <span class="import-row-title"><%= s.title %></span>
+                <span class="mono-s dim"><%= s.why %></span>
+              </li>
+            <% }) %>
+          </ul>
+        </details>
+      <% } %>
+
+      <p class="mt-18">
+        <a class="more-link mono-s" href="/settings/import">IMPORT ANOTHER FILE →</a>
+      </p>
+    <% } %>
+
+    <%# ── The one branch that asks ─────────────────────── %>
+    <% if (locals.askSource) { %>
+      <p class="auth-lede">
+        <%= rowCount %> rows, but the columns aren’t familiar. Which is it?
+      </p>
+
+      <form method="post" action="/settings/import?_csrf=<%= encodeURIComponent(csrfToken) %>"
+            enctype="multipart/form-data" class="auth-form">
+        <fieldset class="choice-set">
+          <legend class="field-label mono-s">FORMAT</legend>
+          <% sources.forEach(function(s, i) { %>
+            <label class="choice">
+              <input type="radio" name="source" value="<%= s.id %>" <%= i === 0 ? 'checked' : '' %>>
+              <span class="choice-mark" aria-hidden="true"></span>
+              <span class="choice-text"><span class="choice-name"><%= s.label %></span></span>
+            </label>
+          <% }) %>
+        </fieldset>
+
+        <%# A file has to be chosen again — a browser will not let a page
+            refill a file input, and nothing was kept. Pasted text was never
+            a file, so it rides along and does not have to be typed twice. %>
+        <% if (locals.pastedText) { %>
+          <input type="hidden" name="pasted" value="<%= pastedText %>">
+        <% } else { %>
+          <label class="field">
+            <span class="field-label mono-s">THE SAME FILE AGAIN</span>
+            <input type="file" name="file" accept=".csv,.tsv,.txt" required>
+          </label>
+        <% } %>
+
+        <button class="auth-action" type="submit">READ IT →</button>
+      </form>
+
+      <p class="field-note mono-s mt-18">
+        COLUMNS FOUND: <%= header.join(' · ').toUpperCase() %>
+      </p>
+    <% } %>
+
+    <%# ── STATE TWO: preview. Never skipped. ───────────── %>
+    <% if (job && job.state === 'parsed') { %>
+      <p class="import-summary"><%= h.importSummary(analysis.counts) %></p>
+
+      <%# A list arrives with no ISBN and no page count, so a book is found
+          on its title and — when there is one — its author. Saying how many
+          carry one is the difference between a good match rate and a
+          mystery, and it is knowable before anything is written. %>
+      <% if (analysis.list) { %>
+        <p class="field-note paste-note">
+          <% if (!analysis.list.withoutAuthor) { %>
+            Every line has an author on it, which is the best case for
+            finding the right book.
+          <% } else if (analysis.list.withAuthor) { %>
+            <%= analysis.list.withAuthor %> of these name an author.
+            The other <%= analysis.list.withoutAuthor %> will be matched on
+            title alone, so a common title may land on the wrong book.
+          <% } else { %>
+            None of these name an author, so they will be matched on title
+            alone. A common title may land on the wrong book.
+          <% } %>
+        </p>
+      <% } %>
+
+      <form method="post" action="/settings/import/<%= jobId %>">
+        <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+
+        <%#
+          Their vocabulary on the left, ours on the right, and the arrow
+          between them doing the translating in public. Letting somebody set
+          this is the moment the product's own language introduces itself.
+        %>
+        <%# Their vocabulary needs a heading; a list has no vocabulary to
+            translate, only a question left over. %>
+        <div class="mono-s dim mt-34 mb-8"><%= analysis.list ? 'WHAT THESE ARE' : 'SHELVES' %></div>
+
+        <% analysis.mapping.forEach(function(m) { %>
+          <div class="map-row">
+            <span class="map-from"><%= m.value || (analysis.list ? 'Every one of them' : '—') %></span>
+            <span class="map-count mono-s dim"><%= m.count %></span>
+            <span class="map-arrow mono-s dim">→</span>
+            <span class="select-wrap">
+              <select name="map:<%= m.value %>" class="bare-select">
+                <% statuses.forEach(function(st) { %>
+                  <option value="<%= st %>" <%= m.status === st ? 'selected' : '' %>>
+                    <%= st === 'SKIP' ? 'DON’T IMPORT' : st %>
+                  </option>
+                <% }) %>
+              </select>
+            </span>
+          </div>
+        <% }) %>
+
+        <button class="auth-action import-confirm" type="submit">
+          Import <%= analysis.rows.length %> →
+        </button>
+      </form>
+
+      <% if (analysis.counts.unmatched) { %>
+        <p class="field-note mono-s import-unmatched-link">
+          <a class="more-link" href="/settings/import/<%= jobId %>/unmatched">
+            <%= analysis.counts.unmatched %> WITHOUT A TITLE →
+          </a>
+        </p>
+      <% } %>
+    <% } %>
+
+    <%# ── STATE THREE: during, and after ───────────────── %>
+    <% if (job && (job.state === 'running' || job.state === 'done' || job.state === 'failed')) { %>
+      <%#
+        One mono line, rewritten in place by public/js/import.js. No bar, no
+        spinner, no percentage counting itself up — the number is the only
+        thing that changes because the number is the only thing that moved.
+      %>
+      <p class="import-line mono <%= job.state === 'done' ? 'done' : '' %>" id="import-line"
+         data-job="<%= jobId %>"
+         data-state="<%= job.state %>">
+        <% if (job.state === 'running') { %>
+          IMPORTING · <%= job.done %> / <%= job.total %>
+        <% } else if (job.state === 'failed') { %>
+          IMPORT FAILED
+        <% } else { %>
+          <%= job.result.imported %> in.<%
+            if (analysis.counts.unmatched) { %> <%= analysis.counts.unmatched %> without a match.<% } %>
+        <% } %>
+      </p>
+
+      <p class="import-after" id="import-after"
+         <%= job.state === 'done' ? '' : 'hidden' %>>
+        <% if (analysis.counts.unmatched || (job.result && job.result.failed && job.result.failed.length)) { %>
+          <a class="more-link mono-s" href="/settings/import/<%= jobId %>/unmatched">FIX THEM BY HAND →</a>
+        <% } %>
+        <a class="more-link mono-s" href="/shelves">YOUR SHELVES →</a>
+      </p>
+    <% } %>
+
+    <%# ── §12 — export, on the same page ───────────────── %>
+    <%#
+      Import and export sitting together is the quiet part of §12 said out
+      loud: "a product that makes leaving easy is one people trust enough to
+      stay in." Somebody arriving from another service is checking for
+      exactly this, and finding it one scroll below the door they came in by
+      is a better answer than any copy about it would be.
+    %>
+    <div class="export-section">
+      <div class="eyebrow mono"><span class="tag">EXPORT</span></div>
+      <h2 class="d2 export-title">Export</h2>
+      <p class="auth-lede">Everything, as JSON and CSV.</p>
+
+      <% if (locals.exportLink) { %>
+        <a class="auth-action" href="<%= exportLink %>">DOWNLOAD IT →</a>
+      <% } else { %>
+        <a class="auth-action" href="/settings/export">BUILD THE ARCHIVE →</a>
+      <% } %>
+    </div>
+
+  </div>
+<%- include('_close') %>

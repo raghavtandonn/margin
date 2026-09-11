@@ -1,0 +1,73 @@
+<%- include('partials/head', { title: title }) %>
+<%- include('partials/spine', { nav: 'clubs' }) %>
+<main class="sheet" data-key="clubs">
+  <span class="crop tl" aria-hidden="true"></span><span class="crop tr" aria-hidden="true"></span>
+  <span class="crop bl" aria-hidden="true"></span><span class="crop br" aria-hidden="true"></span>
+
+  <div class="block pt-20" id="block">
+    <div class="eyebrow mono">
+      <span class="tag">MEMBERS</span>
+      <span class="dim"><a class="no-underline" href="/clubs/<%= club.slug %>"><%= club.name.toUpperCase() %></a></span>
+    </div>
+    <h1 class="d2 mb-30">Members</h1>
+
+    <% if (requests.length) { %>
+      <div class="club-sec mono-s dim">ASKED TO JOIN</div>
+      <% requests.forEach(function(r) { %>
+        <div class="club-row is-static">
+          <span class="club-name"><%= r.display_name || '@' + r.username %></span>
+          <form method="post" action="/clubs/<%= club.slug %>/members/<%= r.user_id %>/approve"
+                class="inline-form">
+            <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+            <button class="more-link mono-s" type="submit">LET THEM IN</button>
+          </form>
+          <form method="post" action="/clubs/<%= club.slug %>/members/<%= r.user_id %>/decline"
+                class="inline-form">
+            <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+            <button class="more-link mono-s dim" type="submit">DECLINE</button>
+          </form>
+        </div>
+      <% }) %>
+    <% } %>
+
+    <div class="club-sec mono-s dim mt-34"><%= members.length %> IN</div>
+    <% members.forEach(function(m) { %>
+      <div class="club-row is-static">
+        <a class="club-name no-underline" href="/@<%= m.username %>">
+          <%= m.display_name || '@' + m.username %>
+        </a>
+        <span class="club-meta mono-s dim"><%= m.role === 'member' ? '' : roleLabel(m.role) %></span>
+
+        <%#
+          security §11 — every admin action here is audited, and a removed
+          member is TOLD. "Silent removal is how communities become
+          paranoid, and it also hides admin abuse."
+        %>
+        <% if (isAdmin && m.role !== 'host' && m.id !== me.user_id) { %>
+          <form method="post" action="/clubs/<%= club.slug %>/members/<%= m.id %>/remove"
+                class="inline-form">
+            <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+            <button class="more-link mono-s dim" type="submit">REMOVE</button>
+          </form>
+          <% if (isHost) { %>
+            <form method="post"
+                  action="/clubs/<%= club.slug %>/members/<%= m.id %>/<%= m.role === 'admin' ? 'demote' : 'promote' %>"
+                  class="inline-form">
+              <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+              <button class="more-link mono-s dim" type="submit">
+                <%= m.role === 'admin' ? 'STEP DOWN' : 'MAKE ADMIN' %>
+              </button>
+            </form>
+            <%# §9.2 — hosting transfers only when the recipient accepts.
+                A host cannot hand a club to someone who did not agree. %>
+            <form method="post" action="/clubs/<%= club.slug %>/members/<%= m.id %>/offer-hosting"
+                  class="inline-form">
+              <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+              <button class="more-link mono-s dim" type="submit">OFFER HOSTING</button>
+            </form>
+          <% } %>
+        <% } %>
+      </div>
+    <% }) %>
+  </div>
+<%- include('partials/foot') %>

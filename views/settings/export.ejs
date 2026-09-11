@@ -1,0 +1,15 @@
+<%- include('_open') %>
+  <div class="measure">
+    <p class="auth-lede">Everything, as JSON and CSV.</p>
+    <% if (locals.link) { %>
+      <a class="auth-action" href="<%= link %>">DOWNLOAD IT →</a>
+      <p class="note mt-14">The link works once, and lasts an hour.</p>
+    <% } else { %>
+      <form method="post" action="/settings/export">
+        <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+        <button class="auth-action" type="submit">BUILD THE ARCHIVE →</button>
+      </form>
+      <p class="note mt-14"><%= today %> of <%= limit %> used today.</p>
+    <% } %>
+  </div>
+<%- include('_close') %>

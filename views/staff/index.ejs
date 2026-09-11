@@ -1,0 +1,62 @@
+<%- include('../partials/head', { title: title }) %>
+<main class="sheet">
+  <div class="block pt-20" id="block">
+    <div class="eyebrow mono">
+      <span class="tag">STAFF</span>
+      <span class="dim"><%= staff.email %> · <%= staff.role.toUpperCase() %></span>
+    </div>
+
+    <nav class="settings-list measure mt-18">
+      <a class="ruled-row settings-row" href="/staff/member">
+        <span class="settings-name">Look up a member</span>
+        <span class="mono-s dim">REASON REQUIRED · LOGGED</span>
+      </a>
+      <a class="ruled-row settings-row" href="/staff/reports">
+        <span class="settings-name">Abuse reports</span>
+        <span class="mono-s dim"><%= reports %> OPEN</span>
+      </a>
+      <% if (staff.role === 'admin') { %>
+        <a class="ruled-row settings-row" href="/staff/incident">
+          <span class="settings-name">Incident: who was affected</span>
+          <span class="mono-s dim">ADMIN</span>
+        </a>
+      <% } %>
+    </nav>
+
+    <% if (pending.length) { %>
+      <div class="mono-s dim mt-44 mb-8">AWAITING A SECOND PAIR OF EYES</div>
+      <%# §14 — the bulk export is the crown jewel and takes two people. This
+          is the queue where the second one signs off. %>
+      <% pending.forEach(function(p) { %>
+        <div class="ruled-row measure">
+          <div class="mono-s"><%= p.action %> · USER <%= p.target_user_id %></div>
+          <div class="dim"><%= p.reason %></div>
+          <div class="mono-s dim">ASKED BY <%= p.requester %></div>
+          <% if (p.requested_by !== staff.id) { %>
+            <form method="post" action="/staff/export/<%= p.id %>/approve" class="mt-8">
+              <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+              <button class="more-link mono-s" type="submit">APPROVE →</button>
+            </form>
+          <% } else { %>
+            <div class="mono-s dim mt-8">YOUR OWN REQUEST · SOMEONE ELSE MUST APPROVE IT</div>
+          <% } %>
+        </div>
+      <% }) %>
+    <% } %>
+
+    <% if (anomalies.length) { %>
+      <div class="mono-s dim mt-44 mb-8">ANOMALIES</div>
+      <% anomalies.forEach(function(a) { %>
+        <div class="ruled-row measure">
+          <span class="field-error mono-s"><%= a.kind.toUpperCase().replace('_', ' ') %></span>
+          <span class="mono-s dim"><%= a.staffId %><% if (a.count) { %> · <%= a.count %> RECORDS<% } %></span>
+        </div>
+      <% }) %>
+    <% } %>
+
+    <form method="post" action="/staff/signout" class="mt-34">
+      <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+      <button class="more-link mono-s" type="submit">SIGN OUT →</button>
+    </form>
+  </div>
+<%- include('../partials/foot') %>

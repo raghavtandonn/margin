@@ -1,0 +1,652 @@
+<%- include('partials/head', { title: work.title }) %>
+<%- include('partials/spine', { nav: 'shelves' }) %>
+
+<main class="sheet" data-key="shelves">
+  <%# Binder holes down the left edge — a page in a ring binder, run evenly
+      rather than clustered at the top where they read as a HUD. %>
+  <span class="holes" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i></span>
+  <span class="crop tl" aria-hidden="true"></span>
+  <span class="crop tr" aria-hidden="true"></span>
+  <span class="crop bl" aria-hidden="true"></span>
+  <span class="crop br" aria-hidden="true"></span>
+
+  <%#
+    ── THE MARGIN ────────────────────────────────────────
+
+    This product is called MARGIN. It has a marginalia column that was
+    designed, tokenised (--margin-w: 300px, 240 below 1440), given its own
+    responsive collapse rule — and rendered on no route in the product.
+    Meanwhile the right-hand half of every band on this page was void: at
+    851px the content sat in a 440px column while the rules ran to 825px.
+
+    Those two facts are one fact. The blank right-hand side was not
+    composition, it was an unfilled slot, and a reader can tell the
+    difference: composed emptiness has something anchoring the far edge.
+
+    The colophon, the jacket credit and the barcode were stacked under the
+    cover in a 320px column. They are caption material about the object, and
+    a margin is where a printed page puts caption material. Below 1024px the
+    column collapses under the content with a rule above it, which is what
+    the responsive rule written for it always said it would do.
+  %>
+  <%# The search sits ABOVE the spread, not inside its left column.
+      Every other page includes it as the first thing in `.block`, where it
+      spans the sheet; nested in the spread it rendered narrower and offset,
+      so the one control that is on every screen was in a different place on
+      this one. %>
+  <%- include('partials/desk', { deskQuery: '' }) %>
+
+  <div class="spread">
+  <div class="block pt-20" id="block">
+
+    <div class="eyebrow mono">
+      <span class="tag">WORK</span>
+      <% if (work.series) { %><span class="dim"><%= work.series.name.toUpperCase() %> #<%= work.series.position %></span><% } %>
+    </div>
+
+    <%# A spread, not a stack. Left is the object; right is the reader. %>
+    <div class="spread-book">
+
+      <%# ── THE OBJECT ─────────────────────────────────── %>
+      <aside class="book-object">
+        <div class="work-cover">
+          <%- h.frame({
+                cover_url: edition.cover_url,
+                cover_cache_key: edition.cover_cache_key,
+                title: work.title,
+                authorLine: work.authorLine,
+                trimAspect: h.trimAspect(edition.format),
+                isbn13: edition.isbn13,
+                work_id: work.id
+              }, { reading: reading && reading.status === 'READING', subject: true }) %>
+
+          <%# The stamp comes down on the cover at the moment the book is
+              finished, and only at that moment — `justFinished` is true for
+              exactly one render, the one the finish action redirects to. On
+              every later visit the state is a line of type again, because a
+              stamp that re-animates on every page load is a decoration. %>
+          <% if (justFinished && reading && reading.status === 'FINISHED') { %>
+            <span class="work-stamp">
+              <%- h.stamp('FINISHED', { date: reading.finished_at,
+                                        seed: edition.isbn13 || work.id,
+                                        animate: true }) %>
+            </span>
+          <% } %>
+        </div>
+      </aside>
+
+      <%# ── THE READER ─────────────────────────────────── %>
+      <div class="book-reader">
+        <h1 class="d1"><%= work.title %></h1>
+        <% if (work.subtitle) { %><p class="d3 dim mb-6"><%= work.subtitle %></p><% } %>
+        <%#
+          The author, as a link.
+
+          /person/:id has rendered a real page since it was written, and
+          nothing in the product ever pointed at it: the name sat here as
+          plain text, so the one obvious route from a book to more of the
+          same writer did not exist. Falls back to the plain line when the
+          work carries no resolved person — an unmatched import has an
+          author string and no author row.
+        %>
+        <p class="d3 dim book-author"><%
+          if (work.authors && work.authors.length) {
+            work.authors.forEach(function(a, i) { %><%
+              if (i) { %>, <% } %><a class="book-author-link" href="/person/<%= a.id %>"><%= a.name %></a><%
+            });
+          } else { %><%= work.authorLine %><% } %></p>
+
+        <div class="book-status">
+          <%# Clicking a star is the save. No container, no buttons, and the
+              accent is never spent on a utility control. %>
+          <form class="stars-inline" method="post" action="/work/<%= work.id %>/rate" id="rate">
+            <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+            <div class="star-input">
+              <span class="star-row" id="star-row">
+                <input type="range" class="star-range" name="stars" id="stars"
+                       min="0" max="5" step="0.5"
+                       value="<%= reading && reading.stars != null ? reading.stars : 0 %>"
+                       aria-label="Rating, 0 to 5 stars in half steps">
+                <span class="star-empty" aria-hidden="true">★★★★★</span>
+                <span class="star-fill" id="star-fill" aria-hidden="true">★★★★★</span>
+              </span>
+              <span class="star-value mono-s dim" id="star-value"></span>
+            </div>
+            <noscript><button class="btn btn-sm" type="submit">SAVE</button></noscript>
+          </form>
+
+          <% if (reading) { %>
+            <span class="mono-s dim book-state">
+              <%= reading.displayStatus %><%
+                if (pressings.length > 1) { %> · PASS <%= reading.pass_number %><% } %><%
+                if (reading.finished_at) { %> · <%= h.monthDay(reading.finished_at) %><%
+                } else if (reading.abandoned_page) { %> · PAGE <%= Math.round(reading.abandoned_page) %><% } %>
+            </span>
+          <% } %>
+        </div>
+
+        <%#
+          ── THE COLOUR ─────────────────────────────────
+
+          Not one emotion. Three at most, weighted, blended in Oklab, and
+          each one carrying the sentence it was drawn from.
+
+          The swatch is the blend — usually not any anchor's own colour —
+          and the components under it are how it was arrived at. Showing
+          them is the exposed seam: a reader can see that this slate is two
+          parts grief and one part nostalgia, and can see the sentence that
+          put each part there.
+
+          It is NOT a rating and must never read as one. The stars above are
+          a verdict on the reading; this is what the book is made of.
+        %>
+        <% if (colour) { %>
+          <section class="colour-panel sec" aria-labelledby="colour-h">
+            <h2 class="mono-s dim" id="colour-h">COLOUR</h2>
+
+            <% if (colour.source === 'none') { %>
+              <%# §05 — a legitimate state, and it has to look chosen.
+
+                  The line here used to be "Nothing was written about this
+                  book that a colour could be drawn from", which is an
+                  apology: the system explaining why it failed. Some of these
+                  slots are permanent — a book nobody has written about
+                  analytically will never acquire criticism because we asked
+                  again — so the copy is the archive recording an absence
+                  rather than the software reporting a fault.
+
+                  Register: the same flat declarative the colophon uses. No
+                  "unfortunately", no "yet", nothing that implies a later
+                  visit will fix it. %>
+              <span class="swatch swatch--none" role="img"
+                    aria-label="Unwritten: no colour, because nothing was written this could be drawn from"></span>
+              <div>
+                <div class="colour-word">Unwritten</div>
+                <div class="colour-name">NO COLOUR</div>
+              </div>
+              <p class="colour-evidence">
+                This book has not been written about in terms a colour could
+                be drawn from. The slot stays open.
+              </p>
+            <% } else if (colour.source === 'provisional') { %>
+              <span class="swatch swatch--provisional" role="img"
+                    aria-label="A colour taken from the jacket, being retired"
+                    id="<%= h.rule(styleRules, 'sw', colour.hex, 'background:' + h.css.color(colour.hex)) %>"></span>
+              <div class="colour-name">FROM THE JACKET · BEING RETIRED</div>
+            <% } else { %>
+              <span class="swatch" role="img"
+                    aria-label="<%= colour.name %>, blended from <%= colour.components.map(function(c){ return c.emotion; }).join(', ') %>"
+                    id="<%= h.rule(styleRules, 'sw', colour.hex, 'background:' + h.css.color(colour.hex)) %>"></span>
+              <div>
+                <div class="colour-word"><%= colour.name %></div>
+                <div class="colour-name"><%= colour.hex %></div>
+              </div>
+
+              <%# The components, heaviest first. Each is a swatch of the
+                  anchor, the share it took, and the sentence that put it
+                  there — the citation is per component now, because the
+                  grounding is. %>
+              <ol class="colour-parts">
+                <% colour.components.forEach(function(c) { %>
+                  <li class="colour-part">
+                    <span class="colour-part-chip"
+                          id="<%= h.rule(styleRules, 'sw', c.anchorHex, 'background:' + h.css.color(c.anchorHex)) %>"></span>
+                    <div>
+                      <div class="colour-part-head">
+                        <span class="colour-part-name"><%= c.emotion %></span>
+                        <span class="colour-part-weight mono-s dim"><%= Math.round(c.weight * 100) %>%</span>
+                      </div>
+                      <p class="colour-evidence"><%= c.evidence %></p>
+                      <div class="colour-source"><%= (c.section || '').toUpperCase() %></div>
+                    </div>
+                  </li>
+                <% }) %>
+              </ol>
+            <% } %>
+          </section>
+        <% } %>
+
+        <%# The publisher's words and the reader's words, same serif, both
+            always present. Stone for theirs, chalk for yours — the eye lands
+            on the reader's sentence without anything being hidden. %>
+        <% if (blurb) { %>
+          <div class="description">
+            <p class="description-body" id="blurb-short"><%= blurb.head %></p>
+            <% if (blurb.truncated) { %>
+              <p class="description-body" id="blurb-full" hidden><%= blurb.full %></p>
+              <button class="more-link mono-s" type="button" id="blurb-more">MORE →</button>
+            <% } %>
+            <%# The description is the catalogue's, and it says whose it is.
+                Rewriting it in your own words was a second review under
+                another name — what a reader thinks of a book is the review,
+                and it already has a place on this page. %>
+            <p class="mono-s dim description-source">
+              <span><%= blurbSourceLabel %></span>
+            </p>
+          </div>
+        <% } %>
+
+        <% if (reading) { %>
+          <div class="notes">
+            <div class="mono-s dim">NOTES · PRIVATE</div>
+            <%# One element, edited in place. The note is not shown twice —
+                the field IS the note, set in the same serif as the page. %>
+            <form method="post" action="/work/<%= work.id %>/note" class="note-form">
+              <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+              <textarea name="note" rows="1" class="note-input note-body" id="note-input"
+                        placeholder="Add a note"><%= reading.private_note || '' %></textarea>
+              <button class="more-link note-save" type="submit">SAVE →</button>
+            </form>
+          </div>
+        <% } %>
+
+        <%#
+          ── SHELVES ─────────────────────────────────────
+
+          The control that did not exist. /work/:id/shelve was a route with
+          nothing posting to it, so a shelf you made could never receive a
+          book you already owned — the only ways onto a shelf were the
+          Open Library import, the ISBN scanner and manual registration,
+          and two of those three accepted the built-in shelves only.
+
+          Every shelf, on or off, as plain text. The system shelves are
+          shown but not toggled: WAITING, READING and FINISHED are what
+          status means, and setting them by hand here would put the shelf
+          and the reading state into disagreement.
+        %>
+        <div class="shelf-set">
+          <div class="mono-s dim shelf-set-label">SHELVES</div>
+          <div class="shelf-set-row">
+            <% shelves.forEach(function(sh) { %>
+              <% if (sh.is_system) { %>
+                <span class="shelf-chip mono-s <%= sh.on ? 'is-on is-locked' : 'is-locked' %>"
+                      title="Set by whether the book is being read"><%= sh.name %></span>
+              <% } else { %>
+                <form method="post" action="/work/<%= work.id %>/shelve" class="inline-form">
+                  <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                  <input type="hidden" name="shelf" value="<%= sh.slug %>">
+                  <input type="hidden" name="on" value="<%= sh.on ? '0' : '1' %>">
+                  <input type="hidden" name="editionId" value="<%= edition.id || '' %>">
+                  <button class="shelf-chip mono-s <%= sh.on ? 'is-on' : '' %>" type="submit"
+                          aria-pressed="<%= sh.on ? 'true' : 'false' %>"><%= sh.name %></button>
+                </form>
+              <% } %>
+            <% }) %>
+
+            <%# Making a shelf from the page where you wanted one. %>
+            <form method="post" action="/work/<%= work.id %>/shelve/new" class="inline-form shelf-new">
+              <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+              <input class="shelf-new-input mono-s" name="name" maxlength="60"
+                     placeholder="+ NEW SHELF" aria-label="Make a shelf and add this book to it">
+            </form>
+          </div>
+        </div>
+
+        <div class="book-actions">
+          <% if (reading && reading.status === 'READING') { %>
+            <form method="post" action="/work/<%= work.id %>/log" class="row gap-8">
+              <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+              <label class="mono-s dim" for="pg"><%= h.positionLabel(reading.position_type) %></label>
+              <%# The VALUE is the raw position, never the formatted one. An
+                  audiobook formats to "4H 07M", and a type="number" input
+                  whose value is not a valid number is sanitised to empty by
+                  the browser — so the field rendered blank and LOG posted
+                  nothing, which Number('') turns into 0 and stores as a
+                  progress reset. The unit belongs in the label beside it,
+                  which already carries it. Same rule as views/reading.ejs. %>
+              <input class="wheels" id="pg" name="position" type="number" inputmode="numeric" min="0"
+                     value="<%= reading.current_page ? Math.round(reading.current_page) : '' %>">
+              <button class="more-link mono-s" type="submit">LOG →</button>
+              <button class="more-link mono-s" type="submit" formaction="/work/<%= work.id %>/finish">FINISHED →</button>
+              <button class="more-link mono-s" type="submit" formaction="/work/<%= work.id %>/abandon">ABANDON →</button>
+            </form>
+
+            <%# A pass started by accident is not finished and was not
+                abandoned; both of those record a decision nobody made. It
+                is thrown away. %>
+            <% if (pressings.length > 1 || reading.current_page === 0) { %>
+              <form method="post" action="/work/<%= work.id %>/discard" class="inline-form">
+                <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                <input type="hidden" name="pass" value="<%= reading.pass_number %>">
+                <button class="more-link mono-s dim" type="submit">DISCARD THIS PASS</button>
+              </form>
+            <% } %>
+          <% } else if (!reading) { %>
+            <form method="post" action="/work/<%= work.id %>/start" class="row gap-14">
+              <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+              <input type="hidden" name="editionId" value="<%= edition.id %>">
+              <button class="btn-do" type="submit">START READING</button>
+            </form>
+          <% } else { %>
+            <form method="post" action="/work/<%= work.id %>/start">
+              <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+              <input type="hidden" name="editionId" value="<%= edition.id %>">
+              <button class="more-link mono-s" type="submit">READ IT AGAIN →</button>
+            </form>
+          <% } %>
+        </div>
+
+        <%#
+          A loan, not a goal.
+
+          "DUE" used to sit permanently on the daily screen, which imported
+          exactly the deadline pressure this product says it does not apply.
+          A borrowed book genuinely has a date on it, so the date survives —
+          here, on the book, set once, as a fact about a library copy.
+
+          A plain text field, not <input type="date">: that control brings
+          its own font, its own metrics, its own focus ring and a calendar
+          icon, and is immune to everything else in the stylesheet.
+        %>
+        <% if (reading && reading.status === 'READING') { %>
+          <details class="loan" <%= reading.due_date ? 'open' : '' %>>
+            <summary class="mono-s dim">
+              <% if (reading.due_date) { %>
+                BORROWED · DUE <%= h.monthDay(reading.due_date) %><%
+                  if (reading.daysUntilDue < 0) { %> · <%= Math.abs(reading.daysUntilDue) %> DAYS OVER<% } %>
+              <% } else { %>
+                IS THIS A LIBRARY COPY?
+              <% } %>
+            </summary>
+            <form method="post" action="/work/<%= work.id %>/due" class="loan-form">
+              <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+              <input class="loan-date" name="date" type="text" inputmode="numeric"
+                     placeholder="YYYY-MM-DD" maxlength="10" pattern="\d{4}-\d{2}-\d{2}"
+                     value="<%= h.fmt.date(reading.due_date) %>"
+                     aria-label="Date the loan is due back">
+              <button class="more-link mono-s" type="submit">
+                <%= reading.due_date ? 'CHANGE →' : 'SET IT →' %>
+              </button>
+              <% if (reading.due_date) { %>
+                <button class="more-link mono-s" type="submit" name="date" value="">CLEAR →</button>
+              <% } %>
+            </form>
+          </details>
+        <% } %>
+
+        <%# Every pass, each with its own dates and its own rating. %>
+        <% if (pressings.length > 1) { %>
+          <div class="pressings">
+            <div class="mono-s dim mb-8">PRESSINGS</div>
+            <% pressings.forEach(function(p) { %>
+              <div class="pressing-row">
+                <span class="mono-s dim">PASS <%= p.pass_number %></span>
+                <span><%- h.stars(p.stars, { size: 12 }) %></span>
+                <span class="mono-s dim">
+                  <%= h.fmt.date(p.started_at) || 'DATE UNRECORDED' %><%
+                    if (p.finished_at || p.abandoned_at) { %> → <%= h.fmt.date(p.finished_at || p.abandoned_at) %><% } %>
+                </span>
+                <form method="post" action="/work/<%= work.id %>/discard" class="inline-form">
+                  <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                  <input type="hidden" name="pass" value="<%= p.pass_number %>">
+                  <button class="more-link mono-s dim" type="submit">DISCARD</button>
+                </form>
+              </div>
+            <% }) %>
+          </div>
+        <% } %>
+
+      </div>
+    </div>
+
+    <%# ── §5 — THE RATING, AS A DISTRIBUTION ─────────── %>
+    <%#
+      "Display the distribution, not just the number." A bombed book shows a
+      bimodal spike any human can see, which is both more informative than
+      "3.87" and visibly harder to fake.
+
+      Below twenty eligible ratings there is no number at all — not a number
+      with a caveat, because a number with a caveat is still a number people
+      quote.
+    %>
+    <% if (agg.count) { %>
+      <div class="ratings" id="ratings">
+        <div class="mono-s dim mb-8">RATINGS</div>
+        <div class="ratings-body">
+          <div class="ratings-bars" role="img" aria-label="<%= agg.count %> ratings">
+            <% agg.distribution.forEach(function(n, i) { %>
+              <span class="ratings-bar">
+                <i id="<%= h.rule(styleRules, 'rb', work.id + '-' + i,
+                     'height:' + h.css.pct(agg.max ? (n / agg.max) * 100 : 0)) %>"></i>
+                <span class="mono-s dim"><%= i + 1 %></span>
+              </span>
+            <% }) %>
+          </div>
+          <div class="ratings-figure">
+            <% if (agg.suppressed) { %>
+              <span class="mono-s dim"><%= agg.count %> SO FAR</span>
+            <% } else { %>
+              <span class="ratings-median"><%= agg.median %></span>
+              <span class="mono-s dim">MEDIAN · <%= agg.count %></span>
+            <% } %>
+          </div>
+        </div>
+        <% if (agg.notice) { %>
+          <p class="field-note mono-s mt-8"><%= agg.notice.toUpperCase() %></p>
+        <% } %>
+      </div>
+    <% } %>
+
+    <%#
+      ── ALONGSIDE ─────────────────────────────────────
+
+      Who else is on this book.
+
+      This page used to carry the editions, the jacket credit, YOUR rating,
+      YOUR notes and YOUR shelves, and then said "Nobody has written about
+      this one yet" — on every book in a four-hundred-book library. The most
+      visited page type in the product was, by construction, the one place
+      you were guaranteed to be alone.
+
+      Every figure is a count of what THIS viewer may see, through the same
+      scope as the profile's shelf counts, so a private reader cannot be
+      inferred by subtracting one page view from another. Anything under
+      three reads as "a few": at that size a count is a name.
+    %>
+    <% if (here.any) { %>
+      <div class="alongside">
+        <h2 class="sec">Alongside</h2>
+
+        <div class="alongside-counts mono-s">
+          <% if (h.countWord(here.reading)) { %>
+            <span><%- h.mark('book') %><strong><%= h.countWord(here.reading) %></strong> reading now</span>
+          <% } %>
+          <% if (h.countWord(here.finished)) { %>
+            <span><%- h.mark('season') %><strong><%= h.countWord(here.finished) %></strong> finished</span>
+          <% } %>
+          <%# The exact number, not "a few".
+              Reading and finished keep the floor: those describe what people
+              are DOING with a book, and on a small install "1 reading now"
+              names the person. How many copies are sitting unread is a fact
+              about the book's standing rather than about anybody's evening,
+              so it is stated plainly. %>
+          <% if (here.waiting) { %>
+            <span><%- h.mark('club') %><strong><%= here.waiting.toLocaleString() %></strong>
+              waiting<%= here.waiting === 1 ? '' : '' %></span>
+          <% } %>
+        </div>
+
+        <%#
+          The grades. Computed on every render since the aggregates module
+          was written and never once drawn — while the home page rendered
+          the identical histogram of the reader's own scores, so the visual
+          language for it already existed.
+
+          Suppressed under three ratings by lib/aggregates.js, which is its
+          decision and not this template's.
+        %>
+        <% if (!agg.suppressed && agg.median != null) { %>
+          <div class="alongside-grades">
+            <div class="grade-bars" aria-hidden="true">
+              <% agg.distribution.forEach(function(n, i) { %>
+                <span class="grade-bar" id="<%= h.rule(styleRules, 'gb', work.id + '-' + i,
+                      'height:' + Math.round((n / agg.max) * 100) + '%') %>"></span>
+              <% }) %>
+            </div>
+            <div class="mono-s dim">
+              <%= agg.median %> MEDIAN ACROSS <%= agg.count %>
+              <% if (agg.notice) { %> · <%= agg.notice.toUpperCase() %><% } %>
+            </div>
+          </div>
+        <% } %>
+
+        <%# The section that earns a follow, so it sits above the aggregate
+            in importance even though it comes after it in the column. %>
+        <% if (here.rail.length) { %>
+          <div class="alongside-rail">
+            <div class="mono-s dim mb-14">ON YOUR RAIL</div>
+            <% here.rail.forEach(function(p) { %>
+              <div class="alongside-row">
+                <a class="no-underline" href="/@<%= p.username %>"><%= p.display_name || '@' + p.username %></a>
+                <span class="dim">
+                  <% if (p.status === 'READING') { %>is reading it<% if (p.current_page) { %>, page <%= Math.round(p.current_page) %><% } %>
+                  <% } else if (p.finished_at) { %>finished it <%= h.monthDay(p.finished_at) %>
+                  <% } else { %>has it<% } %>
+                </span>
+                <% if (p.stars != null) { %><span class="mono-s dim"><%- h.stars(p.stars, { size: 11 }) %></span><% } %>
+              </div>
+            <% }) %>
+          </div>
+        <% } %>
+
+        <% if (here.clubs.length) { %>
+          <div class="alongside-rail">
+            <div class="mono-s dim mb-14">IN CLUBS</div>
+            <% here.clubs.forEach(function(c) { %>
+              <div class="alongside-row">
+                <a class="no-underline" href="/clubs/<%= c.slug %>"><%= c.name %></a>
+                <span class="dim"><%= c.finished_at ? 'has read it' : 'is reading it' %></span>
+              </div>
+            <% }) %>
+          </div>
+        <% } %>
+      </div>
+    <% } %>
+
+    <%# ── §4 / §7 — REVIEWS ──────────────────────────── %>
+    <div class="reviews" id="reviews">
+      <h2 class="sec">Reviews</h2>
+
+      <%# PIN TO PROFILE lived here. The profile shows the reader's own
+          Favourites shelf now, and that shelf is set from the shelf
+          controls above — one list, one place to edit it. %>
+
+      <% if (locals.signedIn) { %>
+        <p class="mono-s mb-20">
+          <a class="<%= reading ? 'btn-do' : 'more-link' %>" href="/work/<%= work.id %>/review<%= reading && reading.pass_number > 1 ? '?pass=' + reading.pass_number : '' %>">
+            <%= myReview ? 'EDIT YOUR REVIEW' : 'WRITE A REVIEW' %><%= reading ? '' : ' →' %>
+          </a>
+          <%# §4.1 — the ONE explicit path from a note to a review. %>
+          <% if (!myReview && hasNote) { %>
+            · <a class="more-link" href="/work/<%= work.id %>/review?from=note">START FROM YOUR NOTE →</a>
+          <% } %>
+        </p>
+      <% } %>
+
+      <%# §7 — reviews from people you follow sit in their own small section
+          ABOVE top reviews, labelled plainly rather than silently promoted. %>
+      <% if (reviews.following.length) { %>
+        <div class="mono-s dim mb-14">FROM PEOPLE YOU FOLLOW</div>
+        <% reviews.following.forEach(function(r) { %>
+          <%- include('partials/review', { r: r, viewerProgress: viewerProgress, replies: r.replies || [], canReply: true }) %>
+        <% }) %>
+      <% } %>
+
+      <% if (reviews.top.length) { %>
+        <div class="mono-s dim mb-14 mt-30">TOP REVIEWS</div>
+        <% reviews.top.forEach(function(r) { %>
+          <%- include('partials/review', { r: r, viewerProgress: viewerProgress, replies: r.replies || [], canReply: true }) %>
+        <% }) %>
+      <% } %>
+
+      <% if (!reviews.top.length && !reviews.following.length) { %>
+        <p class="auth-lede">Nobody has written about this one yet.</p>
+      <% } %>
+    </div>
+
+  </div>
+
+  <%# ── THE MARGIN COLUMN ─────────────────────────────────
+      The object's own record: who made the jacket, what the colophon says,
+      which edition this is, and the barcode that resolves to this page.
+      Caption material, in the margin, on the page the product is named for. %>
+  <aside class="margin-col book-margin">
+
+      <%# Nobody credits book designers. The honest and slightly damning
+          truth about most of publishing. %>
+      <p class="mono-s dim jacket-credit">
+        JACKET · <%= jacket ? jacket.name.toUpperCase() : 'UNCREDITED' %>
+      </p>
+
+      <%# The colophon is caption material. It sits under the object it
+          describes, and only prints the fields that exist. %>
+      <% if (colophonRows.length) { %>
+        <%# The LABEL is a label and keeps the label voice. The VALUE is a
+            fact about the object and is set in the reading face — "FORMAT"
+            in mono, "Paperback" in Literata. Every field row on this page
+            used to be two pieces of 10px tracked capitals, which is how a
+            colophon ends up reading like a shipping manifest. %>
+        <dl class="colophon-caption">
+          <% colophonRows.filter(function(r) { return r.label !== 'FIRST'; }).forEach(function(row) { %>
+            <div>
+              <dt class="mono-s dim"><%= row.label %></dt>
+              <dd class="colophon-value"><%= h.sentence(row.value) %></dd>
+            </div>
+          <% }) %>
+
+          <%#
+            FIRST is editable, and it is the only editable thing in the
+            colophon, because it is the only one the catalogue gets badly
+            and undetectably wrong. Open Library reports whatever edition
+            record happens to be earliest; this library holds Lolita at
+            1777 and The Jungle at 1791, both with only modern editions
+            attached. The desk's year filters are only as good as this
+            number, so it has to be correctable where it is read.
+          %>
+          <div>
+            <dt class="dim">FIRST</dt>
+            <dd>
+              <form method="post" action="/work/<%= work.id %>/first-published" class="inline-form">
+                <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                <input class="colophon-year mono-s" name="year" type="text"
+                       inputmode="numeric" autocomplete="off"
+                       value="<%= work.first_published_year || '' %>"
+                       placeholder="—" aria-label="First published year">
+              </form>
+            </dd>
+          </div>
+        </dl>
+      <% } %>
+
+      <%# An edition picker for a single edition is a control with nothing
+          to choose. %>
+      <% if (editions.length > 1) { %>
+        <div class="editions-strip">
+          <div class="mono-s dim mb-8">EDITION</div>
+          <div class="filmstrip scroll-x">
+            <% editions.forEach(function(e) { %>
+              <a class="ed <%= e.id === edition.id ? 'on' : '' %>" href="/work/<%= work.id %>?edition=<%= e.id %>">
+                <%- h.frame({
+                      cover_url: e.cover_url, cover_cache_key: e.cover_cache_key,
+                      title: work.title, authorLine: work.authorLine,
+                      trimAspect: h.trimAspect(e.format)
+                    }) %>
+                <span class="mono-s dim d-block-mt5">
+                  <%= e.published_year || '—' %><% if (e.page_count) { %> · <%= e.page_count %>PP<% } %>
+                </span>
+              </a>
+            <% }) %>
+          </div>
+        </div>
+      <% } %>
+
+      <% if (edition.isbn13) { %>
+        <button class="barcode" data-permalink="<%= permalink %>" data-isbn="<%= edition.isbn13 %>" title="Copy permalink">
+          <%- h.barcodeSVG(edition.isbn13, { height: 34, unit: 1 }) %>
+          <span class="id dim"><%= h.fmt.isbn(edition.isbn13) %></span>
+        </button>
+      <% } %>
+  </aside>
+  </div>
+
+<%- include('partials/foot') %>

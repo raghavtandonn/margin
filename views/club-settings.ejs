@@ -1,0 +1,128 @@
+<%- include('partials/head', { title: title }) %>
+<%- include('partials/spine', { nav: 'clubs' }) %>
+<main class="sheet" data-key="clubs">
+  <span class="crop tl" aria-hidden="true"></span><span class="crop tr" aria-hidden="true"></span>
+  <span class="crop bl" aria-hidden="true"></span><span class="crop br" aria-hidden="true"></span>
+
+  <div class="block pt-20" id="block">
+    <div class="eyebrow mono">
+      <span class="tag">SETTINGS</span>
+      <span class="dim"><a class="no-underline" href="/clubs/<%= club.slug %>"><%= club.name.toUpperCase() %></a></span>
+    </div>
+    <h1 class="d2 mb-30">Club settings</h1>
+
+    <% if (error) { %><p class="field-error mono-s"><%= error %></p><% } %>
+
+    <%#
+      The emblem. It goes through the same pipeline as a user avatar — the
+      image is re-encoded, its metadata is stripped, and it is served from
+      this origin. An uploaded file is the one thing on a club page that did
+      not arrive through a text field, so it takes the path that has already
+      been hardened rather than a second one written for clubs.
+    %>
+    <div class="measure">
+      <div class="mono-s dim mb-8">EMBLEM</div>
+      <div class="emblem-edit">
+        <span class="grp-emblem grp-emblem--sm">
+          <% if (club.avatar_key) { %>
+            <img id="club-emblem" src="/avatar/<%= club.avatar_key %>/256" alt="" width="96" height="96">
+          <% } else { %>
+            <img id="club-emblem" class="is-empty" src="" alt="" width="96" height="96">
+            <span class="grp-emblem-blank" aria-hidden="true"></span>
+          <% } %>
+        </span>
+        <div>
+          <label class="more-link mono-s emblem-pick">
+            CHOOSE AN IMAGE →
+            <input type="file" id="club-emblem-file" accept="image/png,image/jpeg,image/webp"
+                   data-emblem-post="/clubs/<%= club.slug %>/emblem">
+          </label>
+          <span class="note">PNG, JPEG or WebP. Up to 5 MB. Squared and re-encoded here.</span>
+          <span class="field-note mono-s" id="club-emblem-msg"></span>
+        </div>
+      </div>
+    </div>
+
+    <form method="post" action="/clubs/<%= club.slug %>/settings" class="auth-form measure mt-44">
+      <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+
+      <label class="field">
+        <span class="field-label mono-s">NAME</span>
+        <input name="name" maxlength="60" required value="<%= club.name %>">
+      </label>
+
+      <label class="field">
+        <span class="field-label mono-s">WHAT IT IS</span>
+        <input name="description" maxlength="600" value="<%= club.description || '' %>">
+      </label>
+
+      <fieldset class="field club-choice">
+        <legend class="field-label mono-s">WHO CAN SEE IT</legend>
+        <label><input type="radio" name="visibility" value="public"
+                      <%= club.visibility === 'public' ? 'checked' : '' %>> Public</label>
+        <label><input type="radio" name="visibility" value="unlisted"
+                      <%= club.visibility === 'unlisted' ? 'checked' : '' %>> Unlisted, link only</label>
+        <label><input type="radio" name="visibility" value="private"
+                      <%= club.visibility === 'private' ? 'checked' : '' %>> Private, members only</label>
+      </fieldset>
+
+      <fieldset class="field club-choice">
+        <legend class="field-label mono-s">WHO CAN JOIN</legend>
+        <label><input type="radio" name="join_policy" value="open"
+                      <%= club.join_policy === 'open' ? 'checked' : '' %>> Anyone</label>
+        <label><input type="radio" name="join_policy" value="request"
+                      <%= club.join_policy === 'request' ? 'checked' : '' %>> By request</label>
+        <label><input type="radio" name="join_policy" value="invite_only"
+                      <%= club.join_policy === 'invite_only' ? 'checked' : '' %>> By invitation</label>
+      </fieldset>
+
+      <button class="auth-action" type="submit">SAVE →</button>
+    </form>
+
+    <%#
+      Only the head sees this, and it is at the bottom under its own rule.
+      §9.2 — a club never becomes ownerless: handing it over needs the other
+      person to accept, and that happens from the member list.
+    %>
+    <% if (club.host_id === (locals.user && user.id)) { %>
+      <div class="measure mt-44">
+        <div class="mono-s dim mb-8">HANDING IT OVER</div>
+        <p class="note">
+          Hosting is offered from the <a class="more-link" href="/clubs/<%= club.slug %>/members">member list</a>,
+          and it only moves once the other person accepts.
+        </p>
+      </div>
+    <% } %>
+
+    <%#
+      The invitation, next to the policy it serves.
+
+      "By invitation" was selectable here with no invitation anywhere in the
+      product — a club set to it was a club nobody could join, including by
+      being asked.
+    %>
+    <% if (isAdmin) { %>
+      <div class="club-sec mono-s dim mt-34">INVITATIONS</div>
+      <form method="post" action="/clubs/<%= club.slug %>/invite" class="inline-form">
+        <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+        <input type="hidden" name="uses" value="1">
+        <button class="auth-action" type="submit">MAKE A LINK →</button>
+      </form>
+      <p class="field-note mono-s mt-14">
+        ONE USE, FOURTEEN DAYS. SHOWN ONCE AND NOT RECOVERABLE.
+      </p>
+
+      <% if (locals.invites && invites.length) { %>
+        <% invites.forEach(function(i) { %>
+          <div class="ruled-row">
+            <span class="mono-s dim">LIVE · <%= i.uses %>/<%= i.max_uses || '∞' %> USED · EXPIRES <%= h.monthDay(i.expires_at) %></span>
+            <form method="post" action="/clubs/<%= club.slug %>/invite/<%= i.id %>/revoke" class="inline-form">
+              <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+              <button class="more-link mono-s dim" type="submit">REVOKE</button>
+            </form>
+          </div>
+        <% }) %>
+      <% } %>
+    <% } %>
+  </div>
+<%- include('partials/foot') %>

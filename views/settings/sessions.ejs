@@ -1,0 +1,23 @@
+<%- include('_open') %>
+  <div class="measure">
+    <% sessions.forEach(function(s) { %>
+      <div class="ruled-row settings-row">
+        <span class="settings-name">
+          <%= s.device %><% if (s.current) { %> <span class="mono-s dim">· THIS ONE</span><% } %>
+        </span>
+        <span class="mono-s dim">
+          ACTIVE <%= String(s.last_active_at).slice(0, 10) %><% if (s.aal >= 2) { %> · TWO-FACTOR<% } %>
+        </span>
+        <form method="post" action="/settings/sessions/<%= s.id %>/revoke">
+          <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+          <button class="more-link mono-s" type="submit">SIGN IT OUT →</button>
+        </form>
+      </div>
+    <% }) %>
+
+    <form method="post" action="/settings/sessions/revoke-all" class="mt-18">
+      <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+      <button class="more-link mono-s" type="submit">SIGN OUT EVERYTHING ELSE →</button>
+    </form>
+  </div>
+<%- include('_close') %>

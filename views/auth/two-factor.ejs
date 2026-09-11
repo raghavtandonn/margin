@@ -1,0 +1,37 @@
+<%- include('_open') %>
+  <div class="mono-s auth-label">TWO-FACTOR</div>
+  <h1 class="auth-title"><%= recovery ? 'A recovery code.' : 'The six digits.' %></h1>
+
+  <form method="post" action="/signin/2fa" class="auth-form">
+    <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+    <input type="hidden" name="next" value="<%= next || '/' %>">
+
+    <% if (recovery) { %>
+      <label class="field">
+        <span class="field-label mono-s">RECOVERY CODE</span>
+        <input name="recovery_code" type="text" autocomplete="one-time-code" required autofocus
+               spellcheck="false" placeholder="XXXXX-XXXXX">
+      </label>
+    <% } else { %>
+      <label class="field">
+        <span class="field-label mono-s">FROM YOUR AUTHENTICATOR</span>
+        <input name="code" type="text" inputmode="numeric" pattern="[0-9]*"
+               autocomplete="one-time-code" required autofocus maxlength="7" class="code-input">
+      </label>
+    <% } %>
+
+    <% if (locals.error) { %><p class="field-error mono-s"><%= error %></p><% } %>
+
+    <button class="auth-action" type="submit">CONTINUE →</button>
+  </form>
+
+  <p class="auth-aside">
+    <% if (recovery) { %>
+      <a href="/signin/2fa">Use your authenticator instead</a>
+    <% } else { %>
+      <%# §6 — recovery codes are the thing Letterboxd doesn't have, and
+          their absence is what turns "lost my phone" into a support ticket. %>
+      Lost the device? <a href="/signin/2fa?recovery=1">Use a recovery code</a>.
+    <% } %>
+  </p>
+<%- include('_close') %>

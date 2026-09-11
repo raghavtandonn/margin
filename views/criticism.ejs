@@ -1,0 +1,68 @@
+<%- include('partials/head', { title: title }) %>
+<%- include('partials/spine', { nav: 'reviews' }) %>
+<main class="sheet">
+  <div class="block pt-20" id="block">
+    <div class="eyebrow mono"><span class="tag">THE CRITICISM</span></div>
+    <h1 class="d2">The criticism</h1>
+    <p class="auth-lede mb-30">What people here have written.</p>
+
+    <%#
+      This page is the missing step in the whole funnel. The product asked
+      you to follow people and gave you no way to find out what anybody was
+      like: a review appeared at the foot of one work page and nowhere else,
+      so the only evidence available about a stranger was their shelves.
+
+      Two filters, no algorithm. Everything is newest first.
+    %>
+    <nav class="crit-tabs mono-s">
+      <a class="<%= rail ? '' : 'is-on' %>" href="/reviews">THE HOUSE</a>
+      <a class="<%= rail ? 'is-on' : '' %>" href="/reviews?from=rail">ON YOUR RAIL</a>
+    </nav>
+
+    <% rows.forEach(function(r) { %>
+      <article class="crit-row panel">
+        <div class="crit-head">
+          <%- h.avatarPlate(r, { size: 34, className: 'crit-avatar' }) %>
+          <span class="crit-who">
+            <a class="no-underline" href="/@<%= r.username %>"><%= r.display_name || '@' + r.username %></a>
+            <span class="dim">on</span>
+            <a class="no-underline crit-book" href="/work/<%= r.work_id %>#reviews"><%= r.title %></a>
+          </span>
+          <span class="mono-s dim">
+            <% if (r.rating != null) { %><%- h.stars(r.rating, { size: 11 }) %> · <% } %>
+            <%= h.monthDay(r.published_at) %><% if (r.pass > 1) { %> · PASS <%= r.pass %><% } %>
+          </span>
+        </div>
+
+        <%#
+          §6 — a review declared as carrying spoilers is not opened in an
+          index. There is no page position to gate against out here, so the
+          safe state is the closed one and the reader goes to the book to
+          decide for themselves.
+        %>
+        <% if (r.contains_spoilers) { %>
+          <p class="crit-body dim">
+            Marked for spoilers.
+            <a class="more-link" href="/work/<%= r.work_id %>#reviews">READ IT ON THE BOOK →</a>
+          </p>
+        <% } else { %>
+          <div class="crit-body"><%- r.body_html %></div>
+        <% } %>
+      </article>
+    <% }) %>
+
+    <% if (!rows.length) { %>
+      <p class="auth-lede">
+        <% if (rail) { %>
+          Nobody on your rail has written anything yet.
+          <a class="more-link" href="/reviews">TRY THE HOUSE →</a>
+        <% } else { %>
+          Nothing written here yet.
+        <% } %>
+      </p>
+      <p class="note mt-14">
+        A review you write appears on the book, on your profile, and here.
+      </p>
+    <% } %>
+  </div>
+<%- include('partials/foot') %>

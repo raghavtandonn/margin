@@ -1,0 +1,390 @@
+<%- include('partials/head', { title: title }) %>
+<%- include('partials/spine', { nav: 'clubs' }) %>
+<main class="sheet" data-key="clubs">
+  <span class="crop tl" aria-hidden="true"></span><span class="crop tr" aria-hidden="true"></span>
+  <span class="crop bl" aria-hidden="true"></span><span class="crop br" aria-hidden="true"></span>
+
+  <div class="block pt-20" id="block">
+
+    <%- include('partials/desk', { deskQuery: '' }) %>
+
+    <%#
+      ── THE CLUB ──────────────────────────────────────────
+
+      A group, in the shape people already know one: an emblem, a name, a
+      member count, a head who can promote admins, one book on display,
+      announcements from the people who run it, and a wall everybody can
+      write on.
+
+      §9 still governs what it DOES — the pick, the checkpoints, the archive
+      are all here — but the furniture is a group's rather than a syllabus'.
+    %>
+    <div class="grp-kicker mono-s"><i aria-hidden="true"></i>CLUB</div>
+
+    <header class="grp-head">
+      <span class="grp-emblem">
+        <% if (club.avatar_key) { %>
+          <img src="/avatar/<%= club.avatar_key %>/256" alt="" width="128" height="128">
+        <% } else { %>
+          <%# No emblem is a legitimate state, so it gets a blank plate
+              rather than an illustration apologising for itself. %>
+          <span class="grp-emblem-blank" aria-hidden="true"></span>
+        <% } %>
+      </span>
+
+      <div class="grp-id">
+        <div class="eyebrow mono">
+          <span class="tag">CLUB</span>
+          <% if (club.visibility !== 'public') { %>
+            <span class="dim"><%= club.visibility.toUpperCase() %></span>
+          <% } %>
+        </div>
+        <h1 class="d2 grp-name"><%= club.name %></h1>
+        <p class="grp-count mono-s dim">
+          <%= memberCount %> <%= memberCount === 1 ? 'MEMBER' : 'MEMBERS' %><%
+          if (club.host_username) { %> · HEAD <a class="inherit-color" href="/@<%= club.host_username %>">@<%= club.host_username %></a><% } %>
+        </p>
+        <% if (club.description) { %><p class="grp-blurb"><%= club.description %></p><% } %>
+
+        <div class="grp-actions mono-s">
+          <% if (isMember) { %>
+            <a class="more-link" href="/clubs/<%= club.slug %>/members">MEMBERS</a>
+            <% if (isAdmin) { %>
+              · <a class="more-link" href="/clubs/<%= club.slug %>/pick">ON DISPLAY</a>
+              · <a class="more-link" href="/clubs/<%= club.slug %>/settings">SETTINGS</a>
+            <% } %>
+            · <form method="post" action="/clubs/<%= club.slug %>/leave" class="inline-form">
+                <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                <button class="more-link mono-s" type="submit">LEAVE</button>
+              </form>
+          <% } else if (locals.user) { %>
+            <form method="post" action="/clubs/<%= club.slug %>/join" class="inline-form">
+              <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+              <button class="more-link mono-s" type="submit">
+                <%= club.join_policy === 'open' ? 'JOIN' : 'ASK TO JOIN' %>
+              </button>
+            </form>
+          <% } %>
+          <% if (locals.user && !isHost) { %>
+            · <a class="more-link dim" href="/report?type=club&amp;ref=<%= club.id %>">REPORT</a>
+          <% } %>
+        </div>
+      </div>
+    </header>
+
+    <%#
+      Two columns below the header, for the reason the front page has them:
+      a single column leaves most of the screen empty and the eye reads that
+      as content shoved against the left edge rather than as air.
+
+      Lead: what the club is doing. Rail: who is in it.
+    %>
+    <div class="grp-body">
+    <div class="grp-lead">
+
+    <%#
+      ── ON DISPLAY ────────────────────────────────────────
+
+      One book, in a case, at the top of the club. §9.3's pick framed as the
+      thing the group is gathered around rather than as an assignment: the
+      deadline is a date stated once, and sitting it out is a peer of
+      joining in, not a failure state.
+    %>
+    <% if (pick) { %>
+      <section class="grp-sec">
+        <div class="sec-row">
+          <h2 class="sec">On display</h2>
+          <% if (pick.ends_on) { %><span class="sec-note">UNTIL <%= h.monthDay(pick.ends_on) %></span><% } %>
+        </div>
+
+        <div class="grp-case">
+          <a class="grp-case-cover" href="/work/<%= pick.work_id %>"><%- h.frame(pick) %></a>
+          <div class="grp-case-body">
+            <h2 class="grp-case-title">
+              <a href="/work/<%= pick.work_id %>"><%= pick.title %></a>
+            </h2>
+            <% if (pick.author) { %><p class="grp-case-author"><%= pick.author %></p><% } %>
+
+            <%# §9.3 — an anonymous distribution, and nothing at all below
+                five readers. A per-member position is surveillance. %>
+            <% if (isMember && progress && !progress.tooFew) { %>
+              <p class="mono-s dim"><%= progress.n %> READING · TYPICALLY AROUND PAGE <%= progress.median %></p>
+            <% } else if (isMember && progress && progress.n) { %>
+              <p class="mono-s dim"><%= progress.n %> READING</p>
+            <% } %>
+
+            <% if (isMember) { %>
+              <form method="post" action="/clubs/<%= club.slug %>/pick/<%= pick.id %>/participate"
+                    class="grp-inout">
+                <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                <button class="more-link mono-s <%= participation === 'in' ? 'is-on' : '' %>"
+                        name="state" value="in" type="submit">IN</button>
+                <button class="more-link mono-s <%= participation === 'sitting_out' ? 'is-on' : '' %>"
+                        name="state" value="sitting_out" type="submit">SITTING THIS ONE OUT</button>
+              </form>
+            <% } %>
+          </div>
+        </div>
+
+        <%# §9.4 — checkpoints. "Through chapter 12" as a thread, not a
+            warning: the boundary belongs to the thread, so everything said
+            inside inherits it and nobody has to remember to tag anything. %>
+        <% if (checkpoints.length) { %>
+          <div class="club-sec mono-s dim mt-34">CHECKPOINTS</div>
+          <% checkpoints.forEach(function(cp) { %>
+            <% if (cp.open && isMember) { %>
+              <a class="club-cp" href="/clubs/<%= club.slug %>/c/<%= cp.id %>">
+                <span class="club-cp-label"><%= cp.label %></span>
+                <span class="club-cp-meta mono-s dim">
+                  <% if (cp.through_page) { %>TO P.<%= cp.through_page %><%
+                     } else if (cp.through_chapter) { %><%= cp.through_chapter.toUpperCase() %><% } %>
+                  <% if (cp.posts) { %> · <%= cp.posts %><% } %>
+                </span>
+              </a>
+            <% } else { %>
+              <div class="club-cp is-shut">
+                <span class="club-cp-label"><%= cp.label %></span>
+                <span class="club-cp-meta mono-s dim">
+                  <%= cp.opens_on ? 'OPENS ' + h.monthDay(cp.opens_on) : 'MEMBERS ONLY' %>
+                </span>
+              </div>
+            <% } %>
+          <% }) %>
+        <% } %>
+
+        <% if (queue.length) { %>
+          <div class="club-sec mono-s dim mt-34">NEXT</div>
+          <% queue.forEach(function(q) { %>
+            <a class="club-row" href="/work/<%= q.work_id %>">
+              <span class="club-name"><%= q.title %></span>
+              <span class="club-meta mono-s dim"><%= q.starts_on ? h.monthDay(q.starts_on) : '' %></span>
+            </a>
+          <% }) %>
+        <% } %>
+      </section>
+    <% } else { %>
+      <%# A club with no book up is the state every club starts in, and the
+          note was gated behind isAdmin — so a visitor deciding whether to
+          join saw an empty main column beside a populated rail. Everyone is
+          told; only the people who can act get the action. %>
+      <p class="note">
+        Nothing on display yet.<% if (isAdmin) { %>
+          <a class="btn-do" href="/clubs/<%= club.slug %>/pick">PUT A BOOK UP</a>
+        <% } %>
+      </p>
+    <% } %>
+
+
+    <%#
+      ── THE WALL ──────────────────────────────────────────
+
+      Everybody writes here. Nothing on the wall inherits a spoiler boundary
+      and nothing pretends to — that is what the checkpoint threads are for.
+      Chronological, flat, no scores and no ranking.
+    %>
+    <% if (isMember) { %>
+      <section class="grp-sec">
+        <div class="sec-row">
+          <h2 class="sec">Wall</h2>
+          <% if (wall.length) { %><span class="sec-note"><%= wall.length %></span><% } %>
+        </div>
+
+        <%#
+          The wall, nested one level.
+
+          post() has taken a parentId since it was written and nothing ever
+          passed one: every post was a root, so SAY SOMETHING started a new
+          post and could not answer one. A book club where nobody can respond
+          to anybody is a bulletin board.
+
+          One level, and no deeper. Two is an argument.
+        %>
+        <% wall.forEach(function(p) { %>
+          <article class="club-post">
+            <%# A face beside the name, the same plate the roster uses, so a
+                thread of four people reads as four people rather than as
+                four indistinguishable lines of mono. Readers without a
+                photograph get their initials on a seeded tint — the blank
+                is a state, not a gap. %>
+            <div class="club-post-head mono-s dim">
+              <%- h.avatarPlate(p, { size: 28, className: 'club-post-face' }) %>
+              <a class="inherit-color" href="/@<%= p.username %>"><%= p.display_name || '@' + p.username %></a>
+              · <%= h.monthDay(p.created_at) %>
+            </div>
+            <div class="club-post-body"><%- p.body_html %></div>
+            <p class="club-post-foot mono-s dim">
+              <% if (isMember) { %>
+                <a class="more-link dim" href="#reply-<%= p.id %>">REPLY</a> ·
+              <% } %>
+              <a class="more-link dim" href="/report?type=post&amp;ref=<%= p.id %>">REPORT</a>
+            </p>
+
+            <% if (p.replies && p.replies.length) { %>
+              <div class="club-replies">
+                <% p.replies.forEach(function(rp) { %>
+                  <div class="club-reply">
+                    <div class="club-post-head mono-s dim">
+                      <%- h.avatarPlate(rp, { size: 22, className: 'club-post-face' }) %>
+                      <a class="inherit-color" href="/@<%= rp.username %>"><%= rp.display_name || '@' + rp.username %></a>
+                      · <%= h.monthDay(rp.created_at) %>
+                    </div>
+                    <div class="club-post-body"><%- rp.body_html %></div>
+                  </div>
+                <% }) %>
+              </div>
+            <% } %>
+
+            <% if (isMember) { %>
+              <details class="club-replybox" id="reply-<%= p.id %>">
+                <summary class="mono-s">REPLY</summary>
+                <form method="post" action="/clubs/<%= club.slug %>/post">
+                  <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                  <input type="hidden" name="parent_id" value="<%= p.id %>">
+                  <textarea name="body" rows="3" maxlength="10000" class="club-textarea"></textarea>
+                  <button class="auth-action" type="submit">POST →</button>
+                </form>
+              </details>
+            <% } %>
+          </article>
+        <% }) %>
+
+        <% if (!wall.length) { %>
+          <p class="note">Nobody has written on the wall yet.</p>
+        <% } %>
+
+        <form method="post" action="/clubs/<%= club.slug %>/post" class="club-composer">
+          <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+          <label class="field">
+            <span class="field-label mono-s">SAY SOMETHING</span>
+            <textarea name="body" rows="3" maxlength="10000" class="club-textarea"></textarea>
+          </label>
+          <button class="auth-action" type="submit">POST →</button>
+        </form>
+      </section>
+    <% } %>
+
+    </div><%# /grp-lead %>
+
+    <%#
+      ── THE RAIL ──────────────────────────────────────────
+
+      Who is here, and what the club has read. A roster of eight with the
+      roles printed beside them — §8 of the security spec keeps this
+      members-only, and the route hands the template null for anybody else
+      so there is no branch here that can be got wrong.
+    %>
+    <aside class="grp-rail">
+    <%#
+      ── ANNOUNCEMENTS ─────────────────────────────────────
+
+      Written by the head and the admins, and standing above the wall rather
+      than in it. The same table row as a wall post with a different kind,
+      so it inherits the same sanitising, the same visibility scope and the
+      same report affordance — an announcement is a privileged PLACE, never
+      privileged markup.
+    %>
+    <% if (announcements.length || isAdmin) { %>
+      <section class="grp-sec">
+        <h2 class="sec">Announcements</h2>
+
+        <% announcements.forEach(function(p) { %>
+          <article class="grp-note">
+            <div class="grp-note-head mono-s dim">
+              <a class="inherit-color" href="/@<%= p.username %>">@<%= p.username %></a>
+              · <%= h.monthDay(p.created_at) %>
+            </div>
+            <div class="club-post-body"><%- p.body_html %></div>
+            <% if (isAdmin) { %>
+              <form method="post" action="/clubs/<%= club.slug %>/announce/<%= p.id %>/remove"
+                    class="inline-form">
+                <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                <button class="more-link mono-s dim grp-note-take" type="submit">TAKE IT DOWN</button>
+              </form>
+            <% } %>
+          </article>
+        <% }) %>
+
+        <% if (!announcements.length) { %>
+          <p class="note">Nothing announced.</p>
+        <% } %>
+
+        <% if (isAdmin) { %>
+          <form method="post" action="/clubs/<%= club.slug %>/announce" class="club-composer">
+            <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+            <label class="field">
+              <span class="field-label mono-s">ANNOUNCE SOMETHING</span>
+              <textarea name="body" rows="2" maxlength="4000" class="club-textarea"></textarea>
+              <span class="note">Everyone in the club is told once.</span>
+            </label>
+            <button class="auth-action" type="submit">POST IT →</button>
+          </form>
+        <% } %>
+      </section>
+    <% } %>
+      <div class="grp-rail-sec">
+      <% if (roster) { %>
+        <div class="sec-row">
+          <h2 class="sec">Members</h2>
+          <span class="sec-note"><%= memberCount %></span>
+        </div>
+
+        <% roster.forEach(function(m) { %>
+          <a class="grp-member" href="/@<%= m.username %>">
+            <%# The roster's blank was a bordered empty square, the same
+                thing the profile used to show. It is a plate now, seeded
+                from the handle, so a roster of ten reads as ten people. %>
+            <%- h.avatarPlate(m, { size: 26, className: 'grp-member-face' }) %>
+            <span class="grp-member-name"><%= m.display_name || '@' + m.username %></span>
+            <% if (m.role !== 'member') { %>
+              <span class="grp-member-role mono-s<%= m.role === 'host' ? ' is-head' : ' dim' %>"><%= roleLabel(m.role) %></span>
+            <% } %>
+          </a>
+        <% }) %>
+
+        <% if (memberCount > roster.length) { %>
+          <a class="more-link mono-s grp-rail-more" href="/clubs/<%= club.slug %>/members">
+            +<%= memberCount - roster.length %> MORE →
+          </a>
+        <% } %>
+      <% } else { %>
+        <div class="sec-row">
+          <h2 class="sec">Members</h2>
+          <span class="sec-note"><%= memberCount %></span>
+        </div>
+        <%# §8 of the security spec — a roster is for members. A visitor gets
+            the count and nothing else, which is a number, not a list. %>
+        <p class="note">The list is for members.</p>
+      <% } %>
+      </div>
+
+      <%# §9.6 — the archive is a lookbook. The strip in the order they were
+          read, sitting in the rail where a shelf belongs. %>
+      <% if (archive.picks.length) { %>
+        <div class="grp-rail-sec">
+          <div class="sec-row">
+            <h2 class="sec">Read so far</h2>
+            <span class="sec-note"><%= archive.picks.length %></span>
+          </div>
+
+          <div class="season-strip" role="img"
+               aria-label="<%= archive.picks.length %> books, in the order the club read them">
+            <% archive.strip.forEach(function(c, i) { %>
+              <i id="<%= h.rule(styleRules, 'cb', club.id + '-' + i, 'background:' + h.css.color(c)) %>"></i>
+            <% }) %>
+          </div>
+
+          <div class="club-archive">
+            <% archive.picks.forEach(function(p) { %>
+              <a class="club-arch" href="/work/<%= p.work_id %>">
+                <%- h.frame(p) %>
+                <span class="club-arch-title"><%= p.title %></span>
+              </a>
+            <% }) %>
+          </div>
+        </div>
+      <% } %>
+    </aside>
+    </div><%# /grp-body %>
+
+  </div>
+<%- include('partials/foot') %>

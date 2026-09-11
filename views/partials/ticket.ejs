@@ -1,0 +1,21 @@
+<%#
+  "THE PICK TICKET" — one line: cover, title, author, ISBN, stars, status.
+  §1.4 — every surface that lists books shows covers.
+%>
+<a class="ticket" href="/work/<%= item.work_id %>">
+  <span class="ticket-cover"><%- h.frame(item) %></span>
+  <span class="ticket-main">
+    <span class="ticket-title"><%= item.title %></span>
+    <span class="ticket-meta">
+      <span class="b2 dim"><%= item.authorLine || '' %></span>
+      <% if (item.isbn13) { %><span class="id dim"><%= h.fmt.isbn(item.isbn13) %></span><% } %>
+      <% if (item.page_count) { %><span class="mono-s dim"><%= item.page_count %>PP</span><% } %>
+    </span>
+  </span>
+  <span class="ticket-right">
+    <% if (item.stars != null) { %><%- h.stars(item.stars, { size: 12 }) %><% } %>
+    <% if (item.status) { %>
+      <%- h.stamp(item.status, { date: item.finished_at, page: item.abandoned_page, seed: item.isbn13 || item.work_id }) %>
+    <% } %>
+  </span>
+</a>

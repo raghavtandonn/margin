@@ -1,0 +1,88 @@
+<%- include('partials/head', { title: title }) %>
+<%- include('partials/spine', { nav: 'clubs' }) %>
+<main class="sheet" data-key="clubs">
+  <span class="crop tl" aria-hidden="true"></span><span class="crop tr" aria-hidden="true"></span>
+  <span class="crop bl" aria-hidden="true"></span><span class="crop br" aria-hidden="true"></span>
+
+  <div class="block pt-20" id="block">
+    <div class="eyebrow mono">
+      <span class="tag">CHECKPOINT</span>
+      <span class="dim"><a class="no-underline" href="/clubs/<%= club.slug %>"><%= club.name.toUpperCase() %></a></span>
+    </div>
+
+    <h1 class="d2"><%= cp.label %></h1>
+    <p class="mono-s dim">
+      <% if (cp.through_page) { %>THROUGH PAGE <%= cp.through_page %><%
+         } else if (cp.through_chapter) { %>THROUGH <%= cp.through_chapter.toUpperCase() %><% } %>
+    </p>
+
+    <%#
+      §9.4 — "Posts inside a checkpoint thread inherit its spoiler boundary
+      automatically. No one has to remember to tag anything."
+
+      So the gate is here, once, on the thread — not on each post. A reader
+      behind the boundary is told plainly where the line is and given a way
+      through it. §6: "the reveal is one action, and it stays revealed for
+      that reader on that review" — here, for that reader on that thread.
+    %>
+    <% if (behind) { %>
+      <details class="review-spoiler club-gate">
+        <summary class="mono-s">
+          This thread goes to page <%= cp.through_page %>. You are not there yet.
+        </summary>
+    <% } %>
+
+    <div class="club-thread" id="thread">
+      <% posts.forEach(function(p) { %>
+        <article class="club-post">
+          <div class="club-post-head mono-s dim">
+            <a class="no-underline" href="/@<%= p.username %>"><%= p.display_name || '@' + p.username %></a>
+            · <%= h.monthDay(p.created_at) %>
+          </div>
+          <div class="club-post-body"><%- p.body_html %></div>
+
+          <%#
+            §9.5 — four reactions, and they are all about the argument
+            rather than the person: agreed, unsure, exactly, oof. Counts
+            show; who reacted does not. There is no score and nothing sorts
+            by this.
+          %>
+          <form method="post" action="/clubs/<%= club.slug %>/react/<%= p.id %>"
+                class="inline-form club-react">
+            <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+            <% reactions.forEach(function(r) { %>
+              <%
+                 var n = (p.reactions.find(function(x) { return x.reaction === r; }) || {}).n || 0;
+              %>
+              <button class="more-link mono-s" name="reaction" value="<%= r %>" type="submit">
+                <%= r.toUpperCase() %><% if (n) { %> <%= n %><% } %>
+              </button>
+            <% }) %>
+            <a class="more-link dim mono-s" href="/report?type=post&amp;ref=<%= p.id %>">REPORT</a>
+          </form>
+        </article>
+      <% }) %>
+
+      <% if (!posts.length) { %>
+        <p class="note">Nobody has said anything yet.</p>
+      <% } %>
+    </div>
+    <% if (behind) { %></details><% } %>
+
+    <% if (open) { %>
+      <form method="post" action="/clubs/<%= club.slug %>/post" class="club-composer">
+        <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+        <input type="hidden" name="checkpoint_id" value="<%= cp.id %>">
+        <label class="field">
+          <span class="field-label mono-s">SAY SOMETHING</span>
+          <textarea name="body" rows="3" maxlength="10000" class="club-textarea"></textarea>
+        </label>
+        <button class="auth-action" type="submit">POST →</button>
+      </form>
+    <% } else { %>
+      <p class="note mt-34">
+        This thread opens <%= h.monthDay(cp.opens_on) %>.
+      </p>
+    <% } %>
+  </div>
+<%- include('partials/foot') %>

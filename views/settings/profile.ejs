@@ -1,0 +1,61 @@
+<%- include('_open') %>
+  <%# §9 — "Nothing else. Resist the pull toward Goodreads-style profile
+      sprawl." Six fields, and no more are offered. %>
+  <form method="post" action="/settings/profile" class="auth-form measure">
+    <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+
+    <label class="field">
+      <span class="field-label mono-s">DISPLAY NAME</span>
+      <input name="display_name" maxlength="60" value="<%= values.display_name || '' %>">
+    </label>
+
+    <label class="field">
+      <span class="field-label mono-s">BIO</span>
+      <input name="bio" maxlength="<%= bioMax %>" value="<%= values.bio || '' %>">
+      <span class="note">Plain text.</span>
+    </label>
+
+    <label class="field">
+      <span class="field-label mono-s">LOCATION</span>
+      <input name="location" maxlength="60" value="<%= values.location || '' %>">
+    </label>
+
+    <label class="field">
+      <span class="field-label mono-s">ONE LINK</span>
+      <input name="link" type="url" maxlength="300" value="<%= values.link || '' %>">
+    </label>
+
+    <button class="auth-action" type="submit">SAVE →</button>
+  </form>
+
+  <form method="post" action="/settings/username" class="auth-form measure mt-44">
+    <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+    <label class="field">
+      <span class="field-label mono-s">USERNAME</span>
+      <span class="field-prefixed">
+        <span class="field-prefix">/@</span>
+        <input name="username" minlength="3" maxlength="20" pattern="[a-zA-Z0-9_]+"
+               value="<%= values.username || '' %>">
+      </span>
+      <%# §9 — once every 30 days, and the old one is held for 90 so the
+          freed URL cannot be grabbed for impersonation. %>
+      <span class="note">Changeable once every thirty days.</span>
+    </label>
+    <button class="auth-action" type="submit">CHANGE IT →</button>
+  </form>
+
+  <div class="measure mt-44">
+    <div class="mono-s dim mb-8">AVATAR</div>
+    <%# Shown whether or not one is set, because what a reader wants to see
+        here is what their profile currently looks like to someone else. %>
+    <%- h.avatarPlate(values, { size: 96, className: 'avatar-lg' }) %>
+    <input type="file" id="avatar-file" accept="image/jpeg,image/png,image/webp" class="mt-8">
+    <p class="field-note mono-s" id="avatar-note">JPEG, PNG, or WebP. Up to 5 MB.</p>
+    <% if (values.avatar_key) { %>
+      <form method="post" action="/settings/avatar/remove" class="mt-8">
+        <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+        <button class="more-link mono-s" type="submit">REMOVE →</button>
+      </form>
+    <% } %>
+  </div>
+<%- include('_close') %>

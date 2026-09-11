@@ -1,0 +1,29 @@
+<%- include('_open') %>
+  <div class="measure">
+    <% if (scheduled) { %>
+      <p class="auth-lede">
+        This account is scheduled for deletion on <%= String(scheduled).slice(0, 10) %>.
+        Signing in before then cancels it.
+      </p>
+    <% } %>
+
+    <p class="auth-lede">
+      Deactivating hides the profile and is reversible. Deleting is not:
+      after <%= graceDays %> days every book, note, and rating is destroyed.
+    </p>
+
+    <form method="post" action="/settings/deactivate" class="mb-30">
+      <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+      <button class="more-link mono-s" type="submit">DEACTIVATE INSTEAD →</button>
+    </form>
+
+    <form method="post" action="/settings/delete" class="auth-form">
+      <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+      <label class="field">
+        <span class="field-label mono-s">TYPE YOUR USERNAME TO CONFIRM</span>
+        <input name="confirm" required spellcheck="false" autocomplete="off">
+      </label>
+      <button class="auth-action" type="submit">DELETE THE ACCOUNT →</button>
+    </form>
+  </div>
+<%- include('_close') %>

@@ -1,0 +1,63 @@
+<%- include('partials/head', { title: person.name }) %>
+<%- include('partials/spine', { nav: 'shelves' }) %>
+
+<main class="sheet" data-key="profile">
+  <span class="crop tl" aria-hidden="true"></span>
+  <span class="crop tr" aria-hidden="true"></span>
+  <span class="crop bl" aria-hidden="true"></span>
+  <span class="crop br" aria-hidden="true"></span>
+
+  <div class="block pt-20" id="block">
+
+    <%- include('partials/desk', { deskQuery: '' }) %>
+
+    <div class="eyebrow mono">
+      <span class="tag">PERSON</span>
+      <span class="dim"><%= roles.join(' · ') || 'CONTRIBUTOR' %></span>
+    </div>
+    <h1 class="d2 mb-8"><%= person.name %></h1>
+    <% if (person.bio) { %><p class="b1 mb-20"><%= person.bio %></p><% } %>
+
+    <% if (person.written.length) { %>
+      <div class="rule">
+        <div class="mono"><span class="tag">WROTE</span> <span class="dim"><%= person.written.length %> WORKS</span></div>
+      </div>
+      <% person.written.forEach(function(w) { %>
+        <a class="ticket" href="/work/<%= w.id %>">
+          <span class="ticket-cover"><%- h.frame({
+                cover_url: w.cover && w.cover.cover_url,
+                cover_cache_key: w.cover && w.cover.cover_cache_key,
+                title: w.title, authorLine: person.name,
+                trimAspect: h.trimAspect(w.cover && w.cover.format)
+              }) %></span>
+          <span class="ticket-main">
+            <span class="ticket-title"><%= w.title %></span>
+            <span class="ticket-meta"><span class="mono-s dim"><%= w.first_published_year || '' %></span></span>
+          </span>
+          <span class="ticket-right mono-s dim"><%= w.first_published_year || '' %></span>
+        </a>
+      <% }) %>
+    <% } %>
+
+    <%# §08 — nobody credits book designers. A book's jacket is often the
+        reason you picked it up and the designer's name appears nowhere on any
+        book website in existence. This is that catalog. %>
+    <% if (person.credits.length) { %>
+      <div class="rule">
+        <div class="mono"><span class="tag">CREDITED ON</span> <span class="dim"><%= person.credits.length %> EDITIONS</span></div>
+      </div>
+      <div class="filmstrip scroll-x">
+        <% person.credits.forEach(function(c) { %>
+          <a class="ed" href="/work/<%= c.work_id %>?edition=<%= c.edition_id %>">
+            <%- h.frame({ cover_url: c.cover_url, title: c.work ? c.work.title : '', authorLine: c.publisher || '' }) %>
+            <span class="mono-s orange d-block"><%= c.role.replace(/_/g, ' ') %></span>
+            <span class="mono d-block"><%= c.work ? c.work.title : '' %></span>
+            <span class="mono-s dim d-block"><%= c.published_year || '' %></span>
+          </a>
+        <% }) %>
+      </div>
+    <% } %>
+
+  </div>
+
+<%- include('partials/foot') %>

@@ -1,0 +1,19 @@
+<%- include('partials/head', { title: title }) %>
+<main class="sheet auth-sheet">
+  <span class="crop tl" aria-hidden="true"></span><span class="crop tr" aria-hidden="true"></span>
+  <span class="crop bl" aria-hidden="true"></span><span class="crop br" aria-hidden="true"></span>
+  <div class="auth-block" id="block">
+    <a class="auth-mark mono-s" href="/">MARGIN</a>
+    <div class="mono-s auth-label"><%= title.toUpperCase() %></div>
+    <h1 class="auth-title"><%= heading %></h1>
+    <% if (locals.detail) { %><p class="auth-lede"><%= detail %></p><% } %>
+
+    <%# Several routes were already passing a way out and this page was
+        dropping it, so a refusal was a dead end with nothing but the
+        wordmark to click. %>
+    <% if (locals.back) { %>
+      <p class="mono-s auth-aside"><a class="more-link" href="<%= back %>">BACK →</a></p>
+    <% } %>
+  </div>
+</main>
+<%- include('partials/foot') %>

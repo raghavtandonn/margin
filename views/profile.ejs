@@ -1,0 +1,340 @@
+<%- include('partials/head', { title: title, robots: locals.robots }) %>
+<% if (locals.signedIn) { %><%- include('partials/spine', { nav: 'profile' }) %><% } %>
+<main class="sheet" data-key="profile">
+  <span class="crop tl" aria-hidden="true"></span><span class="crop tr" aria-hidden="true"></span>
+  <span class="crop bl" aria-hidden="true"></span><span class="crop br" aria-hidden="true"></span>
+  <div class="block pt-20" id="block">
+
+    <%- include('partials/desk', { deskQuery: '' }) %>
+
+    <%#
+      ── THE PROFILE ───────────────────────────────────────
+
+      §9 — "Public profile content is exactly: display name, username, bio,
+      avatar, and whichever shelves and entries are marked public." The route
+      hands this template nothing else, so nothing else can appear here by
+      accident.
+
+      The shape is borrowed from what a good film profile does: identity on
+      the left, four numbers on the right, then a wide column of what the
+      person has actually been doing with a rail of where to find more.
+
+      What is deliberately NOT borrowed: the tab bar. Ten tabs is a filing
+      cabinet, and it is how a profile turns into a second navigation the
+      reader has to learn. Everything here is on one page or one rule away.
+    %>
+    <header class="pf-head">
+      <div class="pf-identity">
+        <%# The human slot on the human page. When there is no photograph
+            it is a plate — initials in the display serif on a tint seeded
+            from the handle — rather than an empty bordered box sitting
+            beside full-colour jackets. %>
+        <%- h.avatarPlate(profile, { size: 112, className: 'pf-avatar' }) %>
+
+        <div class="pf-who">
+          <div class="eyebrow mono"><span class="tag">READER</span></div>
+          <h1 class="d2 pf-name"><%= profile.display_name || '@' + profile.username %></h1>
+          <p class="mono-s dim pf-handle">@<%= profile.username %><%
+            if (profile.pronouns) { %> · <%= profile.pronouns.toUpperCase() %><% } %><%
+            if (profile.location) { %> · <%= profile.location.toUpperCase() %><% } %><%
+            if (profile.joined) { %> · SINCE <%= profile.joined %><% } %></p>
+
+          <%# Plain text, escaped, never markup — §13.3 names bio as one of
+              the fields that must never be set as raw HTML. %>
+          <% if (profile.bio) { %><p class="pf-bio"><%= profile.bio %></p><% } %>
+
+          <%# §7 of the security spec — the link shows as its bare hostname,
+              so a deceptive anchor text is impossible to write. %>
+          <% if (profile.link) { %>
+            <p class="mono-s pf-link">
+              <a class="more-link" href="<%= profile.link %>"
+                 rel="nofollow ugc noopener noreferrer" target="_blank"><%= profile.host %> →</a>
+            </p>
+          <% } %>
+        </div>
+      </div>
+
+      <%#
+        §2.1 — "Counts are shown but never celebrated."
+
+        Four numbers, set in the reading face rather than in a badge, with no
+        rank and no verified check anywhere near them. Rank is what created
+        the bot economy; the prize is simply never made.
+
+        Both book figures are counts of what THIS viewer may see — the route
+        puts them through the same scope as everything else on the page, so a
+        private shelf cannot be inferred by subtracting one profile view from
+        another.
+      %>
+      <dl class="pf-stats">
+        <div class="pf-stat">
+          <dt class="mono-s dim"><%- h.mark('book') %> BOOKS</dt>
+          <dd><%= stat.books %></dd>
+        </div>
+        <div class="pf-stat">
+          <dt class="mono-s dim"><%- h.mark('season') %> THIS YEAR</dt>
+          <dd><%= stat.thisYear %></dd>
+        </div>
+        <div class="pf-stat">
+          <dt class="mono-s dim"><%- h.mark('following') %> FOLLOWING</dt>
+          <dd><a href="/@<%= profile.username %>/following"><%= counts.following %></a></dd>
+        </div>
+        <div class="pf-stat">
+          <dt class="mono-s dim"><%- h.mark('followers') %> FOLLOWERS</dt>
+          <dd><a href="/@<%= profile.username %>/followers"><%= counts.followers %></a></dd>
+        </div>
+      </dl>
+    </header>
+
+    <div class="pf-actions mono-s">
+      <% if (isSelf) { %>
+        <a class="more-link" href="/settings/profile">EDIT PROFILE</a>
+        · <a class="more-link" href="/settings/privacy">WHO CAN SEE THIS</a>
+      <% } else if (locals.signedIn) { %>
+        <form method="post" action="/@<%= profile.username %>/follow" class="inline-form">
+          <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+          <input type="hidden" name="on" value="<%= rel.following || rel.requested ? '0' : '1' %>">
+          <button class="more-link mono-s" type="submit">
+            <%= rel.following ? 'FOLLOWING' : rel.requested ? 'REQUESTED' : 'FOLLOW' %> →
+          </button>
+        </form>
+        <%# §3 — a mutual follow is a fact, not a tier. Stated, and given no
+            status of its own. %>
+        <% if (rel.followsYou) { %> · <span class="dim">FOLLOWS YOU</span><% } %>
+        · <form method="post" action="/@<%= profile.username %>/mute" class="inline-form">
+            <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+            <input type="hidden" name="on" value="<%= muted ? '0' : '1' %>">
+            <button class="more-link mono-s dim" type="submit"><%= muted ? 'UNMUTE' : 'MUTE' %></button>
+          </form>
+        · <form method="post" action="/@<%= profile.username %>/block" class="inline-form">
+            <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+            <input type="hidden" name="on" value="1">
+            <button class="more-link mono-s dim" type="submit">BLOCK</button>
+          </form>
+        · <a class="more-link dim" href="/report?type=user&amp;ref=<%= profile.id %>">REPORT</a>
+      <% } %>
+    </div>
+
+    <div class="pf-body">
+      <%# ── LEAD ──────────────────────────────────────── %>
+      <div class="pf-lead">
+
+        <%#
+          ── FAVOURITES ─────────────────────────────────
+
+          The shelf they already keep, at plate size, at the top of the page.
+
+          This was THE STATEMENT: a separate table of hand-pinned works with
+          its own control on every book page, justified on the grounds that a
+          Favourites shelf is a filing decision rather than a sentence about
+          who somebody is. Readers do not agree — a favourites shelf is
+          exactly that sentence, and it is the one they already wrote. The
+          pins table held zero rows.
+        %>
+        <% if (favourites && favourites.length) { %>
+          <section class="pf-sec">
+            <div class="sec-row">
+              <h2 class="sec"><%= h.sentence(favShelf.name) %></h2>
+              <a class="more-link mono-s" href="/shelf/<%= favShelf.slug %>">THE SHELF →</a>
+            </div>
+            <div class="pf-favourites">
+              <% favourites.forEach(function(b) { %>
+                <a href="/work/<%= b.id %>" class="pf-fav">
+                  <%- h.frame({ cover_url: b.cover_url, cover_cache_key: b.cover_cache_key,
+                                title: b.title, authorLine: b.author }) %>
+                </a>
+              <% }) %>
+            </div>
+          </section>
+        <% } %>
+
+
+        <%# §2.1.2 — "On press … the warmest thing on the page and the reason
+            people visit." It comes before the finished books, deliberately:
+            what someone is in the middle of is more interesting than what
+            they have got through. %>
+        <% if (onPressPublic && onPressPublic.length) { %>
+          <section class="pf-sec">
+            <h2 class="sec">On press</h2>
+            <div class="pf-covers">
+              <% onPressPublic.forEach(function(b) { %>
+                <a href="/work/<%= b.id %>" class="pf-cover">
+                  <%- h.frame({ cover_url: b.cover_url, cover_cache_key: b.cover_cache_key,
+                                title: b.title, authorLine: b.author }) %>
+                </a>
+              <% }) %>
+            </div>
+          </section>
+        <% } %>
+
+        <%# The last five finished, in one row. It was twelve, which wrapped
+            to a row and a half and read as a grid that had run out. %>
+        <% if (recent.length) { %>
+          <section class="pf-sec">
+            <div class="sec-row">
+              <h2 class="sec">Lately</h2>
+              <a class="more-link mono-s" href="/shelf/finished">EVERYTHING →</a>
+            </div>
+            <div class="pf-covers pf-covers-row">
+              <% recent.forEach(function(b) { %>
+                <a href="/work/<%= b.id %>" class="pf-cover">
+                  <%- h.frame({ cover_url: b.cover_url, cover_cache_key: b.cover_cache_key,
+                                title: b.title, authorLine: b.author }) %>
+                </a>
+              <% }) %>
+            </div>
+          </section>
+        <% } %>
+
+        <%#
+          §2.1.6 — the most recent reviews.
+
+          With a line of the review in them. A list of titles and dates is a
+          table of contents; what somebody is like as a reader is in the
+          sentences, and those are the reason to be on this page at all.
+        %>
+        <% if (reviews && reviews.length) { %>
+          <section class="pf-sec">
+            <h2 class="sec">Reviews</h2>
+
+            <% reviews.forEach(function(r) { %>
+              <article class="pf-review">
+                <div class="pf-review-head">
+                  <a class="pf-review-title" href="/work/<%= r.work_id %>#reviews"><%= r.title %></a>
+                  <span class="mono-s dim">
+                    <% if (r.rating != null) { %><%- h.stars(r.rating, { size: 11 }) %> · <% } %>
+                    <%= h.monthDay(r.published_at) %><% if (r.pass > 1) { %> · PASS <%= r.pass %><% } %>
+                  </span>
+                </div>
+
+                <%#
+                  §6 — a review declared as carrying spoilers is not opened
+                  on somebody else's profile. There is no page position to
+                  gate against here, so the safe state is the closed one and
+                  the reader goes to the book to decide.
+                %>
+                <% if (r.contains_spoilers) { %>
+                  <p class="pf-review-body dim">
+                    Marked for spoilers.
+                    <a class="more-link" href="/work/<%= r.work_id %>#reviews">READ IT ON THE BOOK →</a>
+                  </p>
+                <% } else { %>
+                  <div class="pf-review-body"><%- r.body_html %></div>
+                <% } %>
+              </article>
+            <% }) %>
+          </section>
+        <% } %>
+
+        <% if (!shelves.length && !recent.length && !(reviews && reviews.length)) { %>
+          <p class="auth-lede">Nothing here is public.</p>
+        <% } %>
+      </div>
+
+      <%# ── RAIL ──────────────────────────────────────── %>
+      <aside class="pf-rail">
+
+        <%#
+          ── WHAT THEY LIKE ─────────────────────────────
+
+          1990s +0.6 · over 600pp +0.2. The most characterful thing the
+          product computes, and it lived on a private home page where only
+          its subject could ever see it: a portrait, filed where the sitter
+          is the only viewer.
+
+          Opt in, off by default. The owner sees it either way, with a line
+          saying which — you should be able to look at what you would be
+          publishing before you publish it.
+        %>
+        <%# WHAT THEY LIKE now renders in the strip at the top of this
+            page, where it sits beside the two figures it is read against.
+            It was here as well, and two copies of the same five deltas on
+            one page is exactly the duplication this move was meant to end.
+            The opt-in and its "only you can see this" line moved with it. %>
+
+        <%#
+          ── SHARED GROUND ──────────────────────────────
+
+          The overlap is the obvious half. The DISAGREEMENT is the one worth
+          printing: two readers three stars apart on the same book have more
+          to say to each other than two who agree, and no reading product
+          puts that in front of them.
+        %>
+        <% if (ground) { %>
+          <section class="pf-rail-sec">
+            <h2 class="sec">Shared ground</h2>
+            <p class="pf-ground">
+              <%= ground.common %> book<%= ground.common === 1 ? '' : 's' %> in common<% if (ground.agreed) { %>,
+              <%= ground.agreed %> you scored the same<% } %>.
+            </p>
+            <% if (ground.argument) { %>
+              <p class="pf-ground pf-argument">
+                You disagree about <a href="/work/<%= ground.argument.id %>"><%= ground.argument.title %></a>
+                by <%= ground.argument.gap %> stars.
+              </p>
+            <% } %>
+          </section>
+        <% } %>
+
+        <% if (shelves.length) { %>
+          <section class="pf-rail-sec">
+            <h2 class="sec">Shelves</h2>
+            <% shelves.forEach(function(s) { %>
+              <a class="pf-rail-row" href="/shelf/<%= s.slug %>">
+                <span class="pf-rail-name"><%= s.name %></span>
+                <%# §10.5 — the count of what THIS viewer may see, not the
+                    true total. A shelf reading 12 to a stranger and 40 to
+                    its owner would leak the 28 by subtraction. %>
+                <span class="mono-s dim"><%= s.count %></span>
+              </a>
+            <% }) %>
+          </section>
+        <% } %>
+
+        <%# §2.1.4 — their lookbook index. Closed seasons only: a season
+            still running is not reviewable mid-show. %>
+        <% if (seasons && seasons.length) { %>
+          <section class="pf-rail-sec">
+            <h2 class="sec">Seasons</h2>
+            <% seasons.forEach(function(s) { %>
+              <a class="pf-rail-row" href="/@<%= profile.username %>/<%= s.code %>">
+                <span class="pf-rail-name"><%= s.given_title || s.label %></span>
+                <span class="mono-s dim"><%= s.short %></span>
+              </a>
+            <% }) %>
+          </section>
+        <% } %>
+      </aside>
+    </div>
+
+    <%#
+      ── THE DATA STRIP ────────────────────────────────────
+
+      The three derived figures, moved here from the front page. They are an
+      analysis of one reader's library and this is the page about a reader.
+
+      Below the columns, not above them. A profile should open with the
+      books — favourites, what they are reading, what they just finished —
+      because that is what somebody came to see. Charts are what you read
+      after you have looked, so they close the page rather than gate it.
+
+      Still full width: it is a band, and it is the one element here that
+      spans the whole measure, which is what stops the foot of the page
+      reading as unfilled.
+
+      Public, to everyone. The route computes every figure through the same
+      visibility scope as the rest of this page, so a stranger's numbers are
+      drawn from the entries a stranger may read and the owner's from their
+      whole library — which means two people can see different figures here
+      and both are right. A panel whose data comes back empty renders
+      nothing, so a thin scope produces a shorter band, not a broken one.
+    %>
+    <% if (dist || taste || when) { %>
+      <div class="pf-strip">
+        <%- include('partials/stats-strip', {
+              dist: dist, like: taste, when: when, self: isSelf }) %>
+
+      </div>
+    <% } %>
+  </div>
+<%- include('partials/foot') %>

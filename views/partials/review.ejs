@@ -1,0 +1,104 @@
+<%#
+  One review. §6 — a reader behind the declared point sees one line saying
+  how far it goes, and taps to reveal. Masked text is the same ground with
+  no blur: blur is heavy and defeated by screenshot sharpening.
+%>
+<%#
+  A review is a panel, and it carries a face.
+
+  It was neither. Reviews are the best content this product holds and they
+  floated on the page ground with a hairline above them, in a product with
+  no filled surfaces at all — and this partial contained no avatar of any
+  kind, so the most human thing here was the one thing with nobody in it.
+%>
+<article class="review panel" id="review-<%= r.id %>">
+  <div class="review-head">
+    <%- h.avatarPlate(r, { size: 44, className: 'review-avatar' }) %>
+    <div class="review-byline">
+      <a class="review-who" href="/@<%= r.username %>"><%= r.display_name || '@' + r.username %></a>
+      <span class="review-meta mono-s dim">
+        <% if (r.rating != null) { %><%- h.stars(r.rating, { size: 11 }) %> · <% } %>
+        <%= h.monthDay(r.published_at) %><%
+          if (r.pass > 1) { %> · PASS <%= r.pass %><% }
+          if (r.edited_at) { %> · EDITED<% } %>
+      </span>
+    </div>
+  </div>
+
+  <% var spoiler = h.spoilerState(r, viewerProgress); %>
+  <% if (spoiler.masked) { %>
+    <details class="review-spoiler">
+      <summary class="mono-s"><%= spoiler.label %><% if (spoiler.viewerPage) { %> <span class="dim">READ ANYWAY →</span><% } %></summary>
+      <div class="review-body"><%- r.body_html %></div>
+    </details>
+  <% } else { %>
+    <div class="review-body"><%- r.body_html %></div>
+  <% } %>
+
+  <div class="review-foot mono-s">
+    <% if (locals.signedIn) { %>
+      <form method="post" action="/review/<%= r.id %>/like" class="inline-form">
+        <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+        <input type="hidden" name="on" value="<%= r.liked ? '0' : '1' %>">
+        <button class="more-link mono-s" type="submit">
+          <%= r.liked ? 'LIKED' : 'LIKE' %><% if (r.like_count) { %> · <%= r.like_count %><% } %>
+        </button>
+      </form>
+    <% } else if (r.like_count) { %>
+      <span class="dim"><%= r.like_count %> LIKED THIS</span>
+    <% } %>
+
+    <% if (locals.signedIn && locals.user && user.id === r.user_id) { %>
+      <a class="more-link mono-s" href="/work/<%= r.work_id %>/review?pass=<%= r.pass %>">EDIT →</a>
+    <% } else if (locals.signedIn) { %>
+      <a class="more-link mono-s review-report" href="/report?type=review&ref=<%= r.id %>">REPORT</a>
+    <% } %>
+  </div>
+
+  <%#
+    ── REPLIES ────────────────────────────────────────────
+
+    One level deep, and that is the whole design. Two levels is an argument,
+    and this product has neither the moderation appetite nor the moderation
+    surface for one.
+
+    Replies are NOT spoiler-masked separately: they sit under a review that
+    is already gated, and a reply that gives something away belongs to the
+    same disclosure as the thing it answers.
+  %>
+  <% if (locals.replies && replies.length) { %>
+    <div class="review-replies">
+      <% replies.forEach(function(rep) { %>
+        <div class="review-reply">
+          <div class="review-reply-head mono-s">
+            <%- h.avatarPlate(rep, { size: 26, className: 'reply-avatar' }) %>
+            <a class="no-underline" href="/@<%= rep.username %>"><%= rep.display_name || '@' + rep.username %></a>
+            <span class="dim"><%= h.monthDay(rep.created_at) %></span>
+            <% if (locals.user && (user.id === rep.user_id || user.id === r.user_id)) { %>
+              <form method="post" action="/review/reply/<%= rep.id %>/delete" class="inline-form">
+                <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                <button class="more-link mono-s dim" type="submit">REMOVE</button>
+              </form>
+            <% } %>
+          </div>
+          <div class="review-reply-body"><%- rep.body_html %></div>
+        </div>
+      <% }) %>
+    </div>
+  <% } %>
+
+  <%# The composer is folded away. An always-open box under every review
+      turns a book page into a comment section, which is the shape this
+      product is trying not to be. %>
+  <% if (locals.signedIn && locals.canReply) { %>
+    <details class="review-replybox">
+      <summary class="mono-s"><%- h.mark('reply') %>REPLY</summary>
+      <form method="post" action="/review/<%= r.id %>/reply">
+        <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+        <textarea name="body" rows="3" maxlength="4000"
+                  placeholder="Answer the review, not the book."></textarea>
+        <button class="auth-action" type="submit">POST →</button>
+      </form>
+    </details>
+  <% } %>
+</article>

@@ -1,0 +1,943 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title><%= (book.meta.short || book.season.code).toUpperCase() %> · MARGIN</title>
+<meta name="description" content="A reading log.">
+<%# The catalogue links its own stylesheet only. margin.css is a different
+    object's palette and would fight this one at every token. %>
+<link rel="stylesheet" href="/css/fonts.css?v=<%= v.fonts %>">
+<link rel="stylesheet" href="/css/lookbook.css?v=<%= v.css %>">
+<link rel="icon" href='data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32"><rect width="32" height="32" fill="%230A0A0A"/><text x="16" y="22" font-family="Helvetica,Arial,sans-serif" font-size="13" font-weight="500" text-anchor="middle" fill="%23E8E4DC">AW</text></svg>'>
+<% if (locals.robots) { %><meta name="robots" content="<%= robots %>"><% } %>
+
+<%#
+  ── THE LINK, WHEN IT IS PASTED ───────────────────────────
+
+  This page has its own <head> rather than the shared partial, so it emitted
+  no preview metadata at all: the best object the product makes arrived in a
+  chat window as a bare grey rectangle with a URL under it.
+
+  The poster IS the preview. Nothing here is a caption or a share string —
+  §8 refuses those, because an artifact that needs a sentence appended to it
+  is not the artifact this one is.
+%>
+<% if (locals.ogImage) { %>
+<meta property="og:title" content="<%= book.meta.short || book.season.code.toUpperCase() %> — a reading season">
+<meta property="og:type" content="article">
+<meta property="og:image" content="<%= ogImage %>">
+<meta property="og:image:width" content="1080">
+<meta property="og:image:height" content="1920">
+<% if (locals.ogDescription) { %><meta property="og:description" content="<%= ogDescription %>"><% } %>
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="<%= ogImage %>">
+<% } %>
+</head>
+<body class="lookbook-page">
+
+<%#
+  ══════════════════════════════════════════════════════════
+  THE SEASONAL LOOKBOOK — §02 RUNNING ORDER
+  ══════════════════════════════════════════════════════════
+
+  §00 — "A lookbook is not a summary. It is a catalogue."
+
+  Nothing on this page congratulates, nothing addresses the reader as "you",
+  and there is no confetti, no superlative and no exclamation mark. §01 —
+  "No emoji anywhere in the artifact, including share cards."
+%>
+<%#
+  The grain. One SVG turbulence over the whole page at low opacity, the way
+  a printed catalogue is never quite flat. It is the only decoration in the
+  feature and it is fixed, so scrolling moves the page under it rather than
+  carrying it along.
+%>
+<svg class="lb-grain" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+  <filter id="lbgrain"><feTurbulence type="fractalNoise" baseFrequency=".82" numOctaves="3"/></filter>
+  <rect width="100%" height="100%" filter="url(#lbgrain)"/>
+</svg>
+
+<main class="lookbook" id="<%= h.rule(styleRules, 'lb', book.season.code,
+        '--bruise:' + h.css.color(book.bruise) +
+        (book.accent ? ';--accent:' + h.css.color(book.accent) : '')) %>">
+
+  <%# ── FRONT MATTER — COVER ─────────────────────────────
+      "Season code only, set large. Archive number beneath it — permanent,
+      citable, collectible. The user's name does not go on the cover. It
+      goes in the credits, like a house does." %>
+  <%# The archive number — SS26-0045-A — is gone from the cover, the line
+      sheet and the colophon. It was styled as permanent, citable and
+      collectible, and it is none of those: it is a reference number for a
+      catalogue of one person's own reading, cited by nobody. The season
+      code says which season this is, which is the only identification
+      anybody needed. %>
+  <header class="lb-cover lb-assemble">
+    <h1 class="lb-code"><%= (book.meta.short || book.season.code).toUpperCase().replace(/^(SS|AW)/, '$1 ') %></h1>
+    <span class="lb-bruise-mark" aria-hidden="true"></span>
+  </header>
+
+  <%#
+    ── THE DESCENT ─────────────────────────────────────────
+
+    The show note, alone, in the dark, at reading size.
+
+    It used to sit in a twelve-column grid beside a label, which made an
+    eighty-word statement look like a caption on a table. A house prints the
+    note on its own page and lets you slow down for it, and the ground goes
+    darker underneath because that is what the reader is being asked to do.
+
+    The two hairlines are the only ornament: a shaft, masked at both ends,
+    which is what a column of type standing alone in a dark field already
+    looks like.
+  %>
+  <% if (book.showNotes) { %>
+    <section class="lb-descent">
+      <span class="lb-shaft" aria-hidden="true"><i></i></span>
+      <div class="lb-note lb-assemble">
+        <div class="lb-label lb-label--quiet">SHOW NOTE</div>
+        <p class="lb-note-body"><%= book.showNotes %></p>
+        <%# Whose sentence this is. §04's habit of citing applies to the
+            house's own copy: a note composed from counts says so, and one
+            the reader wrote is signed. %>
+        <%# WRITE IT YOURSELF → pointed at the season page's note editor,
+            which has been removed. The citation stays: whose sentence this
+            is remains worth saying. %>
+        <div class="lb-cite">
+          <%= book.noteIsTheirs ? 'WRITTEN BY THIS ACCOUNT' : 'COMPOSED FROM THE SEASON\'S OWN FIGURES' %>
+        </div>
+      </div>
+    </section>
+  <% } %>
+
+  <%#
+    ── THE SEASON, READ ACROSS ───────────────────────────
+
+    One paragraph about the season as a whole, drawn from the composition
+    histories rather than from the plots: books cut by editors, books held
+    back from reviewers, a writer working in the shadow of another.
+
+    It sits HERE, at the front, and that is a change from where it started.
+    A synthesis at the foot of a long catalogue is a conclusion nobody
+    reaches; at the front it is a way in, and every plate below is then read
+    against it. Fashion houses put the argument before the clothes for the
+    same reason.
+
+    This is the only place in the catalogue written in the second person and
+    the only one allowed a voice. It earns the exception by being the one
+    piece that reads across the season instead of describing a single
+    object, and it is held to a plainness rule the rest of the page is not:
+    one point, in words a reader could repeat to somebody else.
+
+    Absent until there are at least two documented histories to draw a line
+    between. That absence is correct rather than a hole.
+  %>
+  <%# The section runs whenever the season has books in it. The POSTER used
+      to live inside the note's condition, so a season with too few colours
+      to read across lost its poster as well — A/W 25 has two of seven and
+      showed nothing here at all, when two derived bands and five hatched is
+      exactly the picture it should be showing. %>
+  <% if (book.looks.length) { %>
+    <section class="lb-closing lb-assemble">
+      <div class="lb-closing-grid">
+        <div>
+          <div class="lb-label lb-label--quiet">THE SEASON, READ ACROSS</div>
+          <% if (!(book.closingNote && book.closingNote.note)) { %>
+            <%# Not an error and not an apology: the arithmetic simply is not
+                there yet, and the sentence says which arithmetic. %>
+            <p class="lb-closing-body"><%= book.closingNote.shortfall %></p>
+          <% } %>
+          <%# The note comes back in one or two paragraphs. Printed through a
+              single <p> the blank line collapsed and two distinct moves — the
+              observation, then the claim drawn from it — ran together as one
+              block. Split on the break, escaped per paragraph. %>
+          <% if (book.closingNote && book.closingNote.note) { %>
+          <p class="lb-closing-body"><%= book.closingNote.note %></p>
+          <%# The provenance line says how many books the note speaks for and
+              how many it does not. A note that counted the unwritten ones
+              would be speaking for silence. %>
+          <div class="lb-cite"><%= book.closingNote.provenance %></div>
+
+          <%# The arithmetic itself, so a reader can check the sentence
+              rather than take it. Every claim above is one of these counted. %>
+          <details class="lb-drawn">
+            <summary class="lb-cite">THE COUNT →</summary>
+            <ul class="lb-drawn-list">
+              <% book.closingNote.drawnFrom.forEach(function(d) { %>
+                <li>
+                  <span class="lb-drawn-pct"><%= d.pct %>%</span>
+                  <span class="lb-drawn-emotion"><%= d.emotion %></span>
+                  <span class="lb-drawn-title"><%= d.title %></span>
+                </li>
+              <% }) %>
+            </ul>
+          </details>
+          <% } %>
+        </div>
+
+        <%#
+          THE POSTER, beside it.
+
+          Not an illustration of the note and not decoration: the season's
+          own colours, sampled from the jackets of the books it is about, in
+          bands weighted by how many books carried each one. Nobody
+          art-directed it, which is the whole reason no two seasons look
+          alike, and it is the same palette the printable poster is built
+          from — this is that object, on the page, rather than a link to it.
+        %>
+        <% if (book.looks.length) { %>
+          <figure class="lb-poster">
+            <%# The same picture the printed sheet makes: ONE BAND PER BOOK,
+                in reading order.
+
+                It used to draw `colourway` — the distinct colours, weighted
+                by how many books shared each — which came out as two bands
+                for a seven-book season and was captioned "2 COLOURS FROM 7
+                JACKETS". That was the jacket-extraction path, and it both
+                collapsed the sequence and named the wrong source. A season
+                of seven books is seven bands.
+
+                A book with no derived colour keeps its band and shows the
+                hatch. It is not filled in from the jacket: §05 forbids
+                substituting a colour a book did not earn, and a poster that
+                quietly fills its gaps is a poster that lies about what was
+                read. %>
+            <div class="lb-poster-field">
+              <div class="lb-poster-strip">
+                <% book.looks.forEach(function(l) { %>
+                  <span class="lb-poster-band<%= l.colour && l.colour.source === 'derived' ? '' : ' band--none' %>"
+                        <% if (l.colour && l.colour.source === 'derived') { %>id="<%= h.rule(styleRules, 'lbp', l.colour.hex,
+                              'background:' + h.css.color(l.colour.hex)) %>"<% } %>></span>
+                <% }) %>
+              </div>
+              <div class="lb-poster-foot">
+                <span><%= (book.meta.short || book.season.code).toUpperCase().replace(/^(SS|AW)/, '$1 ') %></span>
+                <span>MARGIN.CO</span>
+              </div>
+            </div>
+            <figcaption class="lb-cite lb-poster-cap">
+              <%# The caption says what is actually on the strip. %>
+              <% var drawn = book.looks.filter(function(l){ return l.colour && l.colour.source === 'derived'; }).length; %>
+              <span>
+                <%= drawn %> DERIVED <%= drawn === 1 ? 'COLOUR' : 'COLOURS' %>
+                ACROSS <%= book.looks.length %> <%= book.looks.length === 1 ? 'BOOK' : 'BOOKS' %><%
+                if (book.looks.length - drawn) { %> · <%= book.looks.length - drawn %> UNASSIGNED<% } %>
+              </span>
+              <% if (owner) { %>
+                <a class="lb-cite" href="/season/<%= book.season.code %>/poster.png">PRINTABLE POSTER →</a>
+              <% } %>
+            </figcaption>
+          </figure>
+        <% } %>
+      </div>
+    </section>
+  <% } %>
+
+  <%# ── THE RUN OF SHOW ─────────────────────────────────
+      "Runway order is chronological so the season has a shape — a
+      beginning, a difficult middle, a close."
+
+      Every look gets the same plates. There was a hero for a while, given a
+      spread of its own while the rest held the line — but a season is not
+      one book and eight also-rans, and the plate that made the difference
+      was the wearing, which is derivable for all of them. %>
+  <div class="lb-run-head lb-assemble">
+    <div class="lb-label">THE RUN OF SHOW</div>
+    <div class="lb-data"><%= book.looks.length %> LOOKS · IN THE ORDER THEY WERE FINISHED</div>
+  </div>
+  <% book.looks.forEach(function(l) { %>
+    <article class="lb-look lb-assemble">
+      <div class="lb-grid">
+        <div class="lb-c12">
+          <div class="lb-look-no">LOOK <%= String(l.n).padStart(2, '0') %> / <%= String(l.of).padStart(2, '0') %></div>
+          <h2 class="lb-look-title"><%= l.work.title %></h2>
+          <% if (l.work.author) { %><p class="lb-look-author"><%= l.work.author %></p><% } %>
+          <hr class="lb-rule">
+        </div>
+      </div>
+
+      <%#
+        The plates row has its own grid rather than the twelve-column one.
+        On twelve columns the jacket cell was 346px holding a 255px plate,
+        so the book sat at the same left margin as the title with ninety
+        pixels of dead space after it — while the two text columns were
+        jammed twenty-four apart and read as one block.
+
+        Here the jacket column is exactly the jacket, it hangs into the
+        outer margin the way a plate does in a catalogue, and the gutter
+        between the columns is a gutter.
+      %>
+      <div class="lb-plates">
+        <%# a. LOOK PLATE — "The cover as garment, styled: where it was
+            read, how fast, what sat next to it on the shelf." %>
+        <div class="lb-plates-jacket">
+          <div class="lb-plate">
+            <%#
+              A missing jacket is a designed plate, not a hole.
+
+              Everywhere else in the product a cover that is absent degrades
+              to a galley — the title in the display face over the author on
+              a tinted ground — and it is a nicer object than several of the
+              real jackets. This page, the showpiece, was the one place that
+              degraded to an empty bordered rectangle instead.
+
+              The plate renders underneath and the jacket layers over it, so
+              a cover that 404s at request time falls back to the same
+              object rather than to a broken-image icon, and neither state
+              shifts the layout.
+            %>
+            <span class="lb-jacket-plate">
+              <span class="lb-jacket-galley" aria-hidden="true">
+                <span class="lb-galley-title"><%= h.shortTitle(l.work.title, { max: 60 }) %></span>
+                <span class="lb-galley-author"><%= (l.work.author || '').toUpperCase() %></span>
+              </span>
+              <% if (l.edition && (l.edition.cover_cache_key || l.edition.cover_url)) { %>
+                <img class="lb-jacket" src="<%= h.coverSrc(l.edition) %>" alt="" loading="lazy" data-cover>
+              <% } %>
+            </span>
+
+            <div class="lb-styling lb-data">
+              <% if (l.edition && l.edition.publisher) { %>
+                <div><span>HOUSE</span><span><%= l.edition.publisher.toUpperCase().slice(0, 30) %></span></div>
+              <% } %>
+              <% if (l.edition && l.edition.page_count) { %>
+                <div><span>YARDAGE</span><span><%= l.edition.page_count %>PP</span></div>
+              <% } %>
+              <%# Labelled for what the column actually holds. A good part
+                  of the catalogue records an edition year here, and calling
+                  that a first edition would be a small confident lie of
+                  exactly the kind §04 is about. %>
+              <% if (l.work.first_published_year) { %>
+                <div><span>CATALOGUED</span><span><%= l.work.first_published_year %></span></div>
+              <% } %>
+              <% if (l.reading.finished_at) { %>
+                <div><span>WORN</span><span><%= String(l.reading.finished_at).slice(0, 10) %></span></div>
+              <% } %>
+              <% if (l.translated) { %>
+                <div><span>PATTERN</span><span>TRANSLATED</span></div>
+              <% } %>
+              <% if (l.reading.stars != null) { %>
+                <div><span>GRADE</span><span><%= l.reading.stars %></span></div>
+              <% } %>
+            </div>
+          </div>
+        </div>
+
+        <%#
+          b. THE OBJECT'S HISTORY
+
+          The conditions the book was written under: where the author
+          physically was, what was happening around them, what they were
+          reacting against, and how it got into print. Treated as exhibition
+          catalogue copy — flat, past tense, no plot, no judgement.
+
+          Every card carries its provenance, and the two kinds look
+          different on purpose. A WRITTEN card was generated from retrieved
+          text and passed a validator that checks every date, figure and
+          name against the sources; it cites the article it came from. A
+          MATERIAL card is a short list of facts the catalogue can prove
+          about the object, shown when no composition history is documented
+          — which is most contemporary and genre fiction.
+
+          The thin card is set thin deliberately. It should not be mistaken
+          at a glance for the other thing.
+        %>
+        <div class="lb-plates-read">
+          <% if (l.history && l.history.kind === 'written') { %>
+            <div class="lb-hist">
+              <div class="lb-label lb-label--quiet">WRITTEN</div>
+              <p class="lb-hist-body"><%= l.history.body %></p>
+              <div class="lb-cite">
+                <% if (l.history.edited) { %>
+                  CORRECTED BY HAND
+                <% } else if (l.history.source) { %>
+                  AFTER <%= l.history.source.title.toUpperCase() %> · EN.WIKIPEDIA.ORG
+                <% } else { %>
+                  FROM RETRIEVED SOURCES
+                <% } %>
+              </div>
+            </div>
+          <% } else if (l.history && l.history.kind === 'material') { %>
+            <div class="lb-hist lb-hist--thin">
+              <div class="lb-label lb-label--quiet">THE OBJECT</div>
+              <ul class="lb-hist-facts">
+                <% l.history.facts.forEach(function(f) { %><li><%= f %></li><% }) %>
+              </ul>
+              <div class="lb-cite">NO COMPOSITION HISTORY ON RECORD</div>
+            </div>
+          <% } %>
+
+
+          <%# THE WEARING. The session log as a run of show, and the point of
+              it is the GAPS — a book set down for eleven days and picked up
+              again is the most interesting thing the log knows, and a chart
+              of cumulative pages hides it completely.
+
+              It sits under WRITTEN now rather than in a column of its own.
+              The book block is three columns: the object, what is known
+              about it, and how its colour was arrived at. A fourth column
+              left the derivation squeezed and the row ragged. %>
+          <div class="lb-wearing">
+            <% if (l.wearing.length) { %>
+              <div class="lb-label lb-label--quiet">THE WEARING</div>
+              <div class="lb-ledger">
+                <% l.wearing.forEach(function(r) { %>
+                  <div class="lb-led-row lb-led--<%= r.kind %>">
+                    <span class="lb-led-when lb-data"><%= r.on %></span>
+                    <span class="lb-led-what"><%= r.text %></span>
+                  </div>
+                <% }) %>
+              </div>
+              <div class="lb-cite">SESSION LOG · THIS ACCOUNT</div>
+            <% } else if (l.held) { %>
+              <div class="lb-label lb-label--quiet">THE WEARING</div>
+              <p class="lb-cite">HELD <%= l.held %> DAYS. NO SESSIONS LOGGED.</p>
+            <% } %>
+          </div>
+
+          <%# MARGINALIA is a second plate, not a continuation of the log. It
+              is the only content on the page nobody can derive. %>
+          <% if (owner && l.marginalia.length) { %>
+            <div class="lb-plate-sec">
+              <div class="lb-label lb-label--quiet">MARGINALIA</div>
+              <% l.marginalia.forEach(function(m) { %>
+                <blockquote class="lb-marg">
+                  <% if (m.at) { %><cite class="lb-data"><%= m.at %></cite><% } %>
+                  <p><%= m.text %></p>
+                </blockquote>
+              <% }) %>
+            </div>
+          <% } %>
+        </div>
+
+        <%#
+          WHY THIS COLOUR.
+
+          The derivation, shown rather than explained. Every value on this
+          panel is already in the database: the anchors the blend was made
+          from, their weights, the resulting hex, the generated name, and
+          each component's own cited span and section.
+
+          NOTHING HERE IS WRITTEN. There is no sentence about why oxidised
+          carmine suits a book — that would be unsourced inference, which §06
+          bans and which the entire citation apparatus exists to prevent. The
+          panel is auditable arithmetic, and being able to follow it is what
+          makes the colour read as considered rather than asserted.
+
+          Absent entirely when a book has no colour: an empty derivation
+          beside a hatch is worse than nothing.
+        %>
+        <% if (l.colour && l.colour.source === 'derived') { %>
+          <div class="lb-plates-why">
+            <%# The label sits ABOVE the panel, the way every other column
+                head on this page does. Inside the border it read as a
+                caption on a card. %>
+            <div class="lb-label lb-label--quiet">WHY THIS COLOUR</div>
+            <div class="lb-panel">
+
+              <%# 1. What went in. Each row is anchor, name, share — and the
+                  name carries both halves, so a reader sees Carmine, Soft
+                  going in and Carmine, Oxidised coming out. %>
+              <ol class="lb-why-anchors">
+                <% l.colour.components.forEach(function(c) { %>
+                  <li class="lb-why-anchor">
+                    <i class="lb-why-chip"
+                       id="<%= h.rule(styleRules, 'wa', c.anchorHex,
+                             'background:' + h.css.color(c.anchorHex)) %>"></i>
+                    <span class="lb-why-nm"><%= c.emotion %> · <%= c.name %></span>
+                    <span class="lb-why-w"><%= Math.round(c.weight * 100) %>%</span>
+                  </li>
+                <% }) %>
+              </ol>
+
+              <div class="lb-why-arrow" aria-hidden="true"><span>↓</span></div>
+
+              <%# 2. What came out. The hero of the panel. %>
+              <div class="lb-why-result">
+                <span class="lb-why-sw"
+                      id="<%= h.rule(styleRules, 'wr', l.colour.hex,
+                            'background:' + h.css.color(l.colour.hex)) %>"></span>
+                <div>
+                  <div class="lb-why-name"><%= l.colour.name %></div>
+                  <div class="lb-why-hex"><%= l.colour.hex %></div>
+                </div>
+              </div>
+
+              <%# 3. Every component's citation, each tied back to its anchor
+                  by the same chip, and attributed to its section. %>
+              <div class="lb-why-evidence">
+                <% l.colour.components.forEach(function(c) { %>
+                  <div class="lb-why-ev">
+                    <div class="lb-why-lbl">
+                      <i id="<%= h.rule(styleRules, 'wd', c.anchorHex,
+                               'background:' + h.css.color(c.anchorHex)) %>"></i>
+                      <span><%= c.emotion %></span>
+                    </div>
+                    <q><%= h.unquote(c.evidence) %></q>
+                    <%# Trimmed: a DOAJ heading is a full article title, and
+                        one running to two lines put that panel's source line
+                        below every other panel's. %>
+                    <span class="lb-why-sec"><%= h.shortSection(c.section) %></span>
+                  </div>
+                <% }) %>
+              </div>
+
+              <div class="lb-why-prov lb-cite"><%= l.colourSource %></div>
+            </div>
+          </div>
+        <% } %>
+
+
+      </div>
+
+    </article>
+  <% }) %>
+
+  <%# ══ SEASON APPARATUS ══════════════════════════════════ %>
+
+  <%#
+    ── THE SEASON ON ONE LINE ────────────────────────────
+
+    Every book of the season on a shared axis, twice: where each one fell in
+    the season's own calendar, and where each one falls across the span of
+    when they were written.
+
+    This replaces three little bands inside every look. Those compared a
+    book's setting against its author's life, and for almost every book two
+    of the three were unknown — one tick and no comparison, a diagram of
+    missing data. A season-wide line has the opposite property: it gets more
+    interesting the more books are on it.
+  %>
+  <% if (book.timeline.read.marks.length >= 2) { %>
+    <section class="lb-section lb-assemble">
+      <div class="lb-section-head">
+        <div class="lb-label">THE SEASON, ON ONE LINE</div>
+        <div class="lb-data"><%= book.timeline.read.marks.length %> FINISHED</div>
+      </div>
+
+      <%#
+        A label per book, stacked into lanes so that two books finished in
+        the same week do not print their numbers on top of each other. The
+        marks keep their true positions; only the labels move.
+      %>
+      <div class="lb-tl">
+        <div class="lb-tl-side">
+          <div class="lb-label lb-label--quiet">READ</div>
+          <div class="lb-cite"><%= book.timeline.read.from.slice(0, 4) %></div>
+        </div>
+        <div class="lb-tl-track">
+          <% book.timeline.read.months.forEach(function(m) { %>
+            <i class="lb-tl-month"
+               id="<%= h.rule(styleRules, 'tm', book.season.code + '-' + m.label + '-' + Math.round(m.pct),
+                     'left:' + h.css.pct(m.pct)) %>"></i>
+          <% }) %>
+          <% book.timeline.read.marks.forEach(function(m) { %>
+            <a class="lb-tl-mark lb-tl-lane-<%= m.lane %>" href="/work/<%= m.workId %>"
+               title="<%= m.title %> · <%= m.at %>"
+               id="<%= h.rule(styleRules, 'tr', book.season.code + '-r' + m.n,
+                     'left:' + h.css.pct(m.pct) +
+                     (m.colour ? ';--tick:' + h.css.color(m.colour) : '')) %>">
+              <span class="lb-tl-stem"></span>
+              <span class="lb-tl-n"><%= String(m.n).padStart(2, '0') %></span>
+            </a>
+          <% }) %>
+        </div>
+      </div>
+      <div class="lb-tl-axis">
+        <span class="lb-tl-side"></span>
+        <div class="lb-tl-scale lb-cite">
+          <% book.timeline.read.months.forEach(function(m) { %><span><%= m.label %></span><% }) %>
+        </div>
+      </div>
+
+      <% if (book.timeline.written) { %>
+        <div class="lb-tl lb-tl--second">
+          <div class="lb-tl-side">
+            <div class="lb-label lb-label--quiet">WRITTEN</div>
+            <div class="lb-cite"><%= book.timeline.written.to - book.timeline.written.from %> YRS</div>
+          </div>
+          <div class="lb-tl-track">
+            <% book.timeline.written.marks.forEach(function(m) { %>
+              <a class="lb-tl-mark lb-tl-lane-<%= m.lane %>" href="/work/<%= m.workId %>"
+                 title="<%= m.title %> · <%= m.year %>"
+                 id="<%= h.rule(styleRules, 'tw', book.season.code + '-w' + m.n,
+                       'left:' + h.css.pct(m.pct) +
+                       (m.colour ? ';--tick:' + h.css.color(m.colour) : '')) %>">
+                <span class="lb-tl-stem"></span>
+                <span class="lb-tl-n"><%= String(m.n).padStart(2, '0') %></span>
+              </a>
+            <% }) %>
+          </div>
+        </div>
+        <div class="lb-tl-axis">
+          <span class="lb-tl-side"></span>
+          <div class="lb-tl-scale lb-cite lb-tl-scale--ends">
+            <span><%= book.timeline.written.from %></span>
+            <span><%= book.timeline.written.to %></span>
+          </div>
+        </div>
+
+        <%#
+          Books the second line cannot place, named rather than silently
+          dropped. "Drawn from four of seven" says three are missing but not
+          which — and the reason is fixable: the year is a field on the book
+          page.
+        %>
+        <% if (book.timeline.written.unplaced.length) { %>
+          <p class="lb-tl-unplaced lb-cite">
+            NOT ON THIS LINE, NO PUBLICATION YEAR ON RECORD —
+            <% book.timeline.written.unplaced.forEach(function(u, i) { %><a
+              class="lb-cite" href="/work/<%= u.workId %>"><%= u.title.toUpperCase() %></a><%=
+              i < book.timeline.written.unplaced.length - 1 ? ' · ' : '' %><% }) %>
+          </p>
+        <% } %>
+      <% } %>
+    </section>
+  <% } %>
+
+  <%# COLORWAY — the season's own colours, in the season's own proportions.
+      Not sampled from jackets any more: each one is what the book was
+      derived to leave a reader with, or what its reader said instead.
+
+      §05 — three assignments or it does not run. A two-band colourway is
+      not a palette, it is two books. %>
+  <% if (book.colourway.length >= 2 && book.colouredCount >= 3) { %>
+    <section class="lb-section lb-assemble">
+      <div class="lb-section-head">
+        <div class="lb-label">COLORWAY</div>
+        <div class="lb-data"><%= book.colourway.length %> ACROSS <%= book.colouredCount %> BOOKS</div>
+      </div>
+      <div class="lb-colourway">
+        <% book.colourway.forEach(function(c) { %>
+          <div class="lb-swatch">
+            <span class="lb-chip"
+                  id="<%= h.rule(styleRules, 'lbc', c.hex, 'background:' + h.css.color(c.hex)) %>"></span>
+            <%# The word first. §05: colour never carries meaning alone, and
+                on this page the name is the meaning. %>
+            <div class="lb-swatch-name"><%= c.emotion %></div>
+            <div class="lb-swatch-hex lb-data"><%= c.name %> · <%= c.count %></div>
+          </div>
+        <% }) %>
+      </div>
+      <p class="lb-cite">EACH COLOUR DERIVED FROM WHAT THE SOURCES SAY THE BOOK IS DOING, OR CHOSEN BY THE READER.</p>
+    </section>
+  <% } else if (book.monochrome) { %>
+    <%# §05 — "All books same colour. Valid and interesting. Say so plainly."
+        A monochrome season is a real result and it gets a sentence, not a
+        suppressed panel. %>
+    <section class="lb-section lb-assemble">
+      <div class="lb-section-head">
+        <div class="lb-label">COLORWAY</div>
+      </div>
+      <div class="lb-colourway">
+        <div class="lb-swatch">
+          <span class="lb-chip"
+                id="<%= h.rule(styleRules, 'lbc', book.monochrome.hex, 'background:' + h.css.color(book.monochrome.hex)) %>"></span>
+          <div class="lb-swatch-name"><%= book.monochrome.emotion %></div>
+          <div class="lb-swatch-hex lb-data"><%= book.monochrome.name %> · <%= book.monochrome.count %></div>
+        </div>
+      </div>
+      <p class="lb-cite">EVERY BOOK IN THIS SEASON CAME OUT THE SAME COLOUR.</p>
+    </section>
+  <% } %>
+
+  <%# ══ BACK MATTER ══════════════════════════════════════ %>
+
+  <%# LINE SHEET — "The ugly-beautiful page. Wholesale catalogue energy."
+      Rating as a bare numeral with no stars. %>
+  <section class="lb-section lb-assemble">
+    <div class="lb-section-head">
+      <div class="lb-label">LINE SHEET</div>
+    </div>
+    <div class="lb-sheet-wrap">
+      <table class="lb-sheet">
+        <thead>
+          <tr>
+            <th>NO</th><th>TITLE</th><th>DESIGNER</th>
+            <th class="num">YARDAGE</th><th>ACQUIRED</th><th>COMPLETED</th><th class="num">GRADE</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% book.lineSheet.forEach(function(r) { %>
+            <tr>
+              <td class="quiet"><%= String(r.n).padStart(3, '0') %></td>
+              <td><%= r.title %></td>
+              <td class="quiet"><%= r.author || '' %></td>
+              <td class="num"><%= r.yardage || '—' %></td>
+              <td class="quiet"><%= r.acquired || '—' %></td>
+              <td class="quiet"><%= r.completed || '—' %></td>
+              <td class="num"><%= r.rating != null ? r.rating : '—' %></td>
+            </tr>
+          <% }) %>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <%# DEADSTOCK — "Goodreads treats abandonment as shameful; this puts it on
+      the wall." §05 asked whether it should be opt-in; it ships on and the
+      switch lives in settings, so a reader who finds it confronting rather
+      than freeing can turn it off without losing the rest. %>
+  <% if (book.deadstock.length) { %>
+    <section class="lb-section lb-assemble">
+      <div class="lb-section-head">
+        <div class="lb-label">DEADSTOCK</div>
+        <div class="lb-data"><%= book.deadstock.length %> NOT PRODUCED</div>
+      </div>
+      <div class="lb-deadstock">
+        <% book.deadstock.forEach(function(d) { %>
+          <div class="lb-dead">
+            <h3 class="lb-dead-title"><%= d.title %></h3>
+            <p class="lb-look-author"><%= d.author || '' %></p>
+            <p class="lb-dead-stamp">
+              <% if (d.abandoned_page) { %>ABANDONED AT P. <%= d.abandoned_page %>.<% } %>
+              NOT PRODUCED.
+            </p>
+          </div>
+        <% }) %>
+      </div>
+    </section>
+  <% } %>
+
+  <%# THE PULP — "Lang shredded his own archive and made sculpture from the
+      remains … Books are literally pulp."
+
+      Assembled from the reader's own notes and therefore built only for
+      them; the assembler returns nothing at all for anybody else. %>
+  <% if (book.pulp) { %>
+    <section class="lb-section lb-assemble">
+      <div class="lb-section-head">
+        <div class="lb-label">THE PULP</div>
+        <div class="lb-data"><%= book.pulp.length %> FRAGMENTS, INTERLEAVED</div>
+      </div>
+      <p class="lb-pulp">
+        <% book.pulp.forEach(function(f) { %><span class="lb-shred"><%= f.text %></span><% }) %>
+      </p>
+      <p class="lb-cite">
+        FROM NOTES WRITTEN BY THIS ACCOUNT. NOT SHOWN TO ANYONE ELSE.
+      </p>
+    </section>
+  <% } %>
+
+  <%# CREDITS — "Authors as designers. Translators as pattern cutters.
+      Cover designer named. Publisher as the house."
+
+      And here, finally, the reader's name. §02: it goes in the credits,
+      like a house does. %>
+  <section class="lb-section lb-assemble">
+    <div class="lb-section-head">
+      <div class="lb-label">CREDITS</div>
+      <div class="lb-data">@<%= username %></div>
+    </div>
+
+    <div class="lb-grid">
+      <div class="lb-c8">
+        <div class="lb-credit-block">
+          <div class="lb-label lb-label--quiet">DESIGN</div>
+          <% book.credits.designers.forEach(function(d) { %>
+            <div class="lb-credit-row">
+              <span class="lb-credit-name"><%= d.name %></span>
+              <span class="lb-cite"><%= d.title.toUpperCase() %></span>
+            </div>
+          <% }) %>
+        </div>
+
+        <% if (book.credits.cutters.length) { %>
+          <div class="lb-credit-block">
+            <div class="lb-label lb-label--quiet">PATTERN CUTTING</div>
+            <% book.credits.cutters.forEach(function(c) { %>
+              <div class="lb-credit-row">
+                <span class="lb-credit-name"><%= c.name %></span>
+                <span class="lb-cite"><%= c.title.toUpperCase() %> · <%= c.source %></span>
+              </div>
+            <% }) %>
+          </div>
+        <% } %>
+
+        <% if (book.credits.jackets.length) { %>
+          <div class="lb-credit-block">
+            <div class="lb-label lb-label--quiet">JACKET</div>
+            <% book.credits.jackets.forEach(function(c) { %>
+              <div class="lb-credit-row">
+                <span class="lb-credit-name"><%= c.name %></span>
+                <span class="lb-cite"><%= c.title.toUpperCase() %> · <%= c.source %></span>
+              </div>
+            <% }) %>
+          </div>
+        <% } %>
+      </div>
+
+    </div>
+
+    <%# The colophon is gone. It printed the reference number, the typefaces,
+        where the subject headings came from, how many histories were
+        documented, that the boards were built by hand, and a link back to
+        the season — six lines of apparatus about the catalogue, at the foot
+        of a catalogue about books. A colophon is a printer's note to other
+        printers; nobody reading their own season needs to be told which
+        fonts it is set in. Each card already carries its own source line,
+        which is where sourcing belongs. %>
+  </section>
+
+  <%# CAMPAIGN — "One sentence from the season. White on black. Full bleed.
+      No image. This is the share card." §00's two precedents meet here: the
+      1998 digital-first release and the text-only billboards. %>
+  <% if (book.campaign) { %>
+    <section class="lb-campaign lb-assemble">
+      <p><%= book.campaign.text %></p>
+      <% if (book.campaign.from) { %>
+        <p class="lb-cite"><%= book.campaign.from.toUpperCase() %></p>
+      <% } %>
+    </section>
+  <% } %>
+  <%#
+    ── THREE TO FOLLOW (recommendation spec §07) ─────────
+
+    Not "more of the same". Nearest-neighbours-to-the-centroid returns what
+    the season already contained, which the reader has just finished; each
+    slot instead stands in a different, defined relation to the season's
+    shape — its centre, its gap, and its outlier's thread.
+
+    Every rationale is a template with arithmetic dropped in. No model wrote
+    a word of this page.
+
+    A slot with no defensible answer prints the hatch rather than a worse
+    book, and empty slots are common by design: four seasons have three or
+    fewer books. The hatch has to look composed, exactly as the colourway
+    voids do.
+  %>
+  <% if (locals.complements && complements.some(function(c){ return c.work_id; })) { %>
+    <section class="lb-page lb-comp">
+      <div class="lb-runhead">
+        <span class="lb-lbl mono-s">COMPLEMENTS</span>
+        <span class="lb-lbl mono-s"><%= (book.meta.short || book.season.code).toUpperCase().replace(/^(SS|AW)/, '$1 ') %></span>
+      </div>
+
+      <h2 class="lb-comp-h">Three to follow</h2>
+      <p class="lb-comp-dek">
+        Chosen against the shape of this season, from the books already on the
+        shelf. Each stands in a different relation to what was read.
+      </p>
+
+      <div class="lb-three">
+        <% complements.forEach(function(c) { %>
+          <div class="lb-slot<%= c.work_id ? '' : ' is-void' %>">
+            <div class="lb-slot-no mono-s">
+              <span><%= c.slot === 'near' ? 'The near' : c.slot === 'absence' ? 'The absence' : 'The thread' %></span>
+              <b><%= c.no %></b>
+            </div>
+
+            <% if (!c.work_id) { %>
+              <%# The hatch. A slot with nothing defensible in it says so and
+                  is not filled. %>
+              <span class="lb-slot-jk lb-slot-hatch" aria-label="No defensible book for this slot"></span>
+              <div class="lb-slot-t">Nothing here</div>
+              <div class="lb-slot-by mono-s">NO BOOK ON THE SHELF ANSWERS THIS</div>
+            <% } else { %>
+              <%# The lookbook's own jacket, not h.frame(): this page links
+                  lookbook.css alone, which carries no `.frame` rules at all.
+                  Using the shared helper here rendered its fallback as raw
+                  link text under an unconstrained image. %>
+              <a class="lb-slot-jk lb-jacket-plate" href="/work/<%= c.work_id %>">
+                <span class="lb-jacket-galley" aria-hidden="true">
+                  <span class="lb-galley-title"><%= h.shortTitle(c.title, { max: 60 }) %></span>
+                  <span class="lb-galley-author"><%= (c.author || '').toUpperCase() %></span>
+                </span>
+                <% if (c.cover_cache_key || c.cover_url) { %>
+                  <img class="lb-jacket" src="<%= h.coverSrc(c) %>" alt="" loading="lazy" data-cover>
+                <% } %>
+              </a>
+              <a class="lb-slot-t" href="/work/<%= c.work_id %>"><%= c.title %></a>
+              <div class="lb-slot-by mono-s">
+                <%= (c.author || 'Unknown').toUpperCase() %><% if (c.year) { %> · <%= c.year %><% } %>
+              </div>
+
+              <div class="lb-why">
+                <%# The rationale is one template with the arithmetic marked
+                    for emphasis. It is split on the marker rather than
+                    interpolated as HTML, so every segment stays escaped and
+                    no rationale can ever carry markup. %>
+                <p class="lb-rsn"><%
+                  c.rationale.split('**').forEach(function(part, i) {
+                    if (i % 2) { %><b><%= part %></b><% } else { %><%= part %><% }
+                  }) %></p>
+
+                <% if (c.neighbourBooks.length) { %>
+                  <div class="lb-bec mono-s">CLOSEST TO WHAT YOU FINISHED</div>
+                  <%# Jackets, not titles. Three covers are read at a glance;
+                      three truncated titles are a list to be parsed. %>
+                  <div class="lb-nbrs">
+                    <% c.neighbourBooks.forEach(function(n) { %>
+                      <a class="lb-n lb-jacket-plate" href="/work/<%= n.work_id %>"
+                         title="<%= n.title %><%= n.author ? ' · ' + n.author : '' %>">
+                        <span class="lb-jacket-galley" aria-hidden="true">
+                          <span class="lb-galley-title"><%= h.shortTitle(n.title, { max: 28 }) %></span>
+                        </span>
+                        <% if (n.cover_cache_key || n.cover_url) { %>
+                          <img class="lb-jacket" src="<%= h.coverSrc(n) %>" alt="" loading="lazy" data-cover>
+                        <% } %>
+                      </a>
+                    <% }) %>
+                  </div>
+                <% } %>
+
+                <%# How much each source of text agreed — the audit made
+                    visible. Only the marked kind ranked this book; the
+                    others are shown because seeing that the criticism and
+                    the plot summaries agree is the insight, and seeing that
+                    they do not is equally one. %>
+                <% if (c.kinds.length) { %>
+                  <%# "AGREEMENT BY SOURCE" named the mechanism. What a
+                      reader wants to know is which descriptions of the book
+                      actually matched, and how strongly — so the heading
+                      says that and the figures are percentages, which people
+                      read, rather than cosines, which they do not. %>
+                  <div class="lb-bec mono-s">HOW STRONGLY EACH MATCHED</div>
+                  <div class="lb-kinds">
+                    <%
+                      var SOURCE = { 'text-plot': 'Plot summary',
+                                     'text-criticism': 'Criticism',
+                                     'text-blurb': 'Publisher blurb',
+                                     'colour-components': 'Colour' };
+                    %>
+                    <% c.kinds.forEach(function(k) { %>
+                      <div class="lb-kd<%= k.lead ? ' is-lead' : '' %>">
+                        <span><%= SOURCE[k.kind] || k.kind %></span>
+                        <%# The width arrives as a CUSTOM PROPERTY, not as a
+                            width: the stylesheet animates 0 → var(--w) on
+                            hover, and a nonced rule setting `width` outright
+                            would paint the bar full before anyone looked. %>
+                        <span class="lb-tr"><i id="<%= h.rule(styleRules, 'kd',
+                          c.work_id + '-' + k.kind, '--w:' + h.css.pct(Math.round(k.cos * 100))) %>"></i></span>
+                        <span class="lb-v"><%= Math.round(k.cos * 100) %>%</span>
+                      </div>
+                    <% }) %>
+                  </div>
+                  <%# Why this book, in the arithmetic that chose it.
+                      This replaced "RANKED ON PLOT · THE REST ARE
+                      AGREEMENTS, NOT INPUTS", which described the machinery
+                      rather than the book and meant nothing to anyone who
+                      had not read the spec. Every number here is measured,
+                      and no model wrote the sentence — it is a template
+                      with the figures dropped in, same as the rationale. %>
+                  <% if (c.detail) { %>
+                    <p class="lb-detail"><%= c.detail %></p>
+                  <% } %>
+                <% } %>
+              </div>
+            <% } %>
+          </div>
+        <% }) %>
+      </div>
+
+    </section>
+  <% } %>
+</main>
+<%# §13.1 — the bruise, the timeline bars and the swatches are the only
+    computed values on this page, and they arrive as real CSS rules under
+    the response nonce. There is not one style attribute in this template. %>
+<% if (locals.styleRules && styleRules.length) { %>
+<style nonce="<%= nonce %>"><%- styleRules.join('') %></style>
+<% } %>
+</body>
+</html>

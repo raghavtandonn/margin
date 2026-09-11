@@ -1,0 +1,31 @@
+<%- include('_open') %>
+  <div class="mono-s auth-label">SIGN IN</div>
+  <h1 class="auth-title">Back to it.</h1>
+
+  <form method="post" action="/signin" class="auth-form">
+    <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+    <input type="hidden" name="next" value="<%= next || '/' %>">
+
+    <label class="field">
+      <span class="field-label mono-s">EMAIL OR USERNAME</span>
+      <input name="identifier" type="text" autocomplete="username" required autofocus
+             value="<%= values.identifier || '' %>">
+    </label>
+
+    <label class="field">
+      <span class="field-label mono-s">PASSWORD</span>
+      <input name="password" type="password" autocomplete="current-password" required>
+    </label>
+
+    <%# §5 — one message for every failure. A wrong address and a wrong
+        password say the same thing, take the same time, and return the
+        same status. %>
+    <% if (error) { %><p class="field-error mono-s"><%= error %></p><% } %>
+
+    <button class="auth-action" type="submit">SIGN IN →</button>
+  </form>
+
+  <p class="auth-aside">
+    <a href="/reset">Forgotten your password</a> · <a href="/signup">Create an account</a>
+  </p>
+<%- include('_close') %>

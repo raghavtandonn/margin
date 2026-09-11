@@ -1,0 +1,226 @@
+<%- include('partials/head', { title: 'Reading' }) %>
+<%- include('partials/spine', { nav: 'reading' }) %>
+
+<main class="sheet" data-key="reading">
+  <span class="crop tl" aria-hidden="true"></span>
+  <span class="crop tr" aria-hidden="true"></span>
+  <span class="crop bl" aria-hidden="true"></span>
+  <span class="crop br" aria-hidden="true"></span>
+
+  <div class="block pt-20" id="block">
+
+    <%- include('partials/desk', { deskQuery: '' }) %>
+
+    <%# The section's own mark, as clubs carries one, so the page is
+        identifiable before a word of it is read. %>
+    <div class="press-kicker mono-s"><i aria-hidden="true"></i>READING — <%=
+      books.length %> ON PRESS</div>
+    <h1 class="d2 mb-30">On press</h1>
+
+    <%#
+      This page collapses to ONE interaction: say what page you are on.
+
+      Everything that used to be here and is not any more:
+
+      — FINISHED and ABANDON. Once-per-book decisions, near-irreversible, and
+        they were sitting a mis-click away on a screen opened every morning.
+        They live on the book page, where the decision is being made.
+      — DUE. A deadline is exactly the pressure the footer promises this
+        product does not apply. It survives only where it is a fact rather
+        than a goal: a library loan, shown on the book that is borrowed.
+      — The pace strip's empty state. A heading that announces its own
+        emptiness is the "THE COLOPHON — UNKNOWN" failure again.
+      — LOG IMPRESSION. A press impression is a lovely fit for "on press",
+        and nobody would ever guess it meant "record my page". A number
+        field that saves itself needs no verb at all.
+    %>
+
+    <% if (!books.length) { %>
+      <%# B4 — zero active books is not an error state. An invitation, per §10. %>
+      <p class="empty note note-lg">Nothing on press.</p>
+      <a class="btn" href="/desk">FIND A BOOK</a>
+    <% } %>
+
+    <div class="press-rows">
+    <% books.forEach(function(b) { %>
+      <%
+        var label = h.positionLabel(b.position_type);
+        var value = b.current_page ? String(Math.round(b.current_page)) : '';
+      %>
+      <section class="press-row" data-work="<%= b.work_id %>">
+
+        <a class="press-cover" href="/work/<%= b.work_id %>" tabindex="-1" aria-hidden="true">
+          <%- h.frame(b) %>
+        </a>
+
+        <div class="press-body">
+          <a class="press-title" href="/work/<%= b.work_id %>"><%= b.title %></a>
+
+          <div class="press-meta mono-s dim">
+            <%= b.authorLine %><%
+              /* The extent belongs on the byline, where a catalogue puts it —
+                 it is a fact about the edition, not about this reading. */
+              if (b.totalPositions) { %> · <%= b.totalPositions %>PP<% }
+              /* PASS 2 is a fact about the row, not an alarm. The accent was
+                 landing here AND on the button beside it, so two reds were
+                 competing in one row for a screen that is allowed one. */
+              if (b.pass_number > 1) { %> · PASS <%= b.pass_number %><% } %>
+          </div>
+
+          <%#
+            The gap, lifted out of the byline and given the weight it earns.
+
+            How long a book has been sitting is the one fact on this row that
+            might change what somebody does today, and it was set in 9pt mono
+            between the author and everything else. It is now the second
+            thing read. Warm only once the book has actually stalled — a
+            number that shouts on day two is a number nobody believes on
+            day thirty.
+          %>
+          <% if (b.daysSinceLog != null) { %>
+            <div class="press-gap<%= b.stalled ? ' is-stale' : '' %>">
+              <b><%= b.daysSinceLog %></b>
+              <span class="mono-s">DAY<%= b.daysSinceLog === 1 ? '' : 'S' %> SINCE LAST LOGGED</span>
+            </div>
+          <% } else if (b.started_at) { %>
+            <div class="press-gap">
+              <span class="mono-s">STARTED TODAY</span>
+            </div>
+          <% } %>
+
+          <%#
+            The three endings, on the row.
+
+            These lived on the book page for a while, on the argument that
+            near-irreversible decisions should not sit a mis-click away on a
+            screen opened every morning. The single link that replaced them
+            could not say which of the three you were going to get, and a
+            pass you want rid of took two screens to be rid of. They are
+            back where the redesign puts them.
+
+            They are POSTs, not links: each carries CSRF, each is a real
+            form, and DISCARD carries the pass number so it cannot delete a
+            later pass started in another tab. `discard` refuses server-side
+            when a pass is the only record of having read something, so the
+            control cannot destroy that even from here.
+          %>
+          <div class="press-acts">
+            <form method="post" action="/work/<%= b.work_id %>/finish" class="inline-form">
+              <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+              <button class="press-act mono-s" type="submit">FINISHED</button>
+            </form>
+            <span class="press-act-sep mono-s" aria-hidden="true">·</span>
+            <form method="post" action="/work/<%= b.work_id %>/abandon" class="inline-form">
+              <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+              <%# Where they stopped, so the stamp records a page rather than
+                  a blank. %>
+              <input type="hidden" name="page" value="<%= b.current_page || '' %>">
+              <button class="press-act mono-s" type="submit">ABANDONED</button>
+            </form>
+            <span class="press-act-sep mono-s" aria-hidden="true">·</span>
+            <form method="post" action="/work/<%= b.work_id %>/discard" class="inline-form">
+              <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+              <input type="hidden" name="pass" value="<%= b.pass_number %>">
+              <button class="press-act press-act-quiet mono-s" type="submit">DISCARD THIS PASS</button>
+            </form>
+          </div>
+
+          <% if (b.stalled) { %>
+            <p class="press-stall mono-s dim">
+              NO SESSION IN <%= b.daysSinceLog %> DAYS. ABANDONING IS FINE.
+            </p>
+          <% } %>
+
+          <%#
+            A due date appears only when the book is genuinely borrowed — a
+            fact with a date attached, not a target somebody set for themselves.
+          %>
+          <% if (b.due_date) { %>
+            <p class="press-due mono-s <%= b.dueSoon ? 'accent' : 'dim' %>">
+              DUE <%= h.monthDay(b.due_date) %><%
+                if (b.daysUntilDue < 0) { %> · <%= Math.abs(b.daysUntilDue) %> DAYS OVER<% } %>
+            </p>
+          <% } %>
+        </div>
+
+        <%#
+          The page number IS the input. Click it, type, blur saves. No verb,
+          no label, no box — the number sits where a number would sit on a
+          running sheet, and the extent beside it behaves the same way.
+
+          A book the catalogue has no page count for has no ceiling, no
+          percentage and no mark on the rule, and the reader is the only one
+          who can say how long the object in their hands is. Set it once and
+          it bounds every log after.
+        %>
+        <form class="press-count" method="post" action="/work/<%= b.work_id %>/log">
+          <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+
+          <div class="press-figure">
+            <input class="press-number"
+                   name="position"
+                   type="text"
+                   inputmode="numeric"
+                   autocomplete="off"
+                   value="<%= value %>"
+                   data-value="<%= value %>"
+                   data-total="<%= b.totalPositions || '' %>"
+                   placeholder="—"
+                   aria-label="<%= label %> in <%= b.title %>">
+            <span class="press-of mono-s dim">/</span>
+            <input class="press-extent mono-s"
+                   name="total"
+                   type="text"
+                   inputmode="numeric"
+                   autocomplete="off"
+                   value="<%= b.totalPositions || '' %>"
+                   data-value="<%= b.totalPositions || '' %>"
+                   data-extent-post="/work/<%= b.work_id %>/extent"
+                   placeholder="?"
+                   aria-label="Total <%= label.toLowerCase() %>s in <%= b.title %>">
+          </div>
+
+          <div class="press-unit mono-s dim"><%= label %></div>
+
+          <%#
+            One hairline with a red mark — the same treatment the home screen
+            uses, so the same idiom means the same thing in both places. Not
+            a filled bar: a fill is a score, and a mark is just where you are.
+
+            A book with no extent gets a broken rule rather than a solid one,
+            because there is no line to be somewhere along yet.
+          %>
+          <div class="press-track<%= b.totalPositions ? '' : ' is-unknown' %>"<%
+               if (b.percent) { %> role="img" aria-label="<%= b.percent %> percent"<% } %>>
+            <% if (b.percent) { %>
+              <i class="press-mark"
+                 id="<%= h.rule(styleRules, 'pm', b.work_id, 'left:' + h.css.pct(b.percent)) %>"></i>
+            <% } %>
+          </div>
+
+          <div class="press-pct mono-s dim">
+            <%= b.totalPositions ? (b.percent || 0) + ' PER CENT' : 'LENGTH UNKNOWN' %>
+          </div>
+
+          <%#
+            Plain mono text, no boxes, and only on the row you are in. They
+            are submit buttons so the page still works with no JavaScript;
+            the styling is what makes them read as text.
+          %>
+          <div class="press-adds">
+            <% [10, 25, 50].forEach(function(n) { %>
+              <button class="press-add mono-s" type="submit" name="advance" value="<%= n %>"
+                      tabindex="-1">+<%= n %></button>
+            <% }) %>
+          </div>
+
+          <%# Without JavaScript, Enter submits and this is the fallback. %>
+          <noscript><button class="press-add mono-s" type="submit">SAVE</button></noscript>
+        </form>
+      </section>
+    <% }) %>
+    </div>
+
+  </div>
+
+<%- include('partials/foot') %>

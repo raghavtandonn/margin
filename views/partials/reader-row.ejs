@@ -1,0 +1,22 @@
+<%#
+  One reader, in a list.
+
+  Handle, name, and ONE line of why they are here — the shared book, the
+  shared club, the bio. Never a follower count: §2.1 says counts are shown
+  but never celebrated, and a number beside a name in a directory is the one
+  place it reads as a score.
+%>
+<a class="ruled-row reader-row no-underline" href="/@<%= r.username %>">
+  <%- h.avatarPlate(r, { size: 34, className: 'reader-avatar' }) %>
+
+  <span class="reader-who">
+    <span class="reader-name"><%= r.display_name || '@' + r.username %></span>
+    <span class="mono-s dim">@<%= r.username %><% if (r.location) { %> · <%= r.location.toUpperCase() %><% } %></span>
+  </span>
+
+  <span class="reader-why mono-s dim">
+    <% if (r.shared_title) { %>READING <%= r.shared_title.toUpperCase().slice(0, 34) %>
+    <% } else if (r.shared_club) { %><%= r.shared_club.toUpperCase().slice(0, 34) %>
+    <% } else if (r.bio) { %><%= r.bio.slice(0, 60) %><% } %>
+  </span>
+</a>

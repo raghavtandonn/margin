@@ -1,0 +1,43 @@
+<%#
+  §7.4 — a frame. Index in mono, cover, title in serif, author and date and
+  pass in mono, and the reader's own caption beneath.
+
+  The caption is a line of their note, verbatim. It is never rewritten and
+  never summarised.
+%>
+<div class="frame-row">
+  <div class="frame-index mono-s"><%= String(f.ordinal).padStart(2, '0') %></div>
+
+  <a class="frame-cover" href="/work/<%= f.work_id %>">
+    <%- h.frame({ cover_url: f.cover_url, cover_cache_key: f.cover_cache_key,
+                  title: f.title, authorLine: f.author }) %>
+  </a>
+
+  <div class="frame-body">
+    <a class="lb-title" href="/work/<%= f.work_id %>"><%= f.title %></a>
+    <%# A NAME IS NOT A LABEL. The author sat in the same 10px tracked
+        capitals as FORMAT and PUBLISHER, which is what made a season page
+        read as a manifest: the people who wrote the books were typeset as
+        field values. The name takes the reading face; the date and the pass
+        are data and keep the label voice. %>
+    <div class="frame-meta">
+      <% if (f.author) { %><span class="frame-author"><%= f.author %></span><% } %>
+      <span class="mono-s dim"><%
+        if (f.finished_at) { %><%= f.author ? ' · ' : '' %><%= h.monthDay(f.finished_at) %><% }
+        if (f.pass_number > 1) { %> · PASS <%= f.pass_number %><% } %></span>
+    </div>
+
+    <% if (f.caption) { %>
+      <p class="frame-caption"><%= f.caption %></p>
+    <% } %>
+
+    <%# §11 — two of the four controls live on the frame. %>
+    <% if (isOwner && !viewerIsPublic) { %>
+      <form method="post" action="/season/<%= code %>/frame/<%= f.reading_id %>/hide" class="frame-controls">
+        <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+        <input type="hidden" name="hidden" value="1">
+        <button class="more-link mono-s" type="submit">HIDE →</button>
+      </form>
+    <% } %>
+  </div>
+</div>

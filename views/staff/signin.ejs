@@ -1,0 +1,29 @@
+<%- include('../partials/head', { title: title }) %>
+<main class="sheet auth-sheet">
+  <div class="auth-block" id="block">
+    <div class="mono-s auth-label">STAFF</div>
+    <h1 class="auth-title">Sign in.</h1>
+    <%# §14 — staff are a separate table with a separate login route and no
+        shared session, so no mass-assignment bug on a member row can ever
+        produce a staff account. %>
+    <form method="post" action="/staff/signin" class="auth-form">
+      <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+      <label class="field">
+        <span class="field-label mono-s">EMAIL</span>
+        <input name="email" type="email" required autofocus autocomplete="username">
+      </label>
+      <label class="field">
+        <span class="field-label mono-s">PASSWORD</span>
+        <input name="password" type="password" required autocomplete="current-password">
+      </label>
+      <label class="field">
+        <span class="field-label mono-s">SECOND FACTOR</span>
+        <input name="code" inputmode="numeric" maxlength="7" required class="code-input">
+        <span class="field-note mono-s">Mandatory.</span>
+      </label>
+      <% if (locals.error) { %><p class="field-error mono-s"><%= error %></p><% } %>
+      <button class="auth-action" type="submit">SIGN IN →</button>
+    </form>
+  </div>
+</main>
+<%- include('../partials/foot') %>

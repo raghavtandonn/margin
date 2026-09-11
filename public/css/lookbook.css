@@ -1,0 +1,1174 @@
+/* ══════════════════════════════════════════════════════════
+   THE SEASONAL LOOKBOOK
+   Ref. AW25–0417–A
+
+   §00 — "The reader should feel like they've been handed a wholesale line
+   sheet by mistake. Slightly unfriendly. If it feels warm, it's broken."
+
+   This is a separate stylesheet from margin.css on purpose. The catalogue
+   is a different object from the product it is made out of, and sharing a
+   palette would make it a page rather than an artefact.
+   ═══════════════════════════════════════════════════════ */
+
+/* The catalogue loads this stylesheet and no other, so it needs its own
+   reset. Without it every padded box here is content-box and comes out
+   wider than it is declared — .lb-plate at max-width 260 measured 298. */
+.lookbook, .lookbook *, .lookbook *::before, .lookbook *::after {
+  box-sizing: border-box;
+}
+
+/* §01 — three permanent, one seasonal. The bruise is set per season by a
+   nonced rule the server writes; this is the fallback if it is ever absent.
+
+   ONE RULE ABOUT THE BRUISE, and it holds for every season the rotation can
+   produce: it is a GROUND, never type. Oxblood #4A1418 on ink #0A0A0A is
+   about 1.5:1 — as a filled area of three pixels or more it reads as a
+   mark, and as a letterform it simply is not there. Every accent below is
+   therefore a block, a bar or a rule; the type on top of it is bone. */
+/* The ground is painted on <body>, not only on .lookbook.
+ *
+ * Every colour on this page is declared on `.lookbook` itself, so the dark
+ * stock only ever covered that element's own box. Anywhere the document ran
+ * taller than it — a short season, or now the derivation popovers, which are
+ * absolutely positioned and so no longer grow their container — the
+ * browser's default white showed through underneath. A page whose subject is
+ * a printed object cannot have the paper change colour halfway down.
+ *
+ * The literal is repeated here deliberately: --ink is declared ON .lookbook,
+ * so <body> cannot see it. */
+html, body.lookbook-page { background: #0A0A0A; }
+.lookbook { min-height: 100vh; }
+
+.lookbook {
+  --ink: #0A0A0A;
+  --bone: #E8E4DC;
+  --grey-inst: #6E6E6E;
+  /* The product's orange. Not `--accent`, which on this page is the
+     season's own bruise and changes every season — this is the one that
+     stays the same colour in every lookbook. */
+  --proof-orange: #FF4E1A;
+  --bruise: #4A1418;
+
+  /* §01 — "A neo-grotesque doing the display work." Inter Tight is the
+     grotesque this product already carries; Neue Haas and Söhne are
+     licensed faces and no page here loads a third-party asset. */
+  --grot: "Inter Tight", "Neue Haas Grotesk", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  --data: "Martian Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+
+  /* §01 — twelve columns, generous outer margins. "The expensive feeling
+     comes from what is left empty — do not fill it." */
+  --gut: 24px;
+  --edge: clamp(24px, 7vw, 132px);
+
+  background: var(--ink);
+  color: var(--bone);
+  font-family: var(--grot);
+  font-weight: 400;
+  min-height: 100vh;
+  padding: 0 var(--edge) 160px;
+  /* No rounded corners anywhere, no shadows, no gradients. */
+}
+
+.lookbook * { border-radius: 0 !important; box-shadow: none !important; }
+
+/* §01 — "Two weights maximum across the whole feature." 400 and 500.
+   Nothing here is bold. */
+.lookbook b, .lookbook strong { font-weight: 500; }
+
+/* ── Type roles ──────────────────────────────────────────
+   "The counter-intuitive move is that the display type is small and the
+   body type is generous. Headlines behave like garment labels." */
+.lb-label {
+  font-family: var(--grot);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: .18em;
+  text-transform: uppercase;
+  color: var(--bone);
+}
+.lb-label--quiet { color: var(--grey-inst); font-weight: 400; }
+
+.lb-data {
+  font-family: var(--data);
+  font-size: 10px;
+  letter-spacing: .04em;
+  font-variant-numeric: tabular-nums;
+  color: var(--grey-inst);
+}
+.lb-cite {                      /* §04 — attribution as design element */
+  font-family: var(--data);
+  font-size: 9px;
+  letter-spacing: .05em;
+  color: var(--grey-inst);
+}
+
+/* ── Grid ────────────────────────────────────────────────
+   Never centre anything except the cover. */
+.lb-grid {
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  gap: var(--gut);
+  align-items: start;
+}
+.lb-c8  { grid-column: span 8; }
+.lb-c12 { grid-column: 1 / -1; }
+
+.lb-rule { border: 0; border-top: 1px solid var(--bone); margin: 0; }
+
+/* ── FRONT MATTER — the cover ────────────────────────────
+   "Season code only, set large. Archive number beneath it. The user's name
+   does not go on the cover." */
+.lb-cover {
+  min-height: 78vh;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;   /* the one centred thing */
+  text-align: center;
+  gap: 26px;
+}
+.lb-code {
+  font-family: var(--grot);
+  font-weight: 500;
+  font-size: clamp(64px, 17vw, 240px);
+  line-height: .84;
+  letter-spacing: -.03em;
+  margin: 0;
+}
+.lb-bruise-mark {
+  width: 44px; height: 3px;
+  background: var(--bruise);
+}
+
+/* ── Show notes ──────────────────────────────────────────
+   Roughly eighty words of terse prose before the looks. */
+
+/* ── Section heads ───────────────────────────────────────
+   Garment labels, not headlines. */
+.lb-section { margin-top: 132px; }
+.lb-section-head {
+  display: flex; justify-content: space-between; align-items: baseline;
+  gap: 20px; padding-bottom: 10px;
+  border-bottom: 1px solid var(--bone);
+  margin-bottom: 34px;
+}
+
+/* ── THE LOOKS ───────────────────────────────────────────
+   Each book is a look. Five plates. */
+.lb-look { margin-top: 120px; }
+/* The five plates of a look are separate grids; without this the source
+   board starts level with the bottom of the look plate and the section
+   label collides with it. */
+.lb-look .lb-grid + .lb-grid { margin-top: 56px; }
+.lb-look-no {
+  font-family: var(--data);
+  font-size: 10px; letter-spacing: .2em;
+  color: var(--grey-inst);
+}
+.lb-look-title {
+  font-family: var(--grot);
+  font-weight: 500;
+  font-size: clamp(26px, 3.4vw, 46px);
+  line-height: 1.02;
+  letter-spacing: -.02em;
+  margin: 12px 0 6px;
+}
+.lb-look-author { font-size: 17px; color: var(--grey-inst); margin: 0; }
+
+/* a. Look plate — the cover as garment, styled.
+   The jacket was 300px wide inside it and eight of them ran the length of
+   the page. These are the supporting looks; the hero is the one that gets
+   scale. */
+/* No box. The jacket is already a rectangle with its own edges; drawing a
+   second one around it makes the plate read as a frame in a gallery rather
+   than as a page in a catalogue. */
+.lb-plate {
+  border: none;
+  padding: 0;
+  display: flex; flex-direction: column; gap: 16px;
+  max-width: 255px;
+}
+/* The jacket holds the plate open whether or not the artwork arrives. A
+   span defaults to inline, where aspect-ratio does nothing at all, and the
+   plate then collapses to the size of its caption — which is how a look
+   ends up with no garment on it. */
+/* The plate is the frame. The galley sits in it, and the jacket lays over
+   the galley — so a cover that is missing, and a cover that fails to load,
+   arrive at the same designed object. */
+.lb-jacket-plate {
+  position: relative;
+  display: block; width: 100%; max-width: 225px;
+  aspect-ratio: 2 / 3;
+  container-type: inline-size;
+}
+/* No background. A jacket that fails to load must be TRANSPARENT, so the
+   galley beneath shows through — with a ground of its own the failed image
+   would sit on top of the fallback and hide it, which is the bug this whole
+   plate exists to fix. It also means the galley reads as a placeholder
+   while a slow cover is still arriving. */
+.lb-jacket {
+  position: absolute; inset: 0;
+  display: block; width: 100%; height: 100%;
+  object-fit: cover;
+}
+.lb-jacket-galley {
+  position: absolute; inset: 0;
+  display: flex; flex-direction: column; justify-content: space-between;
+  padding: 9cqw;
+  border: 1px solid var(--grey-inst);
+  overflow: hidden;
+}
+/* The house rule at the head of the plate, the way a galley proof carries
+   one before the type starts. */
+.lb-jacket-galley::before {
+  content: ""; display: block;
+  height: 1px; background: var(--bruise);
+  margin-bottom: 7cqw;
+}
+.lb-galley-title {
+  flex: 1;
+  font-family: var(--grot);
+  font-weight: 400;
+  font-size: clamp(11px, 11cqw, 25px);
+  line-height: 1.14;
+  letter-spacing: -.02em;
+  color: var(--bone);
+  overflow: hidden;
+}
+.lb-galley-author {
+  font-family: var(--data);
+  font-size: clamp(7px, 4.2cqw, 10px);
+  letter-spacing: .1em;
+  color: var(--grey-inst);
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.lb-styling { display: grid; gap: 7px; }
+.lb-styling div { display: flex; justify-content: space-between; gap: 12px; }
+
+/* b. Composition label. The rule that used to box it in was the loudest
+   line on the page and it was drawn around the quietest content. */
+.lb-care {
+  border: none;
+  padding: 0;
+}
+.lb-fibres { margin: 0 0 22px; display: grid; gap: 4px; }
+.lb-fibre {
+  display: flex; align-items: baseline; gap: 12px;
+  font-family: var(--grot); font-weight: 500;
+  font-size: 23px; letter-spacing: .04em; text-transform: uppercase;
+}
+.lb-fibre-pct {
+  font-family: var(--data); font-size: 23px;
+  font-variant-numeric: tabular-nums;
+  min-width: 3.4em; text-align: right;
+}
+/* The bruise is a 3px mark, never type. Oxblood at 20px on #0A0A0A is a
+   contrast failure — the number simply disappears, which is how the first
+   and largest fibre ended up invisible. The accent marks the row instead. */
+.lb-fibre:first-child { position: relative; }
+.lb-fibre:first-child::after {
+  content: ""; position: absolute; left: -22px; top: .55em;
+  width: 12px; height: 3px; background: var(--bruise);
+}
+.lb-instructions {
+  font-family: var(--grot); font-weight: 400;
+  font-size: 11.5px; letter-spacing: .18em; text-transform: uppercase;
+  line-height: 2; color: var(--bone);
+  margin: 0 0 14px;
+}
+
+/* The read band keeps the bone fill so all three bands compare on equal
+   terms; the bruise marks WHICH band it is, in the gutter beside it. */
+
+/* ── Colorway ────────────────────────────────────────────
+   "Most screenshot-able asset in the feature." */
+.lb-colourway { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1px; background: #262626; }
+.lb-swatch { background: var(--ink); padding-bottom: 18px; }
+.lb-chip { height: 132px; display: block; }
+.lb-swatch-name {
+  font-family: var(--grot); font-weight: 500;
+  font-size: 12.5px; letter-spacing: .14em; text-transform: uppercase;
+  margin: 14px 18px 5px;
+}
+.lb-swatch-hex { margin: 0 18px; }
+
+/* ── Line sheet — the ugly-beautiful page, 7pt mono. ───── */
+.lb-sheet-wrap { overflow-x: auto; }
+.lb-sheet {
+  width: 100%; border-collapse: collapse;
+  font-family: var(--data); font-size: 10.5px;
+  font-variant-numeric: tabular-nums;
+}
+.lb-sheet th {
+  text-align: left; font-weight: 400; letter-spacing: .18em;
+  color: var(--grey-inst); padding: 0 16px 9px 0;
+  border-bottom: 1px solid var(--bone); white-space: nowrap;
+}
+.lb-sheet td {
+  padding: 8px 16px 8px 0; border-bottom: 1px solid #1C1C1C;
+  color: var(--bone); vertical-align: top;
+}
+.lb-sheet .num { text-align: right; padding-right: 24px; }
+.lb-sheet .quiet { color: var(--grey-inst); }
+
+/* ── Deadstock ───────────────────────────────────────────
+   "This is the page people will talk about." */
+.lb-deadstock { display: grid; gap: 0; }
+.lb-dead {
+  padding: 26px 0; border-bottom: 1px solid #262626;
+}
+.lb-dead-title {
+  font-family: var(--grot); font-weight: 500;
+  font-size: clamp(20px, 2.4vw, 30px); letter-spacing: -.01em;
+  margin: 0 0 10px;
+}
+/* The line the page exists for. It is set ON the bruise rather than in it,
+   which is both legible and closer to what a stock stamp actually is. */
+.lb-dead-stamp {
+  display: inline-block;
+  font-family: var(--grot); font-weight: 500;
+  font-size: 12.5px; letter-spacing: .2em; text-transform: uppercase;
+  color: var(--bone); background: var(--bruise);
+  padding: 7px 12px; margin: 4px 0 0;
+}
+
+/* ── The pulp — one continuous shredded text object. ───── */
+.lb-pulp {
+  font-size: clamp(17px, 1.7vw, 22px);
+  line-height: 1.75;
+  column-count: 2; column-gap: 46px;
+  max-width: none;
+}
+.lb-shred { display: inline; }
+.lb-shred + .lb-shred::before {
+  content: " / ";
+  color: var(--grey-inst);
+}
+
+/* ── Credits ─────────────────────────────────────────────
+   Authors as designers. Translators as pattern cutters. */
+.lb-credit-block { display: grid; gap: 8px; }
+.lb-credit-row { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; align-items: baseline; }
+.lb-credit-name { font-size: 17px; }
+
+/* ── Campaign — full bleed, no image, the share card. ──── */
+.lb-campaign {
+  margin: 160px calc(var(--edge) * -1) 0;
+  padding: clamp(70px, 16vh, 190px) var(--edge);
+  background: var(--ink);
+  border-top: 1px solid var(--bone);
+}
+.lb-campaign p {
+  font-family: var(--grot); font-weight: 400;
+  font-size: clamp(26px, 4.6vw, 68px);
+  line-height: 1.14; letter-spacing: -.02em;
+  max-width: 18em; margin: 0;
+}
+
+/* ── §01 — MOTION ────────────────────────────────────────
+   "Motion is one orchestrated sequence, not scattered effects: the lookbook
+   assembles on load, plate by plate, ~90ms apart, opacity only. No
+   parallax, no scroll-jacking."
+
+   Staggered by nth-child in the stylesheet rather than by a per-element
+   delay, because a per-element delay would be a style attribute and the
+   CSP forbids those outright. */
+@keyframes lb-assemble { from { opacity: 0; } to { opacity: 1; } }
+
+.lookbook .lb-assemble {
+  opacity: 0;
+  animation: lb-assemble 620ms cubic-bezier(.2, .7, .3, 1) forwards;
+}
+.lookbook .lb-assemble:nth-of-type(1)  { animation-delay: 0ms; }
+.lookbook .lb-assemble:nth-of-type(2)  { animation-delay: 90ms; }
+.lookbook .lb-assemble:nth-of-type(3)  { animation-delay: 180ms; }
+.lookbook .lb-assemble:nth-of-type(4)  { animation-delay: 270ms; }
+.lookbook .lb-assemble:nth-of-type(5)  { animation-delay: 360ms; }
+.lookbook .lb-assemble:nth-of-type(6)  { animation-delay: 450ms; }
+.lookbook .lb-assemble:nth-of-type(7)  { animation-delay: 540ms; }
+.lookbook .lb-assemble:nth-of-type(n+8) { animation-delay: 630ms; }
+
+/* "Respect prefers-reduced-motion by rendering assembled." Not by playing
+   it faster — assembled, meaning it was never animated at all. */
+@media (prefers-reduced-motion: reduce) {
+  .lookbook .lb-assemble { opacity: 1; animation: none; }
+}
+
+/* ── Responsive ──────────────────────────────────────────
+   Twelve columns collapse to one. The looks keep their order, which is the
+   only thing about them that has to survive. */
+@media (max-width: 900px) {
+  .lb-c8 { grid-column: 1 / -1; }
+  .lb-pulp { column-count: 1; }
+  .lb-credit-row { grid-template-columns: 1fr; gap: 2px; }
+}
+
+/* ── §05 — "Print export. This wants to be a PDF." ───────
+   It is not a PDF, and generating one would mean a dependency this build
+   does not have. It is a print stylesheet, which is the same object through
+   the browser's own export and needs nothing installed. */
+@media print {
+  html, body.lookbook-page { background: #FFF; }
+  .lookbook {
+    background: #FFF; color: #000;
+    --bone: #000; --grey-inst: #555; --ink: #FFF;
+    /* 6.08:1 on paper, where #FF4E1A is 3.30. */
+    --proof-orange: #B03A08;
+    padding: 0;
+  }
+  .lookbook .lb-assemble { opacity: 1; animation: none; }
+  .lb-look, .lb-section { break-inside: avoid; page-break-inside: avoid; }
+  .lb-cover, .lb-campaign { break-after: page; page-break-after: always; }
+  .lb-chip { border: 1px solid #000; }
+}
+
+/* ══════════════════════════════════════════════════════════
+   ATMOSPHERE
+
+   The catalogue was legible and cold in the wrong way: correct plates in
+   correct columns, and nothing that felt like having been in the season.
+   What follows is staging — depth, grain, scale and one accent taken from
+   the hero's own jacket. None of it invents a fact; all of it is the
+   difference between a table and a book.
+   ═══════════════════════════════════════════════════════ */
+
+.lookbook {
+  /* A second accent, sampled from the hero's jacket by the assembler. The
+     bruise stays the season's; this is the book's. Falls back to the bruise
+     when the hero has no artwork to sample. */
+  --accent: var(--bruise);
+  --deep: #050506;
+}
+
+/* One turbulence over everything, fixed, so the page moves under it the way
+   ink sits on a sheet rather than travelling with the scroll. */
+.lb-grain {
+  position: fixed; inset: 0; z-index: 99;
+  pointer-events: none; opacity: .15; mix-blend-mode: overlay;
+}
+@media print { .lb-grain { display: none; } }
+
+/* ── THE DESCENT ──────────────────────────────────────────
+   The show note alone in a darker field. It used to sit in a twelve-column
+   grid beside a label, which made an eighty-word statement read as a
+   caption on a table. */
+.lb-descent {
+  position: relative;
+  margin: 0 calc(var(--edge) * -1);
+  padding: 22vh var(--edge) 24vh;
+  background: linear-gradient(180deg, var(--ink) 0%, #08080A 45%, var(--deep) 100%);
+}
+.lb-shaft { position: absolute; inset: 0; display: flex; justify-content: center; pointer-events: none; }
+.lb-shaft i {
+  display: block; width: min(58vw, 760px); height: 100%;
+  border-left: 1px solid rgba(110, 110, 110, .16);
+  border-right: 1px solid rgba(110, 110, 110, .16);
+  -webkit-mask-image: linear-gradient(180deg, transparent, #000 12%, #000 74%, transparent);
+  mask-image: linear-gradient(180deg, transparent, #000 12%, #000 74%, transparent);
+}
+.lb-note { position: relative; max-width: 34ch; margin: 0 auto; }
+.lb-note .lb-label { display: block; margin-bottom: 34px; }
+.lb-note-body {
+  font-size: clamp(22px, 2.6vw, 36px);
+  line-height: 1.5; letter-spacing: -.014em;
+  margin: 0 0 34px;
+}
+
+/* ── THE HERO ─────────────────────────────────────────────
+   One look at full scale. The display type finally gets to be display
+   type — §01 keeps the LABELS small, not the title of the book the season
+   was about. */
+/* The measure belongs to the title at ITS size, not to the block. 22ch
+   against a 100px face broke "Fire & Blood" across three lines, with the
+   ampersand alone on the second. */
+
+/* The jacket is the object the whole spread is about, so it gets real size.
+   A fixed column rather than a fraction, because a fraction of a wide
+   screen is how it reached 422 x 597 and started reading as the page
+   rather than as the book on it. */
+
+/*
+  THE WEARING, AND WHAT WAS WRONG WITH IT.
+
+  Four separate things — the section label, the ledger, its attribution, the
+  MARGINALIA label, the quotation's own date — were stacked with no vertical
+  margin between any of them. `.lb-label` set type and colour and no spacing
+  at all, so THE WEARING sat on the first ledger row, SESSION LOG · THIS
+  ACCOUNT sat on the last one, MARGINALIA sat on that, and "closing" sat on
+  that. Five lines of small tracked capitals running together with nothing
+  between them, which reads as one confused block rather than as two plates.
+
+  The label is a label: it needs air under it and more air above the thing
+  that follows it. Nothing here changes the type; it is all spacing.
+*/
+.lb-plates .lb-label { display: block; margin-bottom: 16px; }
+
+/* The attribution belongs to the ledger above it, but it is not another
+   row of it. */
+.lb-ledger + .lb-cite { display: block; margin-top: 14px; }
+
+/* MARGINALIA is a second plate, not a continuation of the first. A rule and
+   real space say so — it is the only content on the page nobody can derive,
+   and it was reading as a footnote to the session log. */
+.lb-plates .lb-plate-sec {
+  margin-top: 40px;
+  padding-top: 26px;
+  border-top: 1px solid #262626;
+}
+
+/* The wearing. A gap row carries the accent so the eye finds the silences
+   first, which is the whole reason the plate exists. */
+.lb-ledger { border-top: 1px solid #262626; }
+.lb-led-row {
+  display: grid; grid-template-columns: 96px minmax(0, 1fr); gap: 18px;
+  padding: 13px 0; border-bottom: 1px solid rgba(110, 110, 110, .12);
+  align-items: baseline;
+}
+.lb-led-when { color: var(--grey-inst); white-space: nowrap; }
+.lb-led-what { font-size: 17px; line-height: 1.45; }
+.lb-led--gap { background: linear-gradient(90deg, color-mix(in srgb, var(--accent) 30%, transparent), transparent 72%); }
+.lb-led--gap .lb-led-what,
+.lb-led--gap .lb-led-when { color: var(--bone); }
+.lb-led--close .lb-led-what { font-weight: 500; }
+
+/* Marginalia. The reader's own hand, set as a quotation rather than as
+   data, because that is what it is. */
+.lb-marg { border-left: 2px solid var(--accent); padding-left: 22px; margin: 0 0 30px; }
+.lb-marg + .lb-marg { margin-top: 4px; }
+/* The note's own label — "closing", "page 210" — needs to read as a caption
+   on the quotation rather than as a third heading in the stack. */
+.lb-marg cite {
+  display: block; font-style: normal;
+  margin-bottom: 12px;
+  letter-spacing: .08em; text-transform: uppercase;
+}
+.lb-marg p {
+  margin: 0; font-size: clamp(18px, 2vw, 24px);
+  line-height: 1.5; letter-spacing: -.006em;
+}
+
+.lb-run-head {
+  display: flex; justify-content: space-between; align-items: baseline;
+  gap: 20px; margin-top: 16vh; padding-bottom: 12px;
+  border-bottom: 1px solid var(--bone);
+}
+
+@media (max-width: 900px) {
+  .lb-led-row { grid-template-columns: 74px minmax(0, 1fr); gap: 12px; }
+}
+
+/* A span is not a gap. It says how long the book was out; a gap says it was
+   put down, which is only knowable from session data. They must not look
+   alike, so the span gets no accent — just the quiet of an unlogged run. */
+.lb-led--span .lb-led-when,
+.lb-led--span .lb-led-what { color: var(--grey-inst); }
+
+/* ── THE SEASON ON ONE LINE ───────────────────────────────
+   Two tracks, the same books on both, each mark carrying its own jacket's
+   sampled colour so the line reads as the season's palette laid along an
+   axis rather than as a row of identical dots.
+
+   Labels stack into lanes. Two books finished in the same week are two
+   marks a pixel apart, and their numbers used to run together into "0607" —
+   which reads as one mark with a broken label rather than as two books
+   close in time. The marks keep their true positions; only the labels
+   climb, on a stem, into whichever lane is free. */
+.lb-tl {
+  display: grid; grid-template-columns: 84px minmax(0, 1fr);
+  gap: 22px; align-items: end;
+}
+.lb-tl--second { margin-top: 68px; }
+.lb-tl-side { padding-bottom: 2px; }
+.lb-tl-side .lb-cite { margin-top: 4px; }
+
+.lb-tl-track {
+  position: relative; height: 104px;
+  border-bottom: 1px solid var(--grey-inst);
+}
+.lb-tl-month {
+  position: absolute; bottom: 0; width: 1px; height: 6px;
+  background: #2A2A2C;
+}
+
+/* The mark itself: a short tick on the axis in the jacket's colour. */
+.lb-tl-mark {
+  --tick: var(--bone);
+  position: absolute; bottom: 0; width: 3px; height: 14px;
+  background: var(--tick); text-decoration: none; margin-left: -1px;
+}
+.lb-tl-mark:hover { background: var(--bone); }
+
+/* The stem carries the label up to its lane. */
+.lb-tl-stem {
+  position: absolute; left: 1px; bottom: 14px; width: 1px;
+  background: #2F2F31;
+}
+.lb-tl-n {
+  position: absolute; left: 50%; transform: translateX(-50%);
+  font-family: var(--data); font-size: 9px; letter-spacing: .06em;
+  color: var(--grey-inst); white-space: nowrap;
+}
+.lb-tl-mark:hover .lb-tl-n { color: var(--bone); }
+
+.lb-tl-lane-0 .lb-tl-stem { height: 8px; }
+.lb-tl-lane-0 .lb-tl-n { bottom: 24px; }
+.lb-tl-lane-1 .lb-tl-stem { height: 30px; }
+.lb-tl-lane-1 .lb-tl-n { bottom: 46px; }
+.lb-tl-lane-2 .lb-tl-stem { height: 52px; }
+.lb-tl-lane-2 .lb-tl-n { bottom: 68px; }
+.lb-tl-lane-3 .lb-tl-stem { height: 74px; }
+.lb-tl-lane-3 .lb-tl-n { bottom: 90px; }
+
+.lb-tl-axis { display: grid; grid-template-columns: 84px minmax(0, 1fr); gap: 22px; margin-top: 8px; }
+.lb-tl-scale { display: flex; justify-content: space-between; }
+.lb-tl-unplaced { margin-top: 26px; line-height: 1.9; }
+.lb-tl-unplaced a { color: var(--bone); }
+
+@media (max-width: 700px) {
+  .lb-tl, .lb-tl-axis { grid-template-columns: 60px minmax(0, 1fr); gap: 12px; }
+  .lb-tl-scale span:nth-child(even) { display: none; }
+}
+
+/* ── THE PLATES ROW ───────────────────────────────────────
+   The jacket column is exactly the jacket, and it hangs into the outer
+   margin. On the twelve-column grid the cell was 346px around a 255px
+   plate: the book sat at the same left edge as the title with ninety pixels
+   of nothing after it, while the two text columns were twenty-four apart
+   and read as a single block.
+
+   The hang is clamped to zero on narrow screens, where there is no margin
+   to hang into. */
+.lookbook { --hang: clamp(0px, 3.4vw, 60px); }
+
+.lb-plates {
+  display: grid;
+  grid-template-columns: minmax(0, .72fr) minmax(0, 1fr) minmax(0, 1.05fr);
+  gap: clamp(28px, 4.5vw, 68px);
+  align-items: start;
+}
+.lb-plates-jacket { margin-left: calc(var(--hang) * -1); }
+
+/* All three columns start on the same line, a little below the title rule.
+   Dropping only the wearing put its label out of step with the two beside
+   it; dropping the row keeps them level and still clear of the rule. */
+.lb-plates { padding-top: 34px; }
+
+@media (max-width: 1080px) {
+  /* The derivation drops full width under the two columns it explains. */
+  .lb-plates { grid-template-columns: minmax(0, .8fr) minmax(0, 1fr); }
+  .lb-plates-why { grid-column: 1 / -1; margin-top: 8px; }
+}
+@media (max-width: 640px) {
+  .lb-plates { grid-template-columns: minmax(0, 1fr); }
+  .lb-plates-jacket { margin-left: 0; }
+}
+
+/* ── THE OBJECT'S HISTORY ───────────────────────────────────
+   Where the book was written, under what conditions, and how it got into
+   print. Set as running prose rather than as data, because it is the one
+   plate on the page that is a paragraph — everything else here is a label,
+   a figure or a ledger row, and setting this in the same register would
+   make it read as another field rather than as catalogue copy. */
+.lb-hist { margin: 0 0 34px; }
+
+.lb-hist-body {
+  margin: 12px 0 10px;
+  font-size: clamp(17px, 1.55vw, 21px);
+  line-height: 1.62;
+  letter-spacing: -.004em;
+  max-width: 46ch;
+}
+
+/* The thin card, and it is meant to LOOK thin. A reader glancing down the
+   page should be able to tell a book whose history is documented from one
+   whose is not, without reading either — otherwise the confidence flag is
+   a word nobody notices and the honest fallback quietly passes itself off
+   as the researched thing. So: a list of short facts, smaller, in the data
+   face, behind a rule. It reads as an inventory, which is what it is. */
+.lb-hist--thin { border-left: 1px solid var(--grey-inst); padding-left: 18px; }
+.lb-hist-facts {
+  list-style: none; margin: 12px 0 10px; padding: 0;
+  display: grid; gap: 5px;
+  font-family: var(--data);
+  font-size: 11px; line-height: 1.6; letter-spacing: .02em;
+  color: var(--bone);
+  max-width: 42ch;
+}
+
+/* ── THE CLOSING NOTE ───────────────────────────────────────
+   The one paragraph on the page written to the reader, and the only one
+   with a voice. Given the width and the size of a pull quote so it reads
+   as an ending rather than as one more section. */
+.lb-closing {
+  margin: 14vh auto 0;
+  max-width: 1040px;
+  padding: 0 clamp(20px, 5vw, 64px);
+}
+.lb-closing-body + .lb-closing-body { margin-top: .7em; }
+.lb-closing-body {
+  margin: 16px 0 14px;
+  font-size: clamp(21px, 2.3vw, 31px);
+  line-height: 1.42;
+  letter-spacing: -.014em;
+  text-wrap: pretty;
+  /* The measure belongs HERE and not on the container. `ch` resolves
+     against the element's own font-size, so 66ch set on the wrapper was
+     sixty-six characters of 17px body text — about 590px — and the note
+     came out set in a narrow column six words wide, reading like a poem
+     rather than a paragraph. */
+  max-width: 46ch;
+}
+
+/* ── THE SEASON, READ ACROSS ────────────────────────────────
+   Note and poster side by side at the front of the catalogue. The note
+   started life at the foot, where a synthesis is a conclusion nobody
+   scrolls to; here it is the argument the plates below are read against. */
+.lb-closing-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 300px;
+  gap: clamp(28px, 5vw, 70px);
+  align-items: start;
+}
+
+/* ── THE POSTER ─────────────────────────────────────────────
+   The season's own colours, sampled from the jackets, in bands weighted by
+   how many books carried each. The proportions are `flex-grow` values
+   generated per season under the nonce, so a season where six books share
+   one blue shows a wide band of it and a single outlier shows a stripe.
+   Nobody art-directed it, which is why no two seasons look alike. */
+.lb-poster { margin: 0; }
+.lb-poster-field {
+  display: flex;
+  flex-direction: column;
+  aspect-ratio: 2 / 3;
+  width: 100%;
+  overflow: hidden;
+  background: #0E0D0F;
+}
+/* Standing bands, not stacked ones: the printed sheet turns the strip on
+   its end, and a figure that calls itself the poster has to be the same
+   picture. The strip takes what the foot does not. */
+.lb-poster-strip { display: flex; flex: 1 1 auto; min-height: 34%; }
+/* Equal bands, one per book — the same as the printed sheet.
+   These used to take a per-season `flex-grow` from the nonce rule, weighted
+   by how many books shared a colour. When the strip became one band per book
+   that weighting went with it, and nothing replaced the grow: with
+   `flex-basis: 0` and no grow, seven bands collapsed to seven 3px slivers
+   against the left edge and the rest of the field went black. */
+.lb-poster-band { display: block; flex: 1 1 0; min-width: 3px; }
+
+/* The foot of the sheet: the code left, the wordmark right, on the ground
+   rather than over the colour. The code used to be set over the bands in
+   mix-blend difference — legible against any season, and unlike the object
+   it was standing in for. */
+.lb-poster-foot {
+  flex: 0 0 auto;
+  display: flex; justify-content: space-between; gap: 12px;
+  padding: 14px 14px 16px;
+  font-family: var(--data);
+  font-size: 11px;
+  letter-spacing: .22em;
+  text-transform: uppercase;
+  color: #807B72;
+}
+.lb-poster figcaption { margin-top: 10px; }
+
+@media (max-width: 860px) {
+  /* The poster leads on a narrow screen: it is the thing that survives
+     being small, and the note wants the full measure underneath it. */
+  .lb-closing-grid { grid-template-columns: minmax(0, 1fr); }
+  .lb-poster { max-width: 260px; }
+}
+.lb-poster-cap { display: grid; gap: 4px; line-height: 1.5; }
+
+/* ── THE BLEND, ON A LOOK ────────────────────────────────
+   Replaces the fibre percentages that came from Open Library subject
+   headings. A cataloguer's index of what a book is filed under is not what
+   a book is made of, and the colour system replaced exactly that claim. */
+.lb-blend {
+  display: grid;
+  grid-template-columns: 54px minmax(0, 1fr);
+  gap: 12px;
+  align-items: center;
+  margin-bottom: 14px;
+}
+.lb-blend-swatch {
+  display: block;
+  width: 54px;
+  aspect-ratio: 3 / 2;
+  border-radius: 2px;
+  box-shadow: inset 0 0 0 1px rgba(232, 228, 220, .22);
+}
+.lb-blend-name {
+  font-family: var(--grot);
+  font-size: 17px;
+  letter-spacing: -.01em;
+}
+
+/* §05 — an unfilled slot, drawn as one, on the lookbook's dark ground.
+
+   Composed rather than broken: a fine hatch at low contrast reads as
+   unprinted stock, where the coarse 5px version read as a warning pattern
+   and pulled the eye to every absence before it reached a colour. */
+.lb-blend-swatch.swatch--none,
+.lb-poster-band.band--none {
+  background:
+    repeating-linear-gradient(
+      45deg,
+      transparent 0 3px,
+      rgba(232, 228, 220, .13) 3px 4px
+    ),
+    rgba(232, 228, 220, .04);
+}
+.lb-poster-band.band--none { box-shadow: inset 0 0 0 1px rgba(232, 228, 220, .07); }
+
+/* ── THE COUNT ───────────────────────────────────────────
+   The arithmetic the season note is made of, so a reader can check the
+   sentence rather than take it. Closed by default: the note is the claim,
+   this is the working. */
+.lb-drawn { margin-top: 14px; }
+.lb-drawn summary { cursor: pointer; }
+.lb-drawn-list {
+  list-style: none;
+  margin: 12px 0 0;
+  padding: 0;
+  display: grid;
+  gap: 6px;
+}
+.lb-drawn-list li {
+  display: grid;
+  grid-template-columns: 42px 96px minmax(0, 1fr);
+  gap: 10px;
+  align-items: baseline;
+  font-family: var(--data);
+  font-size: 11px;
+  letter-spacing: .04em;
+  color: var(--stone);
+}
+.lb-drawn-pct { text-align: right; color: var(--bone); }
+.lb-drawn-emotion { color: var(--bone); }
+.lb-drawn-title { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+/* ── WHY THIS COLOUR ─────────────────────────────────────
+   The derivation as a bordered panel: anchors in, blend out, every
+   component's citation beneath, and the source at the foot.
+
+   Geometry is fixed rather than content-driven, because seven or eight of
+   these stack down a season and a panel that changed shape per book would
+   read as broken however good any single one looked. */
+.lb-plates-why { min-width: 0; }
+
+.lb-panel {
+  border: 1px solid #232327;
+  padding: 24px 22px 20px;
+}
+
+/* Each ingredient on its own ruled row. The name carries both halves —
+   Desire · Carmine, Soft — so a reader sees what went in and can compare it
+   with what came out. */
+.lb-why-anchors { list-style: none; margin: 0; padding: 0; }
+.lb-why-anchor {
+  display: grid;
+  grid-template-columns: 12px minmax(0, 1fr) 42px;
+  gap: 12px;
+  align-items: center;
+  padding: 7px 0;
+  border-bottom: 1px solid rgba(110, 110, 110, .13);
+}
+.lb-why-anchor:last-child { border-bottom: none; }
+.lb-why-chip { display: block; width: 12px; height: 12px; }
+.lb-why-nm {
+  font-family: var(--data);
+  font-size: 9.5px;
+  letter-spacing: .13em;
+  text-transform: uppercase;
+  color: #9E9A94;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.lb-why-w {
+  font-family: var(--data);
+  font-size: 9.5px;
+  letter-spacing: .06em;
+  color: var(--grey-inst);
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+/* The operator, and the only mark on the panel that is not a value. */
+.lb-why-arrow { display: flex; justify-content: center; padding: 16px 0 14px; }
+.lb-why-arrow span { font-family: var(--data); font-size: 12px; color: #3E3E42; }
+
+/* The result. Deliberately much larger than the chips above it. */
+.lb-why-result { display: flex; align-items: center; gap: 16px; }
+.lb-why-sw { width: 78px; height: 78px; flex: none; display: block; }
+.lb-why-name {
+  font-family: var(--grot);
+  font-size: 22px;
+  letter-spacing: -.018em;
+  line-height: 1.1;
+  color: var(--bone);
+}
+.lb-why-hex {
+  font-family: var(--data);
+  font-size: 10px;
+  letter-spacing: .12em;
+  color: var(--grey-inst);
+  margin-top: 6px;
+}
+
+.lb-why-evidence {
+  margin-top: 26px;
+  padding-top: 20px;
+  border-top: 1px solid #232327;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+.lb-why-lbl { display: flex; align-items: center; gap: 8px; margin-bottom: 7px; }
+.lb-why-lbl i { width: 7px; height: 7px; display: block; }
+.lb-why-lbl span {
+  font-family: var(--data);
+  font-size: 8.5px;
+  letter-spacing: .17em;
+  text-transform: uppercase;
+  color: #9E9A94;
+}
+.lb-why-ev q {
+  display: block;
+  font-size: 13px;
+  line-height: 1.6;
+  color: #B8B3AB;
+  quotes: '"' '"';
+}
+.lb-why-sec {
+  display: block;
+  font-family: var(--data);
+  font-size: 8px;
+  letter-spacing: .15em;
+  text-transform: uppercase;
+  color: #5A5A5E;
+  margin-top: 6px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.lb-why-prov {
+  margin-top: 22px;
+  padding-top: 14px;
+  border-top: 1px solid rgba(110, 110, 110, .13);
+}
+
+/* The wearing now sits under WRITTEN in the second column. */
+.lb-wearing { margin-top: 52px; }
+
+
+/* ══ THREE TO FOLLOW — the complements page (reco spec §07) ══
+   The choreography is the reference's, moved onto MARGIN's tokens and off
+   the style attributes the CSP forbids. Each slot is a small reveal: the
+   jacket lifts, a connector draws down from it, the derivation fades up,
+   then the neighbours and the contribution bars arrive in sequence. The
+   staggering is what makes it read as a derivation rather than a card. */
+.lb-comp { max-width: 1180px; }
+.lb-runhead {
+  display: flex; justify-content: space-between; align-items: baseline;
+  border-bottom: 1px solid var(--lb-hair, rgba(140,134,122,.16)); padding-bottom: 12px;
+}
+.lb-lbl { letter-spacing: .16em; color: var(--lb-grey, #7A756C); }
+.lb-comp-h { font-size: clamp(30px, 4vw, 46px); font-weight: 400; line-height: 1; margin: 26px 0 0; }
+.lb-comp-dek { font-size: 16px; line-height: 1.55; color: var(--lb-grey, #7A756C); max-width: 60ch; margin-top: 14px; }
+
+.lb-three {
+  display: grid; grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: clamp(20px, 3vw, 46px); margin-top: 44px;
+}
+.lb-slot { min-width: 0; }
+.lb-slot-no {
+  display: flex; justify-content: space-between; align-items: baseline;
+  letter-spacing: .19em; color: var(--lb-grey, #7A756C);
+  border-bottom: 1px solid var(--lb-hair, rgba(140,134,122,.16));
+  padding-bottom: 9px; margin-bottom: 22px;
+}
+.lb-slot-no b { font-weight: 400; color: var(--proof-orange); }
+
+/* .lb-jacket-plate already supplies position/aspect-ratio/max-width; this
+   adds only the lift, and lets the plate run the full column.
+ *
+ * The plate is a <span> everywhere else in this lookbook, so it never needed
+ * link styling. Made into an <a> it inherits the browser default, and the
+ * galley fallback — which is the visible content whenever a book has no
+ * cover — renders as blue underlined text. Both jacket anchors reset it. */
+.lb-slot-jk, .lb-n {
+  color: inherit;
+  text-decoration: none;
+}
+/* Half the column, not all of it. Running the plate to the full column
+   width made the covers the loudest thing on a page whose subject is the
+   reasoning underneath them — the jacket identifies the book, the
+   derivation is what there is to read. Relative rather than a fixed px, so
+   it stays half at every breakpoint. */
+.lb-slot-jk {
+  max-width: 50%;
+  transition: transform .42s cubic-bezier(.2,.7,.3,1);
+}
+.lb-slot:hover .lb-slot-jk, .lb-slot:focus-within .lb-slot-jk { transform: translateY(-7px); }
+
+/* An empty slot is hatched and composed, never filled with a worse book. */
+.lb-slot-hatch {
+  aspect-ratio: 2 / 3;
+  border: 1px solid var(--lb-dim, #2E2B24);
+  background: repeating-linear-gradient(-45deg, transparent 0 9px,
+              rgba(140,134,122,.07) 9px 10px);
+}
+/* An absence stays quiet — orange here would make "nothing" the loudest
+   thing on the page. The heading is 21px, where 3:1 is the bar and
+   --grey-inst clears it at 3.88; the line under it is 8.5px and needs 4.5,
+   so it takes the lighter grey. */
+.lb-slot.is-void .lb-slot-t { color: var(--grey-inst); }
+.lb-slot.is-void .lb-slot-by { color: #8A857C; }
+
+.lb-slot-t {
+  display: block; font-size: 21px; line-height: 1.15; margin-top: 14px;
+  color: inherit; text-decoration: none;
+}
+.lb-slot-t:hover { opacity: .7; }
+.lb-slot-by { display: block; letter-spacing: .14em; color: var(--lb-grey, #7A756C); margin-top: 9px; }
+
+/* The derivation is a panel that opens OVER the page, not a block that
+   unfolds beneath the slot.
+ *
+ * Revealed in flow it landed below the fold on the taller slots — you
+ * hovered a book and the explanation appeared somewhere you could not see,
+ * which is the one thing this page exists to show. As a popover it opens
+ * against the jacket you are pointing at, at a fixed size, wherever the slot
+ * happens to sit on the page.
+ *
+ * It is opaque and it sits above its neighbours, so the column underneath
+ * never shows through the reasoning. */
+.lb-slot { position: relative; }
+.lb-why {
+  position: absolute; z-index: 30;
+  top: 0; width: 368px;
+  padding: 18px 18px 20px;
+  background: var(--ink);
+  border: 1px solid var(--grey-inst);
+  box-shadow: 0 18px 40px rgba(0, 0, 0, .55);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity .38s ease .10s, transform .38s cubic-bezier(.2,.7,.3,1) .10s;
+}
+/* A hairline reaching back to the slot it belongs to, so the panel reads as
+   attached rather than as floating over the page. It runs horizontally now,
+   on whichever side the panel opened from. */
+.lb-why::before {
+  content: ""; position: absolute; top: 34px;
+  width: 14px; height: 1px; background: var(--grey-inst);
+}
+
+/* ── which side it opens on ──────────────────────────────
+   Beside the book, not beneath it: opening downward put the reasoning under
+   the fold on the taller slots and pushed the two neighbouring jackets out
+   of view. The side follows the slot's position in the row, so the panel
+   always opens into the page rather than off it — the first two reach
+   right, the last reaches left. */
+.lb-slot .lb-why { left: 100%; margin-left: 14px; transform: translateX(-9px); }
+.lb-slot .lb-why::before { left: -14px; }
+
+.lb-slot:last-child .lb-why {
+  left: auto; right: 100%; margin-left: 0; margin-right: 14px;
+  transform: translateX(9px);
+}
+.lb-slot:last-child .lb-why::before { left: auto; right: -14px; }
+
+.lb-slot:hover .lb-why, .lb-slot:focus-within .lb-why {
+  opacity: 1; transform: translateX(0); pointer-events: auto;
+}
+
+.lb-rsn { font-size: 15px; line-height: 1.5; color: #CFC9BF; }
+.lb-rsn b { font-weight: 400; color: var(--proof-orange); }
+.lb-bec { letter-spacing: .16em; color: var(--proof-orange); margin-top: 18px; }
+
+/* The neighbours arrive one after another, not all at once. */
+.lb-nbrs { display: flex; gap: 9px; margin-top: 12px; }
+.lb-n {
+  /* 38px, a quarter up from 30. At the smaller size these were unreadable
+     as books — the point of showing jackets rather than titles is that you
+     recognise them, and a cover you cannot identify is worse than the title
+     it replaced. Three of these plus their gaps come to 165px, which still
+     sits on one line inside the panel. */
+  width: 49px; max-width: 49px; flex: none;
+  opacity: 0; transform: translateY(6px);
+  transition: opacity .3s ease, transform .3s ease;
+}
+/* At 30px the galley fallback can only be a tinted plate — a title set in
+   9cqw of a 30px box is four illegible pixels, so the text is suppressed and
+   the border does the work. */
+.lb-n .lb-jacket-galley { padding: 0; }
+.lb-n .lb-galley-title, .lb-n .lb-galley-author { display: none; }
+.lb-n:hover { opacity: .78 !important; }
+.lb-slot:hover .lb-n, .lb-slot:focus-within .lb-n { opacity: 1; transform: none; }
+.lb-slot:hover .lb-n:nth-child(1), .lb-slot:focus-within .lb-n:nth-child(1) { transition-delay: .22s; }
+.lb-slot:hover .lb-n:nth-child(2), .lb-slot:focus-within .lb-n:nth-child(2) { transition-delay: .30s; }
+.lb-slot:hover .lb-n:nth-child(3), .lb-slot:focus-within .lb-n:nth-child(3) { transition-delay: .38s; }
+
+/* The contribution bars fill from nothing, staggered, so the derivation
+   reads as an argument being made rather than a chart being shown. */
+.lb-kinds { margin-top: 18px; display: flex; flex-direction: column; gap: 7px; }
+.lb-kd {
+  display: grid; grid-template-columns: 96px minmax(0, 1fr) 38px; gap: 10px;
+  align-items: center;
+  font-family: var(--grot); font-size: 11px; letter-spacing: .01em;
+  color: var(--proof-orange);
+}
+.lb-tr { height: 2px; background: var(--lb-dim, #2E2B24); position: relative; overflow: hidden; }
+.lb-tr i {
+  position: absolute; inset: 0 auto 0 0; background: #8A857C;
+  width: 0;
+  transition: width .5s cubic-bezier(.2,.7,.3,1);
+}
+.lb-kd.is-lead .lb-tr i { background: var(--proof-orange); }
+.lb-kd.is-lead { color: #9A948A; }
+/* A sentence, so it is set as one: reading face, sentence case, quiet.
+   The labels above it are mono because they name sections; this explains. */
+.lb-detail {
+  font-family: var(--grot); font-size: 12px; line-height: 1.5;
+  color: #9A948A; margin-top: 14px; padding-top: 12px;
+  border-top: 1px solid var(--lb-hair, rgba(140,134,122,.16));
+}
+.lb-slot:hover .lb-tr i, .lb-slot:focus-within .lb-tr i { width: var(--w); }
+.lb-slot:hover .lb-kd:nth-child(1) .lb-tr i,
+.lb-slot:focus-within .lb-kd:nth-child(1) .lb-tr i { transition-delay: .24s; }
+.lb-slot:hover .lb-kd:nth-child(2) .lb-tr i,
+.lb-slot:focus-within .lb-kd:nth-child(2) .lb-tr i { transition-delay: .31s; }
+.lb-slot:hover .lb-kd:nth-child(3) .lb-tr i,
+.lb-slot:focus-within .lb-kd:nth-child(3) .lb-tr i { transition-delay: .38s; }
+.lb-slot:hover .lb-kd:nth-child(4) .lb-tr i,
+.lb-slot:focus-within .lb-kd:nth-child(4) .lb-tr i { transition-delay: .45s; }
+.lb-v { text-align: right; color: var(--proof-orange); font-variant-numeric: tabular-nums; }
+
+
+
+/* Motion off: the derivation is simply present. A reveal that never animates
+   is content nobody can reach. */
+@media (prefers-reduced-motion: reduce) {
+  .lb-why, .lb-slot .lb-why, .lb-slot:last-child .lb-why { transform: none; transition: none; }
+  .lb-n { opacity: 1; transform: none; transition: none; }
+  .lb-tr i { width: var(--w); transition: none; }
+  .lb-slot-jk { transition: none; }
+  .lb-slot:hover .lb-slot-jk { transform: none; }
+}
+@media (max-width: 900px) {
+  .lb-three { grid-template-columns: 1fr; gap: 40px; }
+  /* One column, no hover to speak of: the derivation goes back in flow and
+     stays open, which is what a touch screen can actually use. */
+  .lb-why,
+  .lb-slot .lb-why,
+  .lb-slot:last-child .lb-why {
+    position: static; opacity: 1; transform: none; pointer-events: auto;
+    width: auto; left: auto; right: auto;
+    margin: 18px 0 0; box-shadow: none;
+  }
+  .lb-why::before { display: none; }
+  .lb-n { opacity: 1; transform: none; }
+  .lb-tr i { width: var(--w); }
+}

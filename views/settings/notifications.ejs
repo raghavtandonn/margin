@@ -1,0 +1,42 @@
+<%- include('_open') %>
+  <%#
+    §10 — "Keep them boring. Every product ruins itself here."
+
+    So the page is a list of plain sentences with checkboxes, and it says
+    what is never sent as well as what is. The second list is the more
+    useful of the two: it is a promise you can hold the product to.
+  %>
+  <form method="post" action="/settings/notifications" class="auth-form measure">
+    <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+
+    <label class="opt-row">
+      <input type="checkbox" name="paused" value="1" <%= paused ? 'checked' : '' %>>
+      <span>Pause everything</span>
+    </label>
+    <p class="note">
+      Security notices about your own account still arrive. Nothing else does.
+    </p>
+
+    <div class="mt-34">
+      <% kinds.forEach(function(k) { %>
+        <label class="opt-row">
+          <input type="checkbox" name="kind" value="<%= k.kind %>" <%= k.on ? 'checked' : '' %>>
+          <span><%= k.label %></span>
+        </label>
+      <% }) %>
+    </div>
+
+    <button class="auth-action mt-34" type="submit">SAVE →</button>
+  </form>
+
+  <div class="measure mt-44">
+    <div class="mono-s dim mb-8">NEVER SENT</div>
+    <ul class="never-list">
+      <li>Individual likes.</li>
+      <li>Weekly follower counts.</li>
+      <li>Who else is reading what you are reading.</li>
+      <li>Anything about not having opened this in a while.</li>
+      <li>Streaks.</li>
+    </ul>
+  </div>
+<%- include('_close') %>

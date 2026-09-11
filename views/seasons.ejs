@@ -1,0 +1,52 @@
+<%- include('partials/head', { title: 'Seasons' }) %>
+<%- include('partials/spine', { nav: 'seasons' }) %>
+
+<main class="sheet" data-key="seasons">
+  <span class="crop tl" aria-hidden="true"></span><span class="crop tr" aria-hidden="true"></span>
+  <span class="crop bl" aria-hidden="true"></span><span class="crop br" aria-hidden="true"></span>
+
+  <div class="block pt-20" id="block">
+
+    <%- include('partials/desk', { deskQuery: '' }) %>
+    <div class="eyebrow mono"><span class="tag">SEASONS</span></div>
+    <h1 class="d2 mb-30">Seasons</h1>
+
+    <% seasons.forEach(function(s) { %>
+      <a class="season-row" href="/season/<%= s.code %>">
+        <span class="season-row-head">
+          <span class="season-row-code mono-s"><%= s.short %></span>
+          <span class="season-row-title">
+            <%= s.given_title || '' %>
+          </span>
+          <span class="season-row-strip" role="img" aria-label="<%= h.stripLabel(s.strip) %>">
+            <% s.strip.forEach(function(b) { %>
+              <i class="<%= h.bandClass(b) %>"<% if (b.hex) { %> id="<%= h.rule(styleRules, 'ib', b.hex, 'background:' + h.css.color(b.hex)) %>"<% } %>></i>
+            <% }) %>
+          </span>
+          <span class="season-row-count mono-s dim">
+            <%= s.count || '—' %><% if (s.state === 'open') { %> <span class="season-open">OPEN</span><% } %>
+          </span>
+        </span>
+
+        <%# The books. A season is a set of objects, and this is the first
+            page in the product that has ever shown them as such. %>
+        <% if (s.plates.length) { %>
+          <span class="season-row-plates" aria-hidden="true">
+            <% s.plates.forEach(function(f) { %>
+              <img class="season-plate" src="<%= h.coverSrc(f) %>" alt=""
+                   loading="lazy" decoding="async" width="320" height="494" data-cover>
+            <% }) %>
+          </span>
+        <% } %>
+      </a>
+    <% }) %>
+
+    <%# §2 — an imported reading with no finish date belongs to no season.
+        Saying where they went is more honest than letting them vanish. %>
+    <% if (undated) { %>
+      <p class="note mt-34">
+        <%= undated %> finished books carry no date, so they belong to no season.
+      </p>
+    <% } %>
+  </div>
+<%- include('partials/foot') %>

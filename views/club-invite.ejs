@@ -1,0 +1,31 @@
+<%- include('partials/head', { title: title }) %>
+<%- include('partials/spine', { nav: 'clubs' }) %>
+<main class="sheet">
+  <div class="block pt-20" id="block">
+    <div class="measure">
+      <div class="eyebrow mono"><span class="tag">INVITATION</span></div>
+      <h1 class="d1">Send this once.</h1>
+
+      <%#
+        Shown once, and never again. Only the hash is stored — the same
+        contract the password reset tokens use — so this link cannot be
+        recovered from the server by anyone, including whoever runs it.
+      %>
+      <p class="auth-lede">
+        Anyone holding this link can join <%= club.name %>.
+        It stops working in <%= days %> days, or after it is used.
+      </p>
+
+      <p class="invite-token mono"><%= locals.origin || '' %>/join/<%= token %></p>
+
+      <p class="field-note mono-s">
+        THIS IS THE ONLY TIME IT IS SHOWN. NOTHING ON THE SERVER CAN GET IT BACK.
+      </p>
+
+      <p class="mt-30">
+        <a class="more-link mono-s" href="/clubs/<%= club.slug %>">BACK TO THE CLUB →</a>
+        · <a class="more-link mono-s" href="/clubs/<%= club.slug %>/settings">SETTINGS →</a>
+      </p>
+    </div>
+  </div>
+<%- include('partials/foot') %>

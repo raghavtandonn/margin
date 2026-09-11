@@ -1,0 +1,105 @@
+<%- include('partials/head', { title: title }) %>
+<%- include('partials/spine', { nav: 'shelves' }) %>
+<main class="sheet">
+  <span class="crop tl" aria-hidden="true"></span><span class="crop tr" aria-hidden="true"></span>
+  <span class="crop bl" aria-hidden="true"></span><span class="crop br" aria-hidden="true"></span>
+  <div class="block pt-20" id="block">
+
+    <div class="eyebrow mono">
+      <span class="tag">REVIEW</span>
+      <% if (pass > 1) { %><span class="dim">PASS <%= pass %></span><% } %>
+    </div>
+    <h1 class="d2 mb-8"><%= work.title %></h1>
+
+    <%#
+      §4.1 — a review is public writing; a note is private writing.
+      Arriving here from a note COPIES the text. The note itself is not
+      touched, and nothing is published until this form is submitted.
+    %>
+    <% if (fromNote) { %>
+      <p class="field-note mono-s mb-20">
+        COPIED FROM YOUR NOTE. THE NOTE STAYS PRIVATE AND UNCHANGED.
+      </p>
+    <% } %>
+
+    <form method="post" action="/work/<%= work.id %>/review" class="auth-form measure">
+      <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+      <input type="hidden" name="pass" value="<%= pass %>">
+
+      <label class="field">
+        <span class="field-label mono-s">THE REVIEW</span>
+        <textarea name="body" rows="10" class="note-input review-body" required
+                  maxlength="10000"><%= body %></textarea>
+        <span class="note">
+          Bold, italics, quotes.<% if (!canLink) { %> Links once your account is a fortnight old.<% } %>
+        </span>
+      </label>
+
+      <label class="field">
+        <span class="field-label mono-s">STARS, IF YOU WANT TO</span>
+        <input name="rating" type="text" inputmode="decimal" class="loan-date"
+               value="<%= rating != null ? rating : '' %>" placeholder="—">
+      </label>
+
+      <%#
+        §6 — "The composer asks once, plainly. Default is No. Never force
+        the question into a modal."
+      %>
+      <fieldset class="choice-set">
+        <legend class="field-label mono-s">DOES THIS GIVE ANYTHING AWAY?</legend>
+        <label class="choice">
+          <input type="radio" name="spoilers" value="no" checked>
+          <span class="choice-mark" aria-hidden="true"></span>
+          <span class="choice-text"><span class="choice-name">No</span></span>
+        </label>
+        <label class="choice">
+          <input type="radio" name="spoilers" value="yes"
+                 <%= existing && existing.contains_spoilers ? 'checked' : '' %>>
+          <span class="choice-mark" aria-hidden="true"></span>
+          <span class="choice-text">
+            <span class="choice-name">Yes, through</span>
+            <span class="choice-note mono-s">
+              Anyone behind that point sees a line saying how far it goes, and taps to read on.
+            </span>
+          </span>
+        </label>
+      </fieldset>
+
+      <div class="row gap-14 mb-24">
+        <label class="field spoiler-field">
+          <span class="field-label mono-s">PAGE</span>
+          <input name="through_page" type="text" inputmode="numeric" class="loan-date"
+                 value="<%= existing && existing.spoiler_through_page ? existing.spoiler_through_page : '' %>"
+                 placeholder="—">
+        </label>
+        <label class="field spoiler-field">
+          <span class="field-label mono-s">OR CHAPTER</span>
+          <input name="through_chapter" type="text" class="loan-date" maxlength="60"
+                 value="<%= existing && existing.spoiler_through_chapter ? existing.spoiler_through_chapter : '' %>"
+                 placeholder="—">
+        </label>
+      </div>
+
+      <% if (error) { %><p class="field-error mono-s"><%= error %></p><% } %>
+
+      <button class="auth-action" type="submit">
+        <%= existing ? 'SAVE THE CHANGES →' : 'PUBLISH →' %>
+      </button>
+    </form>
+
+    <% if (!existing && hasNote && !fromNote) { %>
+      <p class="mono-s mt-30">
+        <a class="more-link" href="/work/<%= work.id %>/review?from=note&pass=<%= pass %>">
+          START FROM YOUR NOTE →
+        </a>
+      </p>
+    <% } %>
+
+    <% if (existing) { %>
+      <form method="post" action="/review/<%= existing.id %>/delete" class="mt-30">
+        <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+        <button class="more-link mono-s" type="submit">DELETE THIS REVIEW →</button>
+      </form>
+    <% } %>
+  </div>
+<%- include('partials/foot') %>

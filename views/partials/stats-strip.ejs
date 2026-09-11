@@ -1,0 +1,136 @@
+<%#
+  ── THE DATA STRIP ────────────────────────────────────────
+
+  The same three figures as the full stats block — FOUR FEATURES §2, §3, §4
+  — compressed into one band across the foot of the front page.
+
+  What compression costs, and why each cost is acceptable here:
+
+    · No per-bar counts on the histogram. At 44px tall a number inside a bar
+      is unreadable; the title attribute still carries it, and the shape is
+      what the chart is for.
+    · Three delta rows instead of six. The tail of that list is where the
+      sample sizes get small enough to be noise anyway.
+    · One line of arithmetic instead of three. Median and mean say most of
+      it; the concentration line is a sentence, and a sentence does not
+      belong in a strip.
+
+  Everything still links. Every bar is a filter, every delta row is a query
+  against the shelf. A chart you cannot click is a poster.
+
+  Expects: dist, like, when
+  Optional: self (default true) — whether this is the reader's own page.
+            "What you like" on your own profile, "What they like" on
+            somebody else's. Any panel whose data is null renders nothing,
+            so a visitor who may see only the taste panel gets one panel and
+            not an empty band with two gaps in it.
+%>
+<section class="strip">
+
+  <%# ── §2 RATINGS ────────────────────────────────────── %>
+  <% if (dist && dist.count) { %>
+    <div class="strip-panel">
+      <div class="sec-row">
+        <h2 class="sec">Ratings</h2>
+        <span class="sec-note"><%= dist.count %></span>
+      </div>
+
+      <div class="mini-histo" role="img"
+           aria-label="Rating distribution across <%= dist.count %> rated books. Median <%= dist.median %>, mean <%= dist.mean %>.">
+        <% dist.bars.forEach(function(b) { %>
+          <a class="mini-bar <%= b.count ? '' : 'is-empty' %>"
+             href="/shelf/finished?rating=<%= b.value %>"
+             title="<%= b.value %>★ · <%= b.count %> book<%= b.count === 1 ? '' : 's' %>">
+            <span class="mini-fill"
+                  id="<%= h.rule(styleRules, 'sh', b.value, 'height:' + h.css.pct(b.height)) %>"></span>
+          </a>
+        <% }) %>
+      </div>
+
+      <div class="strip-foot mono-s dim">
+        <span class="star-fill">★</span>
+        <span>MEDIAN <%= dist.median %> · MEAN <%= dist.mean %></span>
+        <span class="star-fill">★★★★★</span>
+      </div>
+    </div>
+  <% } %>
+
+  <%# ── §3 WHAT YOU ACTUALLY LIKE ─────────────────────── %>
+  <% if (like && like.above.length) { %>
+    <div class="strip-panel">
+      <div class="sec-row">
+        <h2 class="sec">What <%= locals.self === false ? 'they' : 'you' %> like</h2>
+        <span class="sec-note">MEAN <%= like.overall %></span>
+      </div>
+
+      <%# Above the reader's own mean, then below it. The delta is the whole
+          point — an absolute 3.8 says nothing without the 3.6 it beats. %>
+      <% like.above.slice(0, 3).forEach(function(b) { %>
+        <a class="mini-delta" href="/shelf/finished?<%= b.filter %>">
+          <span class="mini-delta-label"><%= b.label %></span>
+          <span class="mini-delta-n mono-s"><%= b.mean.toFixed(1) %></span>
+          <span class="mini-delta-d mono-s orange">+<%= b.delta.toFixed(1) %></span>
+        </a>
+      <% }) %>
+
+      <% like.below.slice(0, 3 - Math.min(3, like.above.length) + 1).forEach(function(b) { %>
+        <a class="mini-delta" href="/shelf/finished?<%= b.filter %>">
+          <span class="mini-delta-label"><%= b.label %></span>
+          <span class="mini-delta-n mono-s"><%= b.mean.toFixed(1) %></span>
+          <span class="mini-delta-d mono-s dim"><%= b.delta.toFixed(1) %></span>
+        </a>
+      <% }) %>
+
+    </div>
+  <% } %>
+
+  <%# ── §4 WHEN YOU ACTUALLY READ ─────────────────────── %>
+  <% if (when && when.datedCount) { %>
+    <div class="strip-panel">
+      <div class="sec-row">
+        <h2 class="sec">When <%= locals.self === false ? 'they' : 'you' %> read</h2>
+        <%# Coverage is always stated. Date Read is empty on a lot of an
+            imported library, and a chart drawn from half the books has to
+            say so — under 40% the caveat takes the accent. %>
+        <span class="sec-note <%= when.leadWithCaveat ? 'orange' : '' %>">
+          <%= when.datedCount %>/<%= when.totalCount %>
+        </span>
+      </div>
+
+      <div class="mini-months" role="img"
+           aria-label="Reading by month. Heaviest <%= when.heaviest ? when.heaviest.name : 'none' %>.">
+        <% when.months.forEach(function(m) { %>
+          <span class="mini-month" title="<%= m.name %> · <%= m.value %> <%= when.mode %>">
+            <span class="mini-month-bar"
+                  id="<%= h.rule(styleRules, 'sm', m.label, 'height:' + h.css.pct(m.height)) %>"></span>
+            <span class="mini-month-label mono-s dim"><%= m.label[0] %></span>
+          </span>
+        <% }) %>
+      </div>
+
+      <% if (when.years.length > 1) { %>
+        <div class="mini-years">
+          <% when.years.forEach(function(y) { %>
+            <span class="mini-year" title="<%= y.year %> · <%= y.value %>">
+              <span class="mini-year-bar"
+                    id="<%= h.rule(styleRules, 'sy', y.year, 'height:' + h.css.pct(y.height)) %>"></span>
+              <span class="mini-month-label mono-s dim"><%= String(y.year).slice(2) %></span>
+            </span>
+          <% }) %>
+        </div>
+      <% } %>
+
+      <%# HEAVIEST and LIGHTEST remain the only comparative words allowed
+          anywhere near this chart. No advice, no trend, no verdict. %>
+      <div class="strip-foot mono-s dim">
+        <span></span>
+        <span>
+          <% if (when.heaviest) { %>HEAVIEST <%= when.heaviest.name.toUpperCase() %><% } %><%
+             if (when.lightest && when.heaviest && when.lightest.name !== when.heaviest.name) { %>
+            · LIGHTEST <%= when.lightest.name.toUpperCase() %><% } %>
+        </span>
+        <span></span>
+      </div>
+    </div>
+  <% } %>
+</section>

@@ -1,0 +1,19 @@
+<%- include('_open') %>
+  <div class="mono-s auth-label">RESET</div>
+  <h1 class="auth-title">A new password.</h1>
+
+  <form method="post" action="/reset" class="auth-form">
+    <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+
+    <label class="field">
+      <span class="field-label mono-s">EMAIL</span>
+      <input name="email" type="email" autocomplete="email" required autofocus>
+    </label>
+
+    <% if (locals.error) { %><p class="field-error mono-s"><%= error %></p><% } %>
+
+    <button class="auth-action" type="submit">SEND THE LINK →</button>
+  </form>
+
+  <p class="auth-aside"><a href="/signin">Back to signing in</a></p>
+<%- include('_close') %>

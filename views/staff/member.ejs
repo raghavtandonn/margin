@@ -1,0 +1,77 @@
+<%- include('../partials/head', { title: title }) %>
+<main class="sheet">
+  <div class="block pt-20" id="block">
+    <div class="eyebrow mono"><span class="tag">MEMBER</span></div>
+
+    <form method="get" action="/staff/member" class="auth-form measure">
+      <label class="field">
+        <span class="field-label mono-s">USERNAME OR EMAIL</span>
+        <input name="q" value="<%= q %>" required autofocus>
+      </label>
+      <label class="field">
+        <span class="field-label mono-s">WHY</span>
+        <input name="reason" value="<%= reason %>" required minlength="8">
+        <%# §14 — a written reason, stored next to the exact fields returned.
+            Not a dropdown: a sentence a person has to stand behind. %>
+        <span class="field-note mono-s">Recorded against your name, with what you saw.</span>
+      </label>
+      <button class="auth-action" type="submit">LOOK IT UP →</button>
+    </form>
+
+    <% if (locals.error) { %><p class="field-error mono-s mt-14"><%= error %></p><% } %>
+
+    <% if (member) { %>
+      <dl class="colophon-caption mono-s measure mt-30">
+        <div><dt class="dim">ID</dt><dd><%= member.public_id %></dd></div>
+        <div><dt class="dim">USERNAME</dt><dd><%= member.username || '—' %></dd></div>
+        <div><dt class="dim">EMAIL</dt><dd><%= member.email_masked %></dd></div>
+        <div><dt class="dim">VERIFIED</dt><dd><%= member.email_verified_at ? String(member.email_verified_at).slice(0,10) : 'NO' %></dd></div>
+        <div><dt class="dim">JOINED</dt><dd><%= String(member.created_at).slice(0,10) %></dd></div>
+        <div><dt class="dim">LAST SEEN</dt><dd><%= member.last_seen_at ? String(member.last_seen_at).slice(0,10) : '—' %></dd></div>
+        <div><dt class="dim">VISIBILITY</dt><dd><%= member.profile_visibility.toUpperCase() %></dd></div>
+        <div><dt class="dim">BOOKS</dt><dd><%= member.books_logged %></dd></div>
+        <div><dt class="dim">NOTES</dt><dd>EXCLUDED</dd></div>
+      </dl>
+
+      <%# §11 — "No support tool renders note bodies." There is no gated view
+          of them here at all, because most support cases never need to read
+          somebody's diary and the ones that do should be rare enough to be
+          handled by hand. %>
+      <p class="note measure mt-14">
+        Notes, shelf contents and ratings are not readable here. The export
+        request needs a second person to approve it.
+      </p>
+
+      <%#
+        THE REQUEST FORM.
+
+        The route behind it has existed since the two-person export control
+        was written, the approve half is on the staff index, and the
+        paragraph above has been promising this form the whole time — but
+        nothing ever posted to it, so the request half of a two-person
+        control could not be started by anybody. A safety control with no way
+        to invoke it is not a safety control; it is a comment.
+
+        The reason is required and is stored on the approval row, so the
+        second person is approving a stated purpose rather than a button.
+      %>
+      <details class="staff-export mt-20">
+        <summary class="mono-s">REQUEST A MEMBER EXPORT →</summary>
+        <form method="post" action="/staff/export/request" class="auth-form measure mt-14">
+          <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+          <input type="hidden" name="username" value="<%= member.username %>">
+          <label class="field">
+            <span class="field-label mono-s">WHY THIS IS NEEDED</span>
+            <textarea name="reason" rows="3" minlength="20" maxlength="1000" required
+                      placeholder="A ticket number and what the export is for."></textarea>
+            <span class="note">
+              Twenty characters at least. Logged against your account, shown to
+              whoever approves it, and kept whether or not they do.
+            </span>
+          </label>
+          <button class="btn" type="submit">REQUEST →</button>
+        </form>
+      </details>
+    <% } %>
+  </div>
+<%- include('../partials/foot') %>

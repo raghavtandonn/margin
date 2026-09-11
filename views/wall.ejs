@@ -1,0 +1,143 @@
+<%- include('partials/head', { title: 'The Wall' }) %>
+<%- include('partials/spine', { nav: 'wall' }) %>
+
+<main class="sheet" data-key="shelves">
+  <span class="crop tl" aria-hidden="true"></span>
+  <span class="crop tr" aria-hidden="true"></span>
+  <span class="crop bl" aria-hidden="true"></span>
+  <span class="crop br" aria-hidden="true"></span>
+
+  <div class="block pt-20" id="block">
+
+    <%- include('partials/desk', { deskQuery: '' }) %>
+
+    <nav class="shelf-views mono-s" aria-label="Shelf view">
+      <a href="/shelves">STRIPS</a>
+      <a class="is-on" href="/wall">THE WALL</a>
+    </nav>
+
+    <%# The header states what is on the shelf, so it needs no second title
+        stacked above it and no explanation of its own conceit below it.
+        Spine width and height read as obvious once you look. %>
+    <h1 class="d2 mb-16">
+      <%= books.length %><%
+        if (scope === 'FINISHED') { %> finished book<%= books.length === 1 ? '' : 's' %><%
+        } else if (scope === 'READING') { %> book<%= books.length === 1 ? '' : 's' %> on press<%
+        } else { %> book<%= books.length === 1 ? '' : 's' %><% } %>
+    </h1>
+
+    <div class="wall-controls">
+      <span class="row">
+        <span class="mono-s dim">SHOW</span>
+        <% scopes.forEach(function(k) { %>
+          <a class="mono" href="?scope=<%= k %>&group=<%= group %>&sort=<%= encodeURIComponent(sort) %>"
+             class="tab <%= scope === k ? 'on' : '' %>"><%= k %></a>
+        <% }) %>
+      </span>
+      <span class="row">
+        <span class="mono-s dim">GROUP</span>
+        <% groups.forEach(function(k) { %>
+          <a class="mono" href="?scope=<%= scope %>&group=<%= k %>&sort=<%= encodeURIComponent(sort) %>"
+             class="tab <%= group === k ? 'on' : '' %>"><%= k %></a>
+        <% }) %>
+      </span>
+      <span class="row">
+        <span class="mono-s dim">SORT</span>
+        <% sorts.forEach(function(k) { %>
+          <a class="mono" href="?scope=<%= scope %>&group=<%= group %>&sort=<%= encodeURIComponent(k) %>"
+             class="tab <%= sort === k ? 'on' : '' %>"><%= k %></a>
+        <% }) %>
+      </span>
+      <span class="row ml-auto">
+        <a class="btn btn-sm" href="?scope=<%= scope %>&group=<%= group %>&sort=<%= encodeURIComponent(sort) %>&view=list">VIEW AS LIST</a>
+        <button class="btn btn-sm" type="button" id="wall-export">EXPORT</button>
+      </span>
+    </div>
+
+    <% if (asList) { %>
+      <div>
+        <% books.forEach(function(b) { %>
+          <%- include('partials/ticket', { item: {
+                work_id: b.work_id, title: b.title, authorLine: b.author,
+                cover_url: b.cover_url, cover_cache_key: b.cover_cache_key,
+                trimAspect: h.trimAspect(b.format), isbn13: b.isbn13,
+                page_count: b.page_count, stars: b.stars, status: b.status,
+                finished_at: b.finished_at
+              } }) %>
+        <% }) %>
+      </div>
+
+    <% } else if (!books.length) { %>
+      <p class="empty mono">NOTHING ON THE SHELF AT THIS SCOPE.</p>
+
+    <% } else { %>
+      <%# The caption rail. On a real shelf a thin spine carries no readable
+          title either — you lean in and pull it out. Hovering is leaning in. %>
+      <div class="caption-rail mono-s" id="caption-rail" aria-live="polite">
+        <span class="dim">HOVER A SPINE</span>
+      </div>
+
+      <div class="wall" id="wall">
+        <% shelves.forEach(function(shelf) { %>
+          <div class="wall-shelf">
+            <% if (shelf.label) { %>
+              <div class="wall-shelf-label mono-s dim"><%= shelf.label %></div>
+            <% } %>
+            <div class="wall-rows">
+              <% shelf.rows.forEach(function(row) { %>
+                <div class="wall-row">
+                  <% row.forEach(function(b) {
+                       var g = b.geometry;
+                       var reading = b.state === 'READING';
+                       var color = b.spine_color || null;
+                       var cls = 'spine-book'
+                         + (reading ? ' is-reading' : '')
+                         + (b.state === 'STALLED' ? ' is-stalled' : '')
+                         + (b.state === 'ABANDONED' ? ' is-abandoned' : '')
+                         + (g.noExtent ? ' no-extent' : '');
+                       var w = reading ? g.height : g.width;
+                       var hgt = reading ? g.width : g.height;
+                       var label = b.title + (b.author ? ' · ' + b.author : '');
+                       var year = String(b.finished_at || '').slice(0, 4);
+                       var aria = b.title + ', ' + (b.author || 'unknown author')
+                         + ', ' + b.state.toLowerCase()
+                         + (b.page_count ? ', ' + b.page_count + ' pages' : '')
+                         + (b.stars != null ? ', ' + b.stars + ' of 5 stars' : '');
+                  %>
+                    <%# Size and spine colour are per-book data, so they are
+                        emitted as real rules in the nonced sheet rather than
+                        as a style attribute a strict CSP would refuse. %>
+                    <% var decl = 'width:' + h.css.px(w) + ';height:' + h.css.px(hgt);
+                       if (color && b.state !== 'ABANDONED') {
+                         decl += ';background:' + h.css.color(color) + ';color:' + h.css.color(h.readableOn(color));
+                       } else if (b.state !== 'ABANDONED') {
+                         decl += ';background:var(--stock-gray)';
+                       } %>
+                    <a class="<%= cls %>" href="/work/<%= b.work_id %>"
+                       id="<%= h.rule(styleRules, 'sp', b.work_id, decl) %>"
+                       aria-label="<%= aria %>"
+                       data-title="<%= b.title %>"
+                       data-author="<%= b.author || '' %>"
+                       data-year="<%= year %>"
+                       data-stars="<%= b.stars != null ? b.stars : '' %>"
+                       data-extent="<%= b.page_count || '' %>"
+                       data-state="<%= b.state %>">
+                      <%# Do not scale type down to fit. Under 14px a spine
+                          carries no title at all — blank reads as intentional,
+                          6px type reads as broken. The rail carries the text. %>
+                      <% if (w >= 14 && b.state !== 'ABANDONED') { %>
+                        <span class="spine-label"><%= label %></span>
+                      <% } %>
+                    </a>
+                  <% }) %>
+                </div>
+              <% }) %>
+            </div>
+          </div>
+        <% }) %>
+      </div>
+    <% } %>
+
+  </div>
+
+<%- include('partials/foot') %>

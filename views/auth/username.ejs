@@ -1,0 +1,22 @@
+<%- include('_open') %>
+  <div class="mono-s auth-label">USERNAME</div>
+  <h1 class="auth-title">What to call you.</h1>
+
+  <form method="post" action="/username" class="auth-form">
+    <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+
+    <label class="field">
+      <span class="field-label mono-s">USERNAME</span>
+      <span class="field-prefixed">
+        <span class="field-prefix">/@</span>
+        <input name="username" type="text" required autofocus spellcheck="false"
+               minlength="3" maxlength="20" pattern="[a-zA-Z0-9_]+"
+               value="<%= values.username || '' %>">
+      </span>
+    </label>
+
+    <% if (error) { %><p class="field-error mono-s"><%= error %></p><% } %>
+
+    <button class="auth-action" type="submit">TAKE IT →</button>
+  </form>
+<%- include('_close') %>

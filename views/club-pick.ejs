@@ -1,0 +1,79 @@
+<%- include('partials/head', { title: title }) %>
+<%- include('partials/spine', { nav: 'clubs' }) %>
+<main class="sheet" data-key="clubs">
+  <span class="crop tl" aria-hidden="true"></span><span class="crop tr" aria-hidden="true"></span>
+  <span class="crop bl" aria-hidden="true"></span><span class="crop br" aria-hidden="true"></span>
+
+  <div class="block pt-20" id="block">
+    <div class="eyebrow mono">
+      <span class="tag">THE PICK</span>
+      <span class="dim"><a class="no-underline" href="/clubs/<%= club.slug %>"><%= club.name.toUpperCase() %></a></span>
+    </div>
+    <h1 class="d2 mb-30">The pick</h1>
+
+    <% if (pick) { %>
+      <div class="club-sec mono-s dim">READING NOW</div>
+      <div class="club-row is-static">
+        <span class="club-name"><%= pick.title %></span>
+        <form method="post" action="/clubs/<%= club.slug %>/pick/<%= pick.id %>/finish"
+              class="inline-form">
+          <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+          <button class="more-link mono-s" type="submit">CALL IT DONE</button>
+        </form>
+      </div>
+
+      <%# §9.4 — a checkpoint carries a page, and that page becomes the
+          spoiler boundary of its thread. It is set once, here. %>
+      <div class="club-sec mono-s dim mt-34">CHECKPOINTS</div>
+      <% checkpoints.forEach(function(cp) { %>
+        <div class="club-row is-static">
+          <span class="club-name"><%= cp.label %></span>
+          <span class="club-meta mono-s dim">
+            <% if (cp.through_page) { %>TO P.<%= cp.through_page %><% } %>
+            <% if (cp.opens_on) { %> · OPENS <%= h.monthDay(cp.opens_on) %><% } %>
+          </span>
+        </div>
+      <% }) %>
+
+      <form method="post" action="/clubs/<%= club.slug %>/pick/<%= pick.id %>/checkpoint"
+            class="auth-form measure mt-34">
+        <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+        <label class="field">
+          <span class="field-label mono-s">LABEL</span>
+          <input name="label" maxlength="80" required placeholder="Through chapter 12">
+        </label>
+        <label class="field">
+          <span class="field-label mono-s">THROUGH PAGE</span>
+          <input name="through_page" type="number" min="1" inputmode="numeric">
+          <span class="note">Everything said in that thread is hidden from anyone behind this page.</span>
+        </label>
+        <label class="field">
+          <span class="field-label mono-s">OPENS ON</span>
+          <input name="opens_on" type="date">
+        </label>
+        <button class="auth-action" type="submit">ADD IT →</button>
+      </form>
+    <% } %>
+
+    <%# Setting a pick posts an announcement and notifies members ONCE. %>
+    <div class="club-sec mono-s dim mt-34"><%= pick ? 'QUEUE SOMETHING NEXT' : 'CHOOSE A BOOK' %></div>
+
+    <form method="get" action="/clubs/<%= club.slug %>/pick" class="auth-form measure">
+      <label class="field">
+        <span class="field-label mono-s">FIND A BOOK</span>
+        <input name="q" value="<%= q %>" autofocus>
+      </label>
+    </form>
+
+    <% results.forEach(function(w) { %>
+      <form method="post" action="/clubs/<%= club.slug %>/pick" class="club-row is-static">
+        <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+        <input type="hidden" name="work_id" value="<%= w.id %>">
+        <span class="club-name"><%= w.title %>
+          <% if (w.author) { %><span class="club-desc"><%= w.author %></span><% } %>
+        </span>
+        <button class="more-link mono-s" type="submit">PICK IT</button>
+      </form>
+    <% }) %>
+  </div>
+<%- include('partials/foot') %>

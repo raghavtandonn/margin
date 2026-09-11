@@ -1,0 +1,45 @@
+<%- include('../partials/head', { title: title }) %>
+<main class="sheet">
+  <div class="block pt-20" id="block">
+    <div class="eyebrow mono"><span class="tag">INCIDENT</span></div>
+
+    <%# §14 — "if a staff account is compromised tomorrow, can we produce an
+        exact list of affected members within an hour?" Letterboxd could not.
+        This page is the answer, and it is one query. %>
+    <p class="auth-lede measure">Every member whose data an account touched, and which fields.</p>
+
+    <form method="get" action="/staff/incident" class="auth-form measure">
+      <label class="field">
+        <span class="field-label mono-s">STAFF ACCOUNT</span>
+        <select name="staff" class="bare-select">
+          <option value="">—</option>
+          <% accounts.forEach(function(a) { %>
+            <option value="<%= a.id %>" <%= staffId === a.id ? 'selected' : '' %>><%= a.email %></option>
+          <% }) %>
+        </select>
+      </label>
+      <label class="field">
+        <span class="field-label mono-s">SINCE</span>
+        <input name="since" value="<%= since %>">
+      </label>
+      <button class="auth-action" type="submit">RUN IT →</button>
+    </form>
+
+    <% if (affected) { %>
+      <div class="mono-s dim mt-34 mb-8">
+        <%= affected.length %> MEMBER<%= affected.length === 1 ? '' : 'S' %> AFFECTED
+      </div>
+      <% affected.forEach(function(a) { %>
+        <div class="ruled-row measure">
+          <div class="mono-s">USER <%= a.userId %></div>
+          <div class="dim mono-s"><%= a.fields.join(' · ') %></div>
+          <div class="dim mono-s"><%= a.actions.length %> ACCESS<%= a.actions.length === 1 ? '' : 'ES' %>
+            · <%= a.actions[0].reason || 'no reason recorded' %></div>
+        </div>
+      <% }) %>
+      <% if (!affected.length) { %>
+        <p class="auth-lede">Nothing in that window.</p>
+      <% } %>
+    <% } %>
+  </div>
+<%- include('../partials/foot') %>

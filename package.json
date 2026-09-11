@@ -1,0 +1,60 @@
+{
+  "name": "margin",
+  "version": "0.1.0",
+  "private": true,
+  "description": "\"MARGIN\" \u2014 reading, c/o the reader",
+  "type": "module",
+  "engines": {
+    "node": ">=22.5.0"
+  },
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch server.js",
+    "seed": "node scripts/seed.js",
+    "reset": "rm -f data/margin.db data/margin.db-shm data/margin.db-wal && node scripts/seed.js",
+    "reset:empty": "rm -f data/margin.db data/margin.db-shm data/margin.db-wal && node scripts/seed.js --empty",
+    "import:goodreads": "node scripts/import-goodreads.js",
+    "import:paste": "node scripts/import-paste.js",
+    "enrich": "node scripts/enrich.js",
+    "migrate": "node scripts/migrate-v2.js",
+    "covers": "node scripts/covers.js",
+    "spines": "node scripts/spines.js",
+    "migrate:v05": "node scripts/migrate-v05.js",
+    "audit:covers": "node scripts/audit-covers.js",
+    "subjects": "node scripts/subjects.js",
+    "index": "node scripts/index-desk.js",
+    "gap:corpus": "node scripts/gap-corpus.js",
+    "test": "node --test test/*.test.js",
+    "test:csp": "MARGIN_CSP=enforce node server.js",
+    "claim": "node scripts/claim-account.js",
+    "staff:add": "node scripts/staff.js",
+    "purge": "node scripts/purge-due.js",
+    "accounts": "node scripts/accounts.js",
+    "dev:account": "node scripts/dev-account.js",
+    "colours": "node scripts/colours.js",
+    "colours:derive": "node scripts/colours-derive.mjs",
+    "colours:audit": "node scripts/colours-audit.mjs",
+    "colours:fields": "node scripts/fields-report.mjs",
+    "seasons": "node scripts/seasons.js",
+    "check": "npm run verify",
+    "check:routes": "node scripts/check-routes.mjs",
+    "check:templates": "node scripts/check-templates.mjs",
+    "check:dead": "node scripts/check-dead.mjs",
+    "check:css": "node scripts/css-resolve.mjs",
+    "verify": "npm test && node scripts/check-routes.mjs && node scripts/check-templates.mjs && node scripts/check-sql-literals.mjs",
+    "embed": "node scripts/embed.mjs",
+    "probe": "node scripts/probe.mjs",
+    "reco:eval": "node scripts/reco-eval.mjs",
+    "reco:run": "node scripts/reco-run.mjs"
+  },
+  "dependencies": {
+    "@huggingface/transformers": "^4.2.0",
+    "@simplewebauthn/server": "^13.3.2",
+    "ejs": "^3.1.10",
+    "express": "^4.22.2",
+    "hash-wasm": "^4.12.0"
+  },
+  "overrides": {
+    "qs": "^6.16.0"
+  }
+}

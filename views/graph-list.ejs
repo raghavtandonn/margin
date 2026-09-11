@@ -1,0 +1,35 @@
+<%- include('partials/head', { title: title }) %>
+<%- include('partials/spine', { nav: 'shelves' }) %>
+<main class="sheet">
+  <div class="block pt-20" id="block">
+    <div class="eyebrow mono">
+      <span class="tag"><%= heading.toUpperCase() %></span>
+      <a class="dim no-underline" href="/@<%= target.username %>">@<%= target.username %></a>
+    </div>
+    <h1 class="d2 mb-30"><%= heading %></h1>
+
+    <% list.rows.forEach(function(p) { %>
+      <a class="ruled-row settings-row" href="/@<%= p.username %>">
+        <span class="settings-name"><%= p.display_name || '@' + p.username %></span>
+        <span class="mono-s dim">@<%= p.username %></span>
+      </a>
+    <% }) %>
+
+    <% if (!list.rows.length) { %>
+      <p class="auth-lede">Nobody yet.</p>
+    <% } %>
+
+    <%# §8 — depth is capped for anyone who is not the owner, so a scraper
+        cannot walk a hundred thousand followers. %>
+    <% if (list.capped) { %>
+      <p class="note mt-18">That is as far as this list goes.</p>
+    <% } else if (list.next) { %>
+      <p class="mt-18">
+        <a class="more-link mono-s"
+           href="/@<%= target.username %>/<%= kind %>?after=<%= encodeURIComponent(list.next) %>&page=<%= page + 1 %>">
+          MORE →
+        </a>
+      </p>
+    <% } %>
+  </div>
+<%- include('partials/foot') %>

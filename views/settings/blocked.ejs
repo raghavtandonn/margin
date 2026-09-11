@@ -1,0 +1,32 @@
+<%- include('_open') %>
+  <div class="measure">
+    <div class="mono-s dim mb-8">BLOCKED</div>
+    <%# §11 — a block is mutual invisibility and is never disclosed to the
+        person blocked. Unblocking is the only thing offered here. %>
+    <% blocked.forEach(function(b) { %>
+      <div class="ruled-row settings-row">
+        <span class="settings-name"><%= b.display_name || '@' + b.username %></span>
+        <span class="mono-s dim"><%= h.monthDay(b.created_at) %></span>
+        <form method="post" action="/@<%= b.username %>/block" class="inline-form">
+          <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+          <input type="hidden" name="on" value="0">
+          <button class="more-link mono-s" type="submit">UNBLOCK →</button>
+        </form>
+      </div>
+    <% }) %>
+    <% if (!blocked.length) { %><p class="auth-lede">Nobody.</p><% } %>
+
+    <div class="mono-s dim mt-44 mb-8">MUTED</div>
+    <% muted.forEach(function(m) { %>
+      <div class="ruled-row settings-row">
+        <span class="settings-name"><%= m.display_name || '@' + m.username %></span>
+        <form method="post" action="/@<%= m.username %>/mute" class="inline-form">
+          <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+          <input type="hidden" name="on" value="0">
+          <button class="more-link mono-s" type="submit">UNMUTE →</button>
+        </form>
+      </div>
+    <% }) %>
+    <% if (!muted.length) { %><p class="auth-lede">Nobody.</p><% } %>
+  </div>
+<%- include('_close') %>

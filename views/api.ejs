@@ -1,0 +1,46 @@
+<%- include('partials/head', { title: 'Read API' }) %>
+<%- include('partials/spine', { nav: 'api' }) %>
+
+<main class="sheet">
+  <span class="crop tl" aria-hidden="true"></span>
+  <span class="crop tr" aria-hidden="true"></span>
+  <span class="crop bl" aria-hidden="true"></span>
+  <span class="crop br" aria-hidden="true"></span>
+
+  <div class="block pt-20" id="block">
+
+    <div class="eyebrow mono"><span class="tag">READ API</span> <span class="dim">v1 · FREE FOR NON-COMMERCIAL USE</span></div>
+    <h1 class="d2 mb-8">Read API</h1>
+    <%# §12 — Goodreads killed theirs in 2020 and the ecosystem died with it. %>
+    <p class="b1 mb-30">
+      Documented, rate-limited, free for non-commercial use. Goodreads killed
+      theirs in 2020 and the ecosystem died with it.
+    </p>
+
+    <% endpoints.forEach(function(group) { %>
+      <div class="rule">
+        <div class="mono"><span class="tag"><%= group.name %></span></div>
+      </div>
+      <% group.routes.forEach(function(r) { %>
+        <div class="ruled-row">
+          <div class="row">
+            <span class="mono w-52"><%= r.method %></span>
+            <a class="id" href="<%= r.example || r.path %>" class="link-orange"><%= r.path %></a>
+          </div>
+          <div class="b2 dim mt-4"><%= r.desc %></div>
+        </div>
+      <% }) %>
+    <% }) %>
+
+    <div class="rule">
+      <div class="mono"><span class="tag">RATE LIMIT</span></div>
+    </div>
+    <p class="b2 dim measure-mt10">
+      60 requests per minute per address. Every response carries
+      <span class="id">X-RateLimit-Remaining</span>. Exceeding it returns 429
+      with the reset time. Never a silent throttle.
+    </p>
+
+  </div>
+
+<%- include('partials/foot') %>

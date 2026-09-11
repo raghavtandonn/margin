@@ -1,0 +1,78 @@
+<%#
+  "THE SPINE" (§08) — the nav rotated 90°, exactly as type sits on a book
+  spine. §11: the rotated nav has a horizontal aria-label and full keyboard
+  order — screen readers get no rotation, because rotation is a visual joke
+  and jokes do not belong in the accessibility tree.
+
+  THE WORDMARK IS GONE. "MARGIN" sat at the top of this rail and linked to
+  the front page, directly above a nav item called Home that went to the
+  same place. Two controls, one destination, and the reasoning for keeping
+  both — that a mark says whose product this is rather than where the link
+  goes — is an argument about mastheads, not about a nav rail fifty-six
+  pixels wide. The name is in the tab title, the favicon and the footer,
+  which is where a product's name belongs when its navigation is this small.
+%>
+<nav class="spine" aria-label="Main navigation">
+  <div class="spine-nav">
+    <%#
+      §1 — seven destinations, and every one of them names the thing
+      plainly. Home is the first of them now that the wordmark above it is
+      gone; it was always the item that actually said where it went.
+
+      "The metaphor is never load-bearing." `On press` works because the
+      page beneath it is obviously the currently-reading list; `Pick
+      tickets` failed because you had to decode it.
+
+      The Gap is parked — it wants collaborative signal to compute with, and
+      that does not exist yet. The Wall is not gone: §1 puts it inside
+      Shelves as a view toggle rather than as a nav item of its own.
+    %>
+    <%#
+      "Profile" rather than "You": it is the page other people see, and
+      naming a page for its content beats naming it for its owner.
+    %>
+    <a href="/" <%= nav === 'home' ? 'aria-current="page"' : '' %>>Home<%
+      if (locals.hasUnread) { %><span class="spine-mark" aria-hidden="true"></span><% } %></a>
+    <a href="/reading" <%= nav === 'reading' ? 'aria-current="page"' : '' %>>Reading</a>
+    <a href="/shelves" <%= nav === 'shelves' || nav === 'wall' ? 'aria-current="page"' : '' %>>Shelves</a>
+    <a href="/seasons" <%= nav === 'seasons' ? 'aria-current="page"' : '' %>>Seasons</a>
+    <a href="/clubs" <%= nav === 'clubs' ? 'aria-current="page"' : '' %>>Clubs</a>
+    <a href="/@<%= locals.user && (user.username || user.handle) || '' %>"
+       <%= nav === 'profile' || nav === 'you' ? 'aria-current="page"' : '' %>>Profile</a>
+
+    <%#
+      NOTIFICATIONS HAD A NAV ITEM AND NO LONGER DOES.
+
+      It pointed at a page listing things that had happened, directly beside
+      a front page that is already a list of things that have happened. Two
+      destinations for one idea, and the one with the reader's own name on
+      it was the one nobody opened. Both now sit on Home, above the feed,
+      in the order a person needs them: what is waiting on an answer, what
+      is about you, then what everyone else did.
+
+      The mark moves with them. A dot on Home, never a number — §11's NEVER
+      SENT list refuses the engagement toolkit, and a count on a bell is the
+      first piece of it.
+    %>
+
+    <%#
+      Import is an action, not a section, and it was buried three taps down
+      in Settings — which is the wrong depth for the one thing somebody
+      arriving with a library needs first, and the wrong depth again every
+      time they come back with another file.
+
+      It sits after a rule and set quieter than the six places above it, so
+      the nav still reads as six destinations and one thing you do.
+    %>
+    <a class="spine-do" href="/settings/import"
+       <%= nav === 'import' ? 'aria-current="page"' : '' %>>Import</a>
+  </div>
+  <%#
+    B3 put currently-reading covers at the foot of the spine as 24px chips.
+    They are gone. At that size a jacket is an unreadable smudge of colour,
+    and six of them turned a 56px rail into the busiest thing on every
+    screen in the product. The two-tap path they existed for is still two
+    taps: Reading is one item up this list, and the front page carries the
+    same books in the rail at a size you can actually read.
+  %>
+</nav>

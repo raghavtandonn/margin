@@ -1,0 +1,120 @@
+<%- include('partials/head', { title: title }) %>
+<%- include('partials/spine', { nav: 'clubs' }) %>
+<main class="sheet" data-key="clubs">
+  <span class="crop tl" aria-hidden="true"></span><span class="crop tr" aria-hidden="true"></span>
+  <span class="crop bl" aria-hidden="true"></span><span class="crop br" aria-hidden="true"></span>
+
+  <div class="block pt-20" id="block">
+
+    <%- include('partials/desk', { deskQuery: '' }) %>
+
+    <%#
+      ── THE CLUBS INDEX ───────────────────────────────────
+
+      A directory, not a list of names. The old rows carried a name and a
+      member count, which is the least a row can carry: two clubs of the
+      same size were indistinguishable, and nothing on the page said what
+      any of them were currently reading — the one fact that decides
+      whether you open it.
+
+      Four columns now: emblem, name and what it is for, the book on
+      display, and the size with your standing in it.
+    %>
+    <div class="clubs-kicker mono-s"><i aria-hidden="true"></i>CLUBS</div>
+    <h1 class="d2">Clubs</h1>
+    <p class="clubs-dek">
+      A club puts one book on display at a time. Members declare in or out,
+      and the wall stays between them.
+    </p>
+
+    <% /* One row shape, used by both sections. */ %>
+    <% function row(c, standing, open) { %>
+      <a class="clubs-row" href="/clubs/<%= c.slug %>">
+        <span class="clubs-thumb">
+          <% if (c.avatar_key) { %>
+            <img src="/avatar/<%= c.avatar_key %>/128" alt="" width="54" height="54">
+          <% } else { %>
+            <span class="grp-emblem-blank" aria-hidden="true"></span>
+          <% } %>
+        </span>
+
+        <span class="clubs-id">
+          <span class="clubs-nm"><%= c.name %></span>
+          <%# What tells two clubs apart is what the club is for. Failing
+              that, when it started and who can see it. %>
+          <span class="clubs-sub mono-s">
+            <% if (c.description) { %><%= h.shortTitle(c.description, { max: 52 }) %><% } else { %>STARTED <%= h.monthDay(c.created_at).toUpperCase() %><% } %>
+            <% if (c.visibility !== 'public') { %> · <%= c.visibility.toUpperCase() %><% } %>
+          </span>
+        </span>
+
+        <span class="clubs-disp">
+          <b class="mono-s">ON DISPLAY</b>
+          <% if (c.on_display) { %>
+            <%= h.shortTitle(c.on_display, { max: 34 }) %><% if (c.on_display_by) { %> · <%= c.on_display_by %><% } %>
+          <% } else { %>
+            <span class="dim">Nothing yet</span>
+          <% } %>
+        </span>
+
+        <span class="clubs-meta">
+          <span class="clubs-n"><%= c.members %></span>
+          <span class="clubs-st mono-s<%= open ? ' is-open' : (standing && standing !== "You're in" ? ' is-head' : '') %>"><%= standing %></span>
+        </span>
+      </a>
+    <% } %>
+
+    <% if (mine.length) { %>
+      <section class="clubs-sect">
+        <h2 class="clubs-h2">Yours <span class="mono-s"><%= mine.length %></span></h2>
+        <div class="clubs-rule"></div>
+        <% mine.forEach(function(c) { %>
+          <% row(c, c.role === 'member' ? "You're in" : roleLabel(c.role).toUpperCase(), false) %>
+        <% }) %>
+      </section>
+    <% } %>
+
+    <%#
+      The heading used to be "OPEN", which did double duty and meant
+      neither thing clearly: under a list of your own clubs it reads as
+      "clubs open to join", and an empty one reads as though clubs are
+      switched off. Say which.
+    %>
+    <section class="clubs-sect">
+      <h2 class="clubs-h2">Taking members <span class="mono-s"><%= discover.length %></span></h2>
+      <div class="clubs-rule"></div>
+
+      <% if (discover.length) { %>
+        <% discover.forEach(function(c) { %>
+          <% row(c, 'OPEN', true) %>
+        <% }) %>
+      <% } else { %>
+        <%# §10 — on a social product the empty states ARE the onboarding.
+            This one used to be a full stop. %>
+        <p class="clubs-empty">
+          No club is taking members right now.
+          <% if (canCreate) { %><a class="more-link mono-s clubs-go" href="/clubs/new">START ONE →</a><% } %>
+        </p>
+      <% } %>
+    </section>
+
+    <%#
+      §9 / §12 — clubs need Trust 2 to create.
+
+      The affordance used to be simply absent below that, which is worse
+      than refusing: you cannot tell a permission you have not earned from
+      a feature that was never built. §12's rule is that a LEVEL is never
+      displayed — it becomes a status game the moment it is visible — and a
+      sentence about your own account on your own screen is not that.
+    %>
+    <% if (canCreate) { %>
+      <p class="clubs-start"><a class="more-link mono-s clubs-go" href="/clubs/new">START A CLUB →</a></p>
+    <% } else if (locals.user && whyNot) { %>
+      <p class="clubs-empty">
+        <span class="mono-s dim">STARTING A CLUB</span><br>
+        <%= whyNot %>
+      </p>
+    <% } %>
+
+  </div>
+<%- include('partials/foot') %>

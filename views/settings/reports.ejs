@@ -1,0 +1,17 @@
+<%- include('_open') %>
+  <div class="measure">
+    <%# §11 — "Reporters see an outcome … Silence is what convinces people
+        reporting is pointless." %>
+    <% reports.forEach(function(r) { %>
+      <div class="ruled-row settings-row">
+        <span class="settings-name"><%= r.kind.replace(/_/g, ' ') %> · <%= r.target_type %></span>
+        <span class="mono-s dim"><%= h.monthDay(r.created_at) %></span>
+        <span class="mono-s <%= r.state === 'open' ? 'dim' : '' %>">
+          <%= r.state === 'open' ? 'STILL OPEN'
+             : r.state === 'actioned' ? 'REVIEWED, ACTIONED' : 'REVIEWED, NO ACTION' %>
+        </span>
+      </div>
+    <% }) %>
+    <% if (!reports.length) { %><p class="auth-lede">You have not reported anything.</p><% } %>
+  </div>
+<%- include('_close') %>

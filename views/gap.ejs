@@ -1,0 +1,66 @@
+<%- include('partials/head', { title: 'The gap' }) %>
+<%- include('partials/spine', { nav: 'gap' }) %>
+
+<main class="sheet">
+  <span class="crop tl" aria-hidden="true"></span>
+  <span class="crop tr" aria-hidden="true"></span>
+  <span class="crop bl" aria-hidden="true"></span>
+  <span class="crop br" aria-hidden="true"></span>
+
+  <div class="block pt-20" id="block">
+    <%- include('partials/desk', { deskQuery: '' }) %>
+
+    <% if (!gap) { %>
+      <h2 class="sec">The gap</h2>
+      <p class="mono dim py-20">NOT THIS MONTH.</p>
+
+    <% } else { %>
+      <%# One book on an otherwise empty page. No match percentage, no
+          "because you liked" list, no carousel, no alternatives. %>
+      <h2 class="sec">The gap</h2>
+
+      <div class="gap-book">
+        <div class="gap-cover">
+          <%- h.frame({
+                cover_url: gap.book.cover,
+                title: gap.book.title,
+                authorLine: gap.book.author,
+                trimAspect: 0.647
+              }) %>
+        </div>
+
+        <div>
+          <h1 class="d2 mb-6"><%= gap.book.title %></h1>
+          <p class="d3 dim mb-24">
+            <%= gap.book.author %><% if (gap.book.year) { %> · <%= gap.book.year %><% } %>
+          </p>
+
+          <%# The whole idea: which of the reader's own books opened the door. %>
+          <% if (gap.anchor) { %>
+            <p class="gap-anchor">
+              Nothing in your library is near this, except
+              <a href="/work/<%= gap.anchor.id %>"><%= gap.anchor.title %></a>.
+            </p>
+          <% } %>
+
+          <%# Two actions. Nothing else. %>
+          <div class="row mt-30">
+            <% if (gap.added) { %>
+              <span class="mono-s dim">ON THE WAITING SHELF.</span>
+            <% } else { %>
+              <form method="post" action="/gap/add">
+                <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                <button class="btn btn-orange" type="submit">ADD TO WAITING</button>
+              </form>
+            <% } %>
+            <form method="post" action="/gap/dismiss">
+              <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+              <button class="btn" type="submit">DISMISS</button>
+            </form>
+          </div>
+        </div>
+      </div>
+    <% } %>
+  </div>
+
+<%- include('partials/foot') %>

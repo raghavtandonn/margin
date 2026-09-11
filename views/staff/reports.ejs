@@ -1,0 +1,25 @@
+<%- include('../partials/head', { title: title }) %>
+<main class="sheet">
+  <div class="block pt-20" id="block">
+    <div class="eyebrow mono"><span class="tag">REPORTS</span></div>
+    <% if (!reports.length) { %>
+      <p class="auth-lede mt-18">The queue is empty.</p>
+    <% } %>
+    <% reports.forEach(function(r) { %>
+      <div class="ruled-row measure">
+        <div class="mono-s"><%= r.kind.toUpperCase() %> · @<%= r.target_username || '(deleted)' %></div>
+        <div class="dim"><%= r.detail || '' %></div>
+        <div class="row gap-14 mt-8">
+          <form method="post" action="/staff/reports/<%= r.id %>/action">
+            <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+            <button class="more-link mono-s" type="submit">ACT ON IT →</button>
+          </form>
+          <form method="post" action="/staff/reports/<%= r.id %>/dismiss">
+            <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+            <button class="more-link mono-s" type="submit">DISMISS →</button>
+          </form>
+        </div>
+      </div>
+    <% }) %>
+  </div>
+<%- include('../partials/foot') %>

@@ -1,0 +1,12 @@
+<%- include('../partials/head', { title: title }) %>
+<%- include('../partials/spine', { nav: 'settings' }) %>
+<main class="sheet">
+  <span class="crop tl" aria-hidden="true"></span><span class="crop tr" aria-hidden="true"></span>
+  <span class="crop bl" aria-hidden="true"></span><span class="crop br" aria-hidden="true"></span>
+  <div class="block pt-20" id="block">
+    <%# Every settings page opened with its own name set as a 10px tracked
+        field label, which is the treatment the labels BELOW it use. So the
+        page had no heading and no <h1>, and read as a form with a caption. %>
+    <h1 class="sec settings-h1"><%= title %></h1>
+    <% if (locals.notice) { %><p class="field-success"><%= notice %></p><% } %>
+    <% if (locals.error) { %><p class="field-error mono-s"><%= error %></p><% } %>

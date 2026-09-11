@@ -1,0 +1,23 @@
+<%- include('_open') %>
+  <div class="mono-s auth-label">CONFIRM</div>
+  <h1 class="auth-title">Once more, to be sure.</h1>
+
+  <form method="post" action="/reauth" class="auth-form">
+    <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+    <input type="hidden" name="next" value="<%= next || '/settings' %>">
+
+    <label class="field">
+      <span class="field-label mono-s">PASSWORD</span>
+      <input name="password" type="password" autocomplete="current-password" required autofocus>
+    </label>
+
+    <label class="field">
+      <span class="field-label mono-s">AUTHENTICATOR CODE (IF ENABLED)</span>
+      <input name="code" inputmode="numeric" autocomplete="one-time-code" maxlength="6">
+    </label>
+
+    <% if (locals.error) { %><p class="field-error mono-s"><%= error %></p><% } %>
+
+    <button class="auth-action" type="submit">CONFIRM →</button>
+  </form>
+<%- include('_close') %>

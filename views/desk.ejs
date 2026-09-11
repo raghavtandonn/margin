@@ -1,0 +1,181 @@
+<%- include('partials/head', { title: q || 'The desk' }) %>
+<%- include('partials/spine', { nav: 'desk' }) %>
+
+<main class="sheet">
+  <span class="crop tl" aria-hidden="true"></span>
+  <span class="crop tr" aria-hidden="true"></span>
+  <span class="crop bl" aria-hidden="true"></span>
+  <span class="crop br" aria-hidden="true"></span>
+
+  <div class="block pt-20" id="block">
+
+    <%- include('partials/desk', { deskQuery: q }) %>
+
+    <%# The page had no heading at all. A results page that never names
+        itself gives a screen reader nothing to land on, and gives everyone
+        else no confirmation of what was searched. %>
+    <h1 class="sec desk-h1"><%= q ? 'Results for “' + q + '”' : 'The desk' %></h1>
+
+    <%#
+      What the desk understood. Not an explanation of how the search
+      works — a statement of the filters it applied, so a surprising result
+      can be read as either a misparse or a bad record rather than as
+      inscrutable.
+    %>
+    <% if (locals.filters && filters.length) { %>
+      <p class="desk-filters mono-s dim"><%= filters.join(' · ') %></p>
+    <% } %>
+
+    <div class="desk-results">
+      <%# Messages only: a field the library does not carry, or a warning
+        that these results are the nearest rather than the asked-for ones.
+        The summary line that used to sit here is gone. %>
+    <% if (locals.caption) { %>
+      <p class="desk-caption"><%= caption %></p>
+    <% } %>
+
+    <% if (rows.length) { %>
+
+        <%# The desk introduces no result layout of its own — results render
+            in whichever view the reader was last using. %>
+        <div class="between mb-14">
+          <span class="mono-s dim"><%= rows.length %> <%= rows.length === 1 ? 'RESULT' : 'RESULTS' %></span>
+          <span class="row">
+            <% ['COVERS', 'LIST'].forEach(function(v) { %>
+              <a class="mono" href="/desk?q=<%= encodeURIComponent(q) %>&view=<%= encodeURIComponent(v) %>"
+                 class="tab <%= view === v ? 'on' : '' %>"><%= v %></a>
+            <% }) %>
+          </span>
+        </div>
+
+        <% if (view === 'COVERS') { %>
+          <div class="contact">
+            <% rows.forEach(function(it, i) { %>
+              <a href="/work/<%= it.work_id %>" title="<%= it.title %>">
+                <%- h.frame({
+                      cover_url: it.cover_url, cover_cache_key: it.cover_cache_key,
+                      title: it.title, authorLine: it.authorLine,
+                      trimAspect: h.trimAspect(it.format), isbn13: it.isbn13,
+                      work_id: it.work_id
+                    }, { reading: it.status === 'READING' }) %>
+                <span class="frame-foot">
+                  <span class="frame-no"><%= String(i + 1).padStart(3, '0') %></span>
+                  <% if (it.stars != null) { %><%- h.stars(it.stars, { size: 11 }) %><% } %>
+                </span>
+                <span class="frame-title"><%= it.title %></span>
+                <%# The reader's own words, verbatim, when a note carried the
+                    match. Identical treatment to any other result. %>
+                <% if (it.noteExcerpt) { %>
+                  <span class="note-excerpt"><%= it.noteExcerpt %></span>
+                <% } %>
+              </a>
+            <% }) %>
+          </div>
+        <% } else { %>
+          <div>
+            <% rows.forEach(function(it) { %>
+              <a class="ticket" href="/work/<%= it.work_id %>">
+                <span class="ticket-cover"><%- h.frame({
+                      cover_url: it.cover_url, cover_cache_key: it.cover_cache_key,
+                      title: it.title, authorLine: it.authorLine,
+                      trimAspect: h.trimAspect(it.format)
+                    }) %></span>
+                <span class="ticket-main">
+                  <span class="ticket-title"><%= it.title %></span>
+                  <span class="ticket-meta">
+                    <span class="b2 dim"><%= it.authorLine || '' %></span>
+                    <% if (it.page_count) { %><span class="mono-s dim"><%= it.page_count %>PP</span><% } %>
+                    <% if (it.first_published_year) { %><span class="mono-s dim"><%= it.first_published_year %></span><% } %>
+                  </span>
+                  <% if (it.noteExcerpt) { %>
+                    <span class="note-excerpt"><%= it.noteExcerpt %></span>
+                  <% } %>
+                </span>
+                <span class="ticket-right">
+                  <% if (it.stars != null) { %><%- h.stars(it.stars, { size: 12 }) %><% } %>
+                  <% if (it.status) { %>
+                    <%- h.stamp(it.status, { date: it.finished_at, page: it.abandoned_page, seed: it.isbn13 || it.work_id }) %>
+                  <% } %>
+                </span>
+              </a>
+            <% }) %>
+          </div>
+        <% } %>
+
+      <% } else if (q) { %>
+        <%# Nothing found in the library. The only thing offered is the one
+            thing the desk cannot do itself: bring a book in. %>
+        <% if (candidates && candidates.length) { %>
+          <div class="rule">
+            <div class="mono"><span class="tag">NOT IN THE LIBRARY</span></div>
+          </div>
+          <% candidates.forEach(function(c) { %>
+            <div class="ticket">
+              <span class="ticket-cover"><%- h.frame({ cover_url: c.cover_url, title: c.title, authorLine: c.authors.join(', ') }) %></span>
+              <span class="ticket-main">
+                <span class="ticket-title"><%= c.title %></span>
+                <span class="ticket-meta">
+                  <span class="b2 dim"><%= c.authors.join(', ') || '' %></span>
+                  <% if (c.year) { %><span class="mono-s dim"><%= c.year %></span><% } %>
+                </span>
+              </span>
+              <span class="ticket-right">
+                <form method="post" action="/add" class="row gap-6">
+                  <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                  <input type="hidden" name="workKey" value="<%= c.workKey %>">
+                  <input type="hidden" name="q" value="<%= q %>">
+                  <button class="btn btn-sm" type="submit" name="shelf" value="waiting">WAITING</button>
+                  <button class="btn btn-sm" type="submit">ADD</button>
+                </form>
+              </span>
+            </div>
+          <% }) %>
+        <% } %>
+      <% } %>
+
+      <%#
+        REGISTER IT BY HAND.
+
+        `POST /capture/register` has existed and worked since the capture
+        flow was written — it creates the work, adds an edition, and puts it
+        on any shelf the reader owns — and nothing in the product posted to
+        it. Its own validation failure redirected to `/capture`, a page that
+        does not exist, so the one visible consequence of the feature was a
+        404.
+
+        This is where it belongs: the desk has looked in the library, then
+        asked Open Library, and come back with nothing. A book that neither
+        knows about is exactly the book somebody has in their hand. The
+        scanner says NEEDS REGISTRATION for the same case and had nowhere to
+        send anybody either.
+      %>
+      <% if (locals.q && !rows.length) { %>
+        <details class="desk-register mt-34">
+          <summary class="mono-s">NOT HERE? REGISTER IT BY HAND →</summary>
+          <form method="post" action="/capture/register" class="auth-form measure mt-14">
+            <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+            <label class="field">
+              <span class="field-label mono-s">TITLE</span>
+              <input name="title" required maxlength="300" value="<%= q %>">
+            </label>
+            <label class="field">
+              <span class="field-label mono-s">AUTHOR</span>
+              <input name="author" required maxlength="200">
+            </label>
+            <label class="field">
+              <span class="field-label mono-s">ISBN <span class="dim">OPTIONAL</span></span>
+              <input name="isbn13" maxlength="17" inputmode="numeric" autocomplete="off">
+            </label>
+            <label class="field">
+              <span class="field-label mono-s">PAGES <span class="dim">OPTIONAL</span></span>
+              <input name="pageCount" maxlength="5" inputmode="numeric" autocomplete="off">
+            </label>
+            <button class="btn" type="submit" name="shelf" value="waiting">ADD TO WAITING →</button>
+          </form>
+        </details>
+      <% } %>
+    </div>
+
+  </div>
+
+<%- include('partials/foot') %>

@@ -1,0 +1,21 @@
+<%- include('_open') %>
+  <div class="measure">
+    <% requests.forEach(function(r) { %>
+      <div class="ruled-row settings-row">
+        <a class="settings-name no-underline" href="/@<%= r.username %>">
+          <%= r.display_name || '@' + r.username %>
+        </a>
+        <form method="post" action="/settings/requests/<%= r.follower_id %>/approve" class="inline-form">
+          <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+          <button class="more-link mono-s" type="submit">APPROVE →</button>
+        </form>
+        <%# §3 — declining is silent. No notification reaches the requester. %>
+        <form method="post" action="/settings/requests/<%= r.follower_id %>/decline" class="inline-form">
+          <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+          <button class="more-link mono-s" type="submit">DECLINE →</button>
+        </form>
+      </div>
+    <% }) %>
+    <% if (!requests.length) { %><p class="auth-lede">No requests.</p><% } %>
+  </div>
+<%- include('_close') %>

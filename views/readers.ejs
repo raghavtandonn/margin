@@ -1,0 +1,94 @@
+<%- include('partials/head', { title: title }) %>
+<%- include('partials/spine', { nav: 'readers' }) %>
+<main class="sheet">
+  <div class="block pt-20" id="block">
+    <div class="eyebrow mono"><span class="tag">THE ROLL</span></div>
+    <h1 class="d2">The roll</h1>
+    <p class="auth-lede mb-30">Who else is here.</p>
+
+    <%#
+      Search first, because the commonest reason to be on this page is
+      looking for one specific person. The placeholder says @ works, because
+      nothing else on the page would tell you.
+    %>
+    <form method="get" action="/readers" class="roll-search">
+      <label class="field-label mono-s" for="roll-q">FIND A READER</label>
+      <input id="roll-q" name="q" value="<%= q %>" autocomplete="off"
+             placeholder="a name, or @handle">
+      <button class="auth-action" type="submit">LOOK →</button>
+    </form>
+
+    <% if (results) { %>
+      <section class="roll-sec">
+        <div class="eyebrow mono"><span class="tag"><%= results.length %> FOUND</span></div>
+        <% results.forEach(function(r) { %><%- include('partials/reader-row', { r }) %><% }) %>
+        <% if (!results.length) { %>
+          <p class="auth-lede">Nobody by that name.</p>
+          <%# A private account is invisible here by design, and saying so is
+              the difference between "no such person" and "not for you". %>
+          <p class="field-note mono-s">
+            READERS WHO KEEP THEIR PROFILE PRIVATE DO NOT APPEAR IN THE ROLL.
+          </p>
+        <% } %>
+      </section>
+    <% } %>
+
+    <%#
+      The four sections. Each heading states the rule it was built from, so a
+      reader can tell why a stranger is in front of them — which is the thing
+      "suggested for you" can never do.
+    %>
+    <% if (alongside.length) { %>
+      <section class="roll-sec">
+        <div class="roll-head">
+          <div class="lb-label">ALONGSIDE</div>
+          <div class="mono-s dim">IN THE MIDDLE OF A BOOK YOU ARE IN THE MIDDLE OF</div>
+        </div>
+        <% alongside.forEach(function(r) { %><%- include('partials/reader-row', { r }) %><% }) %>
+      </section>
+    <% } %>
+
+    <% if (clubs.length) { %>
+      <section class="roll-sec">
+        <div class="roll-head">
+          <div class="lb-label">IN YOUR CLUBS</div>
+          <div class="mono-s dim">ALREADY IN A ROOM WITH YOU</div>
+        </div>
+        <% clubs.forEach(function(r) { %><%- include('partials/reader-row', { r }) %><% }) %>
+      </section>
+    <% } %>
+
+    <% if (fresh.length) { %>
+      <section class="roll-sec">
+        <div class="roll-head">
+          <div class="lb-label">NEW TO THE HOUSE</div>
+          <div class="mono-s dim">PUBLIC IN THE LAST THIRTY DAYS</div>
+        </div>
+        <% fresh.forEach(function(r) { %><%- include('partials/reader-row', { r }) %><% }) %>
+      </section>
+    <% } %>
+
+    <% if (widest.length) { %>
+      <section class="roll-sec">
+        <div class="roll-head">
+          <div class="lb-label">THE WIDEST SHELVES</div>
+          <%# Ordered, deliberately unnumbered. §2.1 — counts are shown but
+              never celebrated, and a ranked list with the figures beside it
+              is a leaderboard. %>
+          <div class="mono-s dim">PUBLIC PROFILES, MOST BOOKS FIRST</div>
+        </div>
+        <% widest.forEach(function(r) { %><%- include('partials/reader-row', { r }) %><% }) %>
+      </section>
+    <% } %>
+
+    <% if (!results && !alongside.length && !clubs.length && !fresh.length && !widest.length) { %>
+      <p class="auth-lede">
+        Nobody to show yet. The roll fills as readers make their profiles public.
+      </p>
+      <p class="field-note mono-s mt-14">
+        YOU CAN STILL SEND SOMEONE STRAIGHT TO YOUR PROFILE:
+        <a class="more-link" href="/@<%= user.username %>">/@<%= user.username %></a>
+      </p>
+    <% } %>
+  </div>
+<%- include('partials/foot') %>

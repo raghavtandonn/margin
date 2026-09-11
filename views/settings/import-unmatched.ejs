@@ -1,0 +1,47 @@
+<%- include('_open') %>
+  <div class="measure">
+    <%# §12 — the rows that did not land, so they can be fixed by hand
+        rather than silently lost. %>
+    <% if (locals.restored && !rows.length) { %>
+      <%# The rows themselves were never written to disk, so after a restart
+          there is a count but nothing to list. Saying that is better than an
+          empty page that looks like everything matched. %>
+      <p class="auth-lede">
+        That import has finished, and the rows it could not place are no
+        longer held. Import the file again to see them.
+      </p>
+    <% } else if (!rows.length && !failed.length) { %>
+      <p class="auth-lede">Everything matched.</p>
+    <% } %>
+
+    <% if (rows.length) { %>
+      <p class="auth-lede">
+        <%= rows.length %> <%= rows.length === 1 ? 'row has' : 'rows have' %> no title,
+        so there was no book to attach them to.
+      </p>
+      <% rows.forEach(function(r) { %>
+        <div class="ruled-row unmatched-row">
+          <span class="mono-s dim">LINE <%= r.line %></span>
+          <span class="unmatched-raw">
+            <%= Object.entries(r.raw).filter(function(e){ return e[1]; })
+                  .slice(0, 4).map(function(e){ return e[0] + ': ' + e[1]; }).join('  ·  ') || '(empty)' %>
+          </span>
+        </div>
+      <% }) %>
+    <% } %>
+
+    <% if (failed.length) { %>
+      <div class="mono-s dim mt-34 mb-8">REFUSED</div>
+      <% failed.forEach(function(f) { %>
+        <div class="ruled-row unmatched-row">
+          <span class="unmatched-raw"><%= f.title || '(untitled)' %></span>
+          <span class="field-error mono-s"><%= f.error %></span>
+        </div>
+      <% }) %>
+    <% } %>
+
+    <p class="mt-30">
+      <a class="more-link mono-s" href="/settings/import">IMPORT ANOTHER FILE →</a>
+    </p>
+  </div>
+<%- include('_close') %>

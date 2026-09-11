@@ -1,0 +1,117 @@
+<%- include('partials/head', { title: shelf.name }) %>
+<%- include('partials/spine', { nav: 'shelves' }) %>
+
+<main class="sheet" data-key="shelves">
+  <span class="crop tl" aria-hidden="true"></span>
+  <span class="crop tr" aria-hidden="true"></span>
+  <span class="crop bl" aria-hidden="true"></span>
+  <span class="crop br" aria-hidden="true"></span>
+
+  <div class="block pt-20" id="block">
+
+    <%- include('partials/desk', { deskQuery: '' }) %>
+
+    <div class="eyebrow mono">
+      <span class="tag">SHELF</span>
+      <span class="dim">
+        <%= h.fmt.int(items.length) %> WORKS
+        <%# §1 Surface C — the shelf clock. %>
+        <% if (clock.known) { %> · <%= clock.label %> AT YOUR PACE<% } %>
+      </span>
+    </div>
+    <% if (clock.unknown) { %>
+      <p class="mono-s dim mb-8">+ <%= clock.unknown %> BOOKS OF UNKNOWN LENGTH</p>
+    <% } %>
+    <% if (filters.length) { %>
+      <p class="mono-s orange mb-8">
+        FILTERED: <%= filters.join(' · ') %>
+        <a class="dim" href="/shelf/<%= shelf.slug %>" class="ml-8">CLEAR</a>
+      </p>
+    <% } %>
+    <h1 class="d2 mb-6"><%= shelf.name %></h1>
+
+    <%#
+      Rename and remove, for shelves the reader made. Adding the routes
+      without these would leave them orphaned the same way /work/:id/shelve
+      was — a working endpoint nothing could reach.
+
+      The system shelves get neither: WAITING, READING and FINISHED are what
+      status means, and a library with no FINISHED shelf has nowhere to put
+      a finished book.
+    %>
+    <% if (!shelf.is_system) { %>
+      <div class="shelf-admin mono-s">
+        <form method="post" action="/shelf/<%= shelf.slug %>/rename" class="inline-form">
+          <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+          <input class="shelf-rename mono-s" name="name" value="<%= shelf.name %>"
+                 maxlength="60" aria-label="Rename this shelf">
+        </form>
+        ·
+        <form method="post" action="/shelf/<%= shelf.slug %>/delete" class="inline-form">
+          <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+          <button class="more-link mono-s dim" type="submit">REMOVE THE SHELF</button>
+        </form>
+        <span class="note">The books stay in the library.</span>
+      </div>
+    <% } %>
+
+    <div class="row mono my-block">
+      <% shelves.forEach(function(s) { %>
+        <% if (s.item_count) { %>
+          <a href="/shelf/<%= s.slug %>?view=<%= encodeURIComponent(view) %>&sort=<%= encodeURIComponent(sort) %>"
+             class="tab <%= s.id === shelf.id ? 'on' : '' %>">
+            <%= s.name %> <span class="dim"><%= s.item_count %></span>
+          </a>
+        <% } %>
+      <% }) %>
+    </div>
+
+    <div class="between mb-14">
+      <div class="row">
+        <% ['COVERS', 'LIST'].forEach(function(v) { %>
+          <a class="btn <%= view === v ? 'on' : '' %>" href="?view=<%= encodeURIComponent(v) %>&sort=<%= encodeURIComponent(sort) %>"><%= v %></a>
+        <% }) %>
+        <a class="btn" href="/wall">THE WALL</a>
+      </div>
+      <div class="row">
+        <span class="mono-s dim">SORT</span>
+        <% sortKeys.forEach(function(k) { %>
+          <a class="mono" href="?view=<%= encodeURIComponent(view) %>&sort=<%= encodeURIComponent(k) %>"
+             class="tab <%= sort === k ? 'on' : '' %>"><%= k %></a>
+        <% }) %>
+      </div>
+    </div>
+
+    <% if (!items.length) { %>
+      <p class="empty mono">NOTHING SHELVED. ADD A BOOK.</p>
+      <a class="btn btn-orange" href="/desk">ADD A BOOK</a>
+
+    <% } else if (view === 'COVERS') { %>
+      <div class="sheet-head mono-s dim">
+        <span>COVERS</span>
+        <span><%= h.fmt.int(items.length) %> BOOKS · SORTED BY <%= sort %></span>
+      </div>
+      <div class="contact">
+        <% items.forEach(function(it, i) { %>
+          <a href="/work/<%= it.work_id %>" title="<%= it.title %>">
+            <%- h.frame(it, { reading: it.status === 'READING' }) %>
+            <span class="frame-foot">
+              <span class="frame-no"><%= String(i + 1).padStart(3, '0') %></span>
+              <% if (it.stars != null) { %><%- h.stars(it.stars, { size: 11 }) %><% } %>
+            </span>
+            <span class="frame-title"><%= it.title %></span>
+          </a>
+        <% }) %>
+      </div>
+
+    <% } else { %>
+      <div>
+        <% items.forEach(function(item) { %>
+          <%- include('partials/ticket', { item: item }) %>
+        <% }) %>
+      </div>
+    <% } %>
+
+  </div>
+
+<%- include('partials/foot') %>

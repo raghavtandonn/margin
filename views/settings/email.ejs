@@ -1,0 +1,14 @@
+<%- include('_open') %>
+  <form method="post" action="/settings/email" class="auth-form measure">
+    <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+    <p class="auth-lede">Currently <span class="auth-em"><%= values.email %></span>.</p>
+    <label class="field">
+      <span class="field-label mono-s">NEW ADDRESS</span>
+      <input name="email" type="email" required autofocus>
+      <%# §8 — the old address is told, with a link that undoes it. That is
+          what catches a takeover while it is still happening. %>
+      <span class="note">The old address gets 72 hours to stop it.</span>
+    </label>
+    <button class="auth-action" type="submit">SEND THE LINK →</button>
+  </form>
+<%- include('_close') %>

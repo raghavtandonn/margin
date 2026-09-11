@@ -1,0 +1,25 @@
+<%- include('../partials/head', { title: title }) %>
+<main class="sheet auth-sheet">
+  <div class="auth-block" id="block">
+    <div class="mono-s auth-label">CONFIRM</div>
+    <h1 class="auth-title">Again, for this one.</h1>
+    <%# §14 — step-up for every data-reading action, not once per session.
+        An unattended staff session is the threat model. %>
+    <p class="auth-lede">Both factors, each time.</p>
+    <form method="post" action="/staff/reauth" class="auth-form">
+      <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+      <input type="hidden" name="next" value="<%= next %>">
+      <label class="field">
+        <span class="field-label mono-s">PASSWORD</span>
+        <input name="password" type="password" required autofocus>
+      </label>
+      <label class="field">
+        <span class="field-label mono-s">SECOND FACTOR</span>
+        <input name="code" inputmode="numeric" maxlength="7" required class="code-input">
+      </label>
+      <% if (locals.error) { %><p class="field-error mono-s"><%= error %></p><% } %>
+      <button class="auth-action" type="submit">CONFIRM →</button>
+    </form>
+  </div>
+</main>
+<%- include('../partials/foot') %>

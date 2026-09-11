@@ -1,0 +1,207 @@
+<%- include('partials/head', { title: title, robots: locals.robots }) %>
+<% if (!viewerIsPublic) { %><%- include('partials/spine', { nav: 'seasons' }) %><% } %>
+
+<main class="sheet" data-key="seasons">
+  <span class="crop tl" aria-hidden="true"></span><span class="crop tr" aria-hidden="true"></span>
+  <span class="crop bl" aria-hidden="true"></span><span class="crop br" aria-hidden="true"></span>
+
+  <div class="block pt-20" id="block">
+
+    <%- include('partials/desk', { deskQuery: '' }) %>
+
+    <%#
+      §7 — the lookbook, in order, one continuous scroll.
+
+      Nothing here has a progress bar or a completion percentage, and there
+      is no target anywhere in the feature. The subject is how time passed,
+      not how much was accomplished.
+    %>
+
+    <%# ── 1. FRONT MATTER ────────────────────────────── %>
+    <div class="eyebrow mono">
+      <span class="tag">SEASON</span>
+      <span class="dim">
+        <%= meta.short %><%
+          if (row.state === 'closed' && row.closed_at) { %> · CLOSED <%= h.monthDay(row.closed_at) %><%
+          } %>
+      </span>
+      <%# §9 — the OPEN marker is the only red in the feature. %>
+      <% if (row.state === 'open') { %><span class="season-open mono-s">OPEN</span><% } %>
+    </div>
+
+    <h1 class="season-title"><%= row.given_title || meta.label %></h1>
+
+    <% if (strip.length) { %>
+      <%# One band per book, in finish order — the colour each book was
+          derived to carry, or the one its reader chose instead. A book with
+          no evidence gets no colour: it is drawn as a hatch, which is a
+          state and not a gap. §05.
+
+          The emotion words are in the label rather than on the bands: at
+          this height there is no room for type, and colour on its own
+          carries no meaning to anyone who cannot see it. %>
+      <div class="season-strip" role="img" aria-label="<%= h.stripLabel(strip) %>">
+        <% strip.forEach(function(b) { %>
+          <i class="<%= h.bandClass(b) %>"<% if (b.hex) { %> id="<%= h.rule(styleRules, 'sb', b.hex, 'background:' + h.css.color(b.hex)) %>"<% } %>></i>
+        <% }) %>
+      </div>
+    <% } %>
+
+    <%# ── 2. THE NOTE ────────────────────────────────── %>
+    <%# §3 — an open season has no note. "You cannot review a collection
+        mid-show." §12 — a season under three books has none either. %>
+    <% if (row.note) { %>
+      <p class="season-note"><%= row.note %></p>
+
+      <%#
+        The jump-links that used to sit here — EDIT, REGENERATE,
+        REGENERATED TODAY, COMPOSED FROM THE FACTS — pointed at controls
+        that are already visible further down this page, under their own
+        headings. A row of anchors duplicating what is on screen is a table
+        of contents for a page you can see all of.
+
+        The lookbook stays: it is a different object, and this is the only
+        way to it.
+      %>
+      <%#
+        THE TWO OBJECTS, AS CONTROLS.
+
+        These were two 11px grey links separated by a middot, at the foot of
+        a block of statistics — the same treatment as a field label, for the
+        only two things on this page anybody actually goes to. The lookbook
+        and the poster are what a season is FOR; the page above them is the
+        record they are made from.
+
+        So they take the treatment the publish button used to have. The
+        lookbook is filled, because it is the object; the poster carries the
+        same weight in outline, because it is one press of the same season.
+        Two controls on a page whose entire purpose is to lead to them is
+        not a breach of "one accent per screen" — it is the screen.
+      %>
+      <% if (isOwner && !viewerIsPublic) { %>
+        <p class="season-controls">
+          <a class="btn-do" href="/season/<%= row.code %>/lookbook">THE LOOKBOOK</a>
+          <a class="btn-do" href="/season/<%= row.code %>/poster.png">THE POSTER</a>
+        </p>
+
+        <%#
+          ── PUBLISHING ────────────────────────────────
+
+          The lookbook and the poster are the best objects this product makes
+          and both were sealed inside an account that defaults to private.
+
+          The way out is NOT "make your profile public". It is publishing one
+          artifact, once: a closed season, at whatever visibility the account
+          keeps. Scoped, reversible, and legible — which is what lets
+          private-by-default survive a product that also wants to be shared.
+        %>
+        <%# PUBLISHING IS GONE.
+
+            A season could be published as one link anyone could open. The
+            argument for it was that the lookbook and the poster are the most
+            shareable things this product makes and they were sealed inside a
+            private account. That was true and it was still the wrong answer:
+            a season is a record of what one person read and thought about
+            it, the marginalia in it is their own writing, and handing that a
+            public URL made a personal object into something to be
+            circulated. If a reader wants to show somebody, they can show
+            them. The product does not need to mint a link for it. %>
+      <% } %>
+    <% } %>
+
+    <% if (locals.error) { %><p class="field-error mono-s"><%= error %></p><% } %>
+
+    <%# ── 3. MOVEMENTS AND FRAMES ────────────────────── %>
+    <% movements.forEach(function(m) { %>
+      <section class="movement <%= m.is_empty ? 'movement-empty' : '' %>">
+        <div class="movement-head">
+          <h2 class="movement-name">
+            <span class="movement-numeral"><%= m.roman %>.</span> <%= m.name %>
+          </h2>
+          <div class="movement-meta mono-s">
+            <%= h.monthDay(m.starts_on) %> · <%= h.monthDay(m.ends_on) %>
+            · <%= m.is_empty ? 'NOTHING' : m.books.length + (m.books.length === 1 ? ' BOOK' : ' BOOKS') %>
+          </div>
+        </div>
+
+        <%#
+          §6 — the empty movement. A name, a date range, a count of zero,
+          and nothing beneath it but a hairline.
+
+          No commentary. No prompt to read more. Not collapsed. A month in
+          which somebody did not read is part of their season.
+        %>
+        <% if (!m.is_empty) { %>
+          <div class="frames">
+            <% m.books.forEach(function(f) { %>
+              <%- include('partials/frame', { f: f, isOwner: isOwner, viewerIsPublic: viewerIsPublic, code: row.code }) %>
+            <% }) %>
+          </div>
+        <% } %>
+      </section>
+    <% }) %>
+
+    <%# Frames with no movement: an open season, or one with no structure. %>
+    <% if (loose.length) { %>
+      <div class="frames <%= movements.length ? 'mt-34' : '' %>">
+        <% loose.forEach(function(f) { %>
+          <%- include('partials/frame', { f: f, isOwner: isOwner, viewerIsPublic: viewerIsPublic, code: row.code }) %>
+        <% }) %>
+      </div>
+    <% } %>
+
+    <%# §12 — a season with nothing in it shows the date range and nothing
+        else. No message, no prompt, no encouragement. %>
+    <% if (!frames.length) { %>
+      <p class="season-range mono-s dim">
+        <%= h.monthDay(meta.starts_on) %> · <%= h.monthDay(meta.ends_on) %>
+      </p>
+    <% } %>
+
+    <%# ── 5. ABSENCES ────────────────────────────────── %>
+    <%# §7.5 — listed plainly. No commentary. %>
+    <% if (absences.length) { %>
+      <h2 class="sec mt-44">Set down</h2>
+      <% absences.forEach(function(a) { %>
+        <div class="absence">
+          <span class="absence-title"><%= a.title %></span>
+          <span class="frame-author"><%= a.author || '' %></span>
+          <span class="mono-s dim"><% if (a.page) { %>P.<%= Math.round(a.page) %><% } %></span>
+        </div>
+      <% }) %>
+    <% } %>
+
+    <%# ── 6. THE COLOPHON ────────────────────────────── %>
+    <%# §7.6 — the credits page. No charts, no bars, no graphs. %>
+    <% if (colophon.length) { %>
+      <h2 class="sec mt-44">Colophon</h2>
+      <dl class="season-colophon">
+        <% colophon.forEach(function(p) { %>
+          <div><dt><%= p.label %></dt><dd><%= p.value %></dd></div>
+        <% }) %>
+      </dl>
+    <% } %>
+
+    <%# ── SHARE, and the four editing controls ───────── %>
+    <%# §12 — "0 books: Season exists, shows the date range and nothing
+        else. No message, no prompt, no encouragement." A poster link and a
+        regenerate button are prompts. %>
+    <% if (row.state === 'closed' && isOwner && !viewerIsPublic && frames.length) { %>
+      <%# POSTER → is gone from here: the poster is a filled control at the
+          top of this page, and a second link to it at the foot was the same
+          door twice. EDIT THE NOTE and REGENERATE THE ANALYSIS went with it.
+
+          What that costs is stated rather than hidden: a season's note and
+          its given title can no longer be edited by hand, and the analysis
+          cannot be asked for again. The routes behind both were removed with
+          the controls, because a POST nothing can reach is worse than no
+          POST at all. `npm run seasons` still closes and writes seasons. %>
+      <% if (locals.user && user.profile_visibility === 'public' && user.username) { %>
+        <p class="mono-s mt-44">
+          <a class="more-link" href="/@<%= user.username %>/<%= row.code %>">PUBLIC PAGE →</a>
+        </p>
+      <% } %>
+    <% } %>
+
+  </div>
+<%- include('partials/foot') %>

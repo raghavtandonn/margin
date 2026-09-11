@@ -1,0 +1,377 @@
+<%- include('partials/head', { title: 'Home' }) %>
+<%- include('partials/spine', { nav: 'home' }) %>
+
+<main class="sheet">
+  <span class="crop tl" aria-hidden="true"></span>
+  <span class="crop tr" aria-hidden="true"></span>
+  <span class="crop bl" aria-hidden="true"></span>
+  <span class="crop br" aria-hidden="true"></span>
+
+  <div class="block pt-20" id="block">
+
+    <%- include('partials/desk', { deskQuery: '' }) %>
+
+    <%#
+      ── THE MASTHEAD ──────────────────────────────────────
+
+      A date, not a name. "You" was a title that never changed and told the
+      reader nothing they did not already know; a masthead date changes
+      daily, is the warmest thing on the page, and is what a paper puts in
+      that position. The handle sits on the right in the folio position,
+      small, where a masthead puts the edition.
+    %>
+    <header class="masthead">
+      <h1 class="masthead-date"><%= h.fmt.longDate(today) %></h1>
+      <a class="masthead-who mono-s dim no-underline" href="/@<%= user.username || user.handle %>">
+        @<%= user.username || user.handle %>
+      </a>
+    </header>
+
+    <%#
+      WAITING ON YOU.
+
+      A follow request is the only thing in this product that is blocked on
+      an answer, so it sits above everything else and it is a panel rather
+      than a line — it is the one thing on this page you are meant to act
+      on. The redesign has no slot for it, because the day it was drawn
+      there was nothing waiting; that is not a reason to drop the only
+      control on the page.
+
+      §3 — declining is silent. Neither button says anything about what the
+      other person will be told, because they are told nothing.
+    %>
+    <% if (requests && requests.length) { %>
+      <section class="panel front-waiting">
+        <h2 class="sec">Waiting on you</h2>
+        <% requests.forEach(function(r) { %>
+          <div class="pigeon-row">
+            <%- h.avatarPlate(r, { size: 30, className: 'pigeon-face' }) %>
+            <span class="pigeon-main">
+              <a class="no-underline" href="/@<%= r.username %>"><%= r.display_name || '@' + r.username %></a>
+              <span class="dim">asked to follow you</span>
+            </span>
+            <span class="pigeon-acts">
+              <form method="post" action="/settings/requests/<%= r.follower_id %>/approve" class="inline-form">
+                <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                <input type="hidden" name="from" value="home">
+                <button class="more-link mono-s" type="submit">LET THEM IN</button>
+              </form>
+              <form method="post" action="/settings/requests/<%= r.follower_id %>/decline" class="inline-form">
+                <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                <input type="hidden" name="from" value="home">
+                <button class="more-link mono-s dim" type="submit">NO</button>
+              </form>
+            </span>
+          </div>
+        <% }) %>
+      </section>
+    <% } %>
+
+    <%#
+      ABOUT YOU — the pigeonhole, folded in. §10 still governs: no counts in
+      the navigation, no "mark all as read". Reading them is what clears
+      them, which is a side effect of opening this page.
+    %>
+    <% if (notices && notices.length) { %>
+      <section class="panel front-notices">
+        <h2 class="sec">About you</h2>
+        <% notices.forEach(function(g) { %>
+          <div class="pigeon-row<%= g.unread ? ' is-unread' : '' %>">
+            <span class="pigeon-main">
+              <%= h.actorLine(g.actors) %> <span class="dim"><%= g.subject %></span>
+            </span>
+            <span class="pigeon-acts">
+              <% if (g.url) { %><a class="more-link mono-s" href="<%= g.url %>">OPEN →</a><% } %>
+            </span>
+          </div>
+        <% }) %>
+      </section>
+    <% } %>
+
+    <%#
+      ── THE FRONT ─────────────────────────────────────────
+
+      Three bands, and each answers a different question.
+
+        on press      what am I inside of        — jackets, at a size
+        where you are where does the rest stand  — season, pile, clubs
+        latest        what has everyone done     — the feed, two up
+
+      The rail is gone. It had become a column of six unrelated things
+      stacked in a 260px gutter — a lead jacket, two books, a season, and
+      whatever else arrived — read top to bottom in a strip narrower than
+      the covers it was showing. The books are the object this product is
+      about, so they get the width.
+    %>
+
+    <%#
+      WHAT IS ON PRESS.
+
+      Three jackets at plate size, the page number burned into the foot of
+      each. The front page used to carry one lead jacket and then describe
+      the other two in type; showing all three as objects is both simpler
+      and more use, because which book you pick up is a decision made by
+      looking at them.
+    %>
+    <div class="front-duo">
+
+      <section class="front-col">
+        <h2 class="front-h2">
+          <span>On press</span>
+          <% if (reading.length) { %>
+            <a class="more-link mono-s" href="/reading">ALL <%= reading.length %> →</a>
+          <% } %>
+        </h2>
+
+        <% if (!reading.length) { %>
+          <p class="note front-empty">
+            Nothing on press. <a class="more-link mono-s" href="/desk">FIND A BOOK →</a>
+          </p>
+        <% } else { %>
+          <div class="press-shelf">
+            <% reading.slice(0, 3).forEach(function(b) { %>
+              <a class="shelf-bk" href="/work/<%= b.work_id %>">
+                <span class="shelf-jk">
+                  <%- h.frame({ cover_url: b.cover_url, cover_cache_key: b.cover_cache_key,
+                                title: b.title, authorLine: b.authorLine,
+                                trimAspect: b.trimAspect, isbn13: b.isbn13,
+                                work_id: b.work_id }) %>
+                  <%# The page, on the jacket. It is the one number on this
+                      page anybody acts on, and it belongs on the object it
+                      describes rather than in a column beside it. %>
+                  <span class="shelf-page">
+                    <b><%= b.current_page ? h.fmt.position(b.current_page, b.position_type) : '—' %></b>
+                    <span class="mono-s"><%= b.totalPositions ? 'OF ' + b.totalPositions
+                                                              : h.positionLabel(b.position_type) %></span>
+                  </span>
+                </span>
+
+                <%# A filled bar here, not the reading page's mark.
+                    "A fill is a score and a mark is just where you are" was
+                    written for a press row, which is tall enough for a 9px
+                    tick to read as a position on a rule. Under a jacket the
+                    rule is a 2px base line and the tick straddled the
+                    jacket's own edge, reading as a stray orange fleck rather
+                    than as progress. At this size the fill IS the position.
+                    A book with no extent gets a broken rule, because there
+                    is no line to be somewhere along yet. %>
+                <span class="shelf-prog<%= b.totalPositions ? '' : ' is-unknown' %>"<%
+                      if (b.percent) { %> role="img" aria-label="<%= b.percent %> percent"<% } %>>
+                  <% if (b.percent) { %>
+                    <i id="<%= h.rule(styleRules, 'hp', b.work_id, 'width:' + h.css.pct(b.percent)) %>"></i>
+                  <% } %>
+                </span>
+
+                <span class="shelf-t"><%= h.shortTitle(b.title, { max: 46 }) %></span>
+                <span class="shelf-by mono-s"><%= b.authorLine %></span>
+                <% if (b.daysSinceLog != null) { %>
+                  <span class="shelf-gap mono-s<%= b.stalled ? ' is-stale' : '' %>">
+                    <%= h.sinceLabel(b.daysSinceLog).replace('LAST LOGGED ', '') %>
+                  </span>
+                <% } else if (b.started_at) { %>
+                  <span class="shelf-gap mono-s">STARTED TODAY</span>
+                <% } %>
+              </a>
+            <% }) %>
+          </div>
+        <% } %>
+      </section>
+
+      <%#
+        WHERE YOU ARE.
+
+        Three standings, none of them a metric: the season you are in, the
+        pile you are not reading, and the clubs waiting on you. The pile is
+        the largest single fact about this library and the front page said
+        nothing about it at all.
+      %>
+      <section class="front-col">
+        <h2 class="front-h2"><span>Where you are</span></h2>
+
+        <% if (season) { %>
+          <div class="where-card">
+            <div class="where-k mono-s">
+              <span>SEASON <%= season.short %></span>
+              <% if (season.state === 'open') { %><em class="is-open">OPEN</em><% } %>
+            </div>
+            <% if (season.strip.length) { %>
+              <a class="where-strip no-underline" href="/season/<%= season.code %>"
+                 role="img" aria-label="<%= h.stripLabel(season.strip) %>">
+                <% season.strip.forEach(function(b) { %>
+                  <i class="<%= h.bandClass(b) %>"<% if (b.hex) { %> id="<%= h.rule(styleRules, 'hs', b.hex, 'background:' + h.css.color(b.hex)) %>"<% } %>></i>
+                <% }) %>
+              </a>
+            <% } %>
+            <a class="where-sub mono-s no-underline" href="/season/<%= season.code %>">
+              <%= season.count ? season.count + ' SO FAR' : 'NOTHING YET' %>
+            </a>
+          </div>
+        <% } %>
+
+        <%#
+          NEXT FROM THE PILE.
+
+          The pile card used to be a count and a row of spines — the largest
+          fact about the library, stated and left there. It now carries three
+          books to actually read, which is the difference between a pile that
+          accuses you and one that is useful.
+
+          The count survives as the card's own badge, so nothing is lost.
+
+          Every line under a title is derived: which finished books this one
+          sits nearest, or how long it has been held. No sentence here is
+          written by a model, and the card never says it learned anything —
+          it is similarity ranking over content, and §01 of the spec is
+          explicit that the word "learning" must not attach to it.
+        %>
+        <% if (recos && recos.length) { %>
+          <div class="where-card">
+            <div class="where-k mono-s">
+              <span>NEXT FROM THE PILE</span>
+              <% if (waiting) { %><em class="is-quiet"><%= waiting.count %> UNREAD</em><% } %>
+            </div>
+            <div class="pile-recos">
+              <% recos.forEach(function(r) { %>
+                <a class="pile-reco" href="/work/<%= r.work_id %>">
+                  <span class="pile-cv">
+                    <%- h.frame({ cover_url: r.cover_url, cover_cache_key: r.cover_cache_key,
+                                  title: r.title, work_id: r.work_id }) %>
+                  </span>
+                  <span class="pile-m">
+                    <span class="pile-n"><%= h.shortTitle(r.title, { max: 30 }) %></span>
+                    <span class="pile-a mono-s">
+                      <%= (r.author || 'Unknown').toUpperCase() %><%
+                        if (r.heldDays) { %> · HELD <%= r.heldDays.toLocaleString() %> DAYS<% } %>
+                    </span>
+                    <% if (r.neighbourTitles.length) { %>
+                      <span class="pile-why">Nearest to <%
+                        r.neighbourTitles.forEach(function(t, i) { %><%
+                          if (i) { %> and <% } %><b><%= h.shortTitle(t, { max: 26 }) %></b><%
+                        }) %></span>
+                    <% } %>
+                  </span>
+                </a>
+              <% }) %>
+            </div>
+            <span class="where-sub mono-s">RANKED ON WIKIPEDIA PLOT SUMMARIES</span>
+          </div>
+        <% } else if (waiting) { %>
+          <div class="where-card">
+            <div class="where-k mono-s"><span>WAITING</span></div>
+            <a class="where-big no-underline" href="/shelf/waiting">
+              <span class="where-v"><%= waiting.count %></span>
+              <span class="where-u">unopened</span>
+            </a>
+            <%# Only the editions with a sampled spine are drawn. A made-up
+                colour on a shelf of real ones is a lie about which books
+                are which. %>
+            <% if (waiting.spines.length) { %>
+              <span class="where-spines" aria-hidden="true">
+                <% waiting.spines.forEach(function(c) { %>
+                  <i id="<%= h.rule(styleRules, 'sp', c, 'background:' + h.css.color(c)) %>"></i>
+                <% }) %>
+              </span>
+            <% } %>
+            <% if (waiting.heldDays) { %>
+              <span class="where-sub mono-s">OLDEST HELD <%= waiting.heldDays.toLocaleString() %> DAYS</span>
+            <% } %>
+          </div>
+        <% } %>
+
+        <% if (clubs && clubs.length) { %>
+          <div class="where-card">
+            <div class="where-k mono-s">
+              <span>CLUBS</span>
+              <em class="is-in"><%= clubs.length %> IN</em>
+            </div>
+            <% clubs.forEach(function(c) { %>
+              <a class="where-club no-underline" href="/clubs/<%= c.slug %>">
+                <span class="where-em">
+                  <% if (c.avatar_key) { %>
+                    <img src="/avatar/<%= c.avatar_key %>/128" alt="" width="38" height="38">
+                  <% } else { %>
+                    <span class="grp-emblem-blank" aria-hidden="true"></span>
+                  <% } %>
+                </span>
+                <span>
+                  <span class="where-n"><%= h.shortTitle(c.name, { max: 26 }) %></span>
+                  <span class="where-d mono-s">
+                    <%= c.on_display ? h.shortTitle(c.on_display, { max: 28 }) : 'NOTHING ON DISPLAY' %>
+                    · <%= c.members %> IN
+                  </span>
+                </span>
+              </a>
+            <% }) %>
+          </div>
+        <% } %>
+      </section>
+    </div>
+
+    <%#
+      LATEST, two up.
+
+      The thumbnail varies with what happened, because the events are not
+      all about the same kind of thing: a finished book shows its jacket, a
+      closed season shows its strip, a club shows its emblem. Where there is
+      no object — or no jacket held — the reader's own face stands in, which
+      is the edge this feed carried on every row before.
+
+      A jacket at 20px was an unreadable smudge and that argument stood; at
+      38px on a 2:3 trim it is a legible thumbnail, which is a different
+      thing. The season strip is the one place a derived colour appears
+      here, and it appears as the season's own strip rather than as a tint
+      on somebody else's row.
+    %>
+    <section class="front-latest">
+      <h2 class="front-h2">
+        <span>Latest</span>
+        <% if (feed.length) { %><a class="more-link mono-s" href="/wall">ALL ACTIVITY →</a><% } %>
+      </h2>
+
+      <% if (!feed.length) { %>
+        <p class="note front-empty">Nothing this week. This fills up when you follow people.</p>
+      <% } else { %>
+        <div class="front-evs">
+          <% feed.forEach(function(e) { %>
+            <%
+              var href = e.kind === 'season' ? '/@' + e.username + '/' + e.code
+                       : (e.kind === 'club' || e.kind === 'announcement') ? '/clubs/' + e.slug
+                       : '/work/' + e.work_id;
+              var verb = { finished: 'finished', review: 'reviewed', season: 'closed',
+                           club: 'joined', announcement: 'announced' }[e.kind] || 'logged';
+            %>
+            <a class="front-ev" href="<%= href %>">
+              <span class="ev-mini">
+                <% if (e.kind === 'season' && e.strip && e.strip.length) { %>
+                  <span class="ev-strip" aria-hidden="true">
+                    <% e.strip.forEach(function(b) { %>
+                      <i<% if (b.hex) { %> id="<%= h.rule(styleRules, 'hs', b.hex, 'background:' + h.css.color(b.hex)) %>"<% } %>></i>
+                    <% }) %>
+                  </span>
+                <% } else if (e.cover_url || e.cover_cache_key) { %>
+                  <%- h.frame({ cover_url: e.cover_url, cover_cache_key: e.cover_cache_key,
+                                title: e.title, work_id: e.work_id }) %>
+                <% } else { %>
+                  <%- h.avatarPlate(e, { size: 38, className: 'ev-face' }) %>
+                <% } %>
+              </span>
+
+              <span class="ev-txt">
+                <b>@<%= e.username %></b> <%= verb %>
+                <i><%= e.title || e.club_name %></i><%
+                  if (e.kind === 'finished' && e.items && e.items.length > 1) { %>
+                  and <%= e.items.length - 1 %> more<% }
+                  if (e.stars != null) { %> · <%= h.starText(e.stars) %><% } %>
+                <% if (e.caption) { %><span class="ev-cap"><%= e.caption %></span><% } %>
+              </span>
+
+              <span class="ev-when mono-s"><%= e.ago %></span>
+            </a>
+          <% }) %>
+        </div>
+        <p class="entry-end note">That\u2019s everything from this week.</p>
+      <% } %>
+    </section>
+  </div>
+
+<%- include('partials/foot') %>

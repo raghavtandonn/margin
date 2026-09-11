@@ -1,0 +1,11 @@
+<%- include('partials/head', { title: title }) %>
+<%- include('partials/spine', { nav: '' }) %>
+<main class="sheet">
+  <div class="block pt-20" id="block">
+    <div class="eyebrow mono"><span class="tag">404</span></div>
+    <%# §10 — machine-plain. Never "Something went wrong". %>
+    <h1 class="d2 mb-14">Not found</h1>
+    <p class="mono dim mb-20">NO RECORD MATCHES THAT ADDRESS.</p>
+    <a class="btn btn-orange" href="/desk">SEARCH</a>
+  </div>
+<%- include('partials/foot') %>

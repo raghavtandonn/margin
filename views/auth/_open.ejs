@@ -1,0 +1,22 @@
+<%#
+  §17 — the auth frame, opened.
+
+  "Scaffolding tools generate ugly forms. These screens must match the rest
+  of the product." So this is not a card floating on a page: it is a sheet
+  with crop marks, the same object every other screen in the product is.
+
+  No social login buttons. §17 — passkeys are the modern path, and a wall of
+  coloured OAuth buttons would wreck the page.
+
+  Every value below is printed through EJS's escaping output tag rather
+  than concatenated into a string, so output escaping is the default and
+  not a thing anyone has to remember (§13.3).
+%>
+<%- include('../partials/head', { title: title }) %>
+<main class="sheet auth-sheet">
+  <span class="crop tl" aria-hidden="true"></span>
+  <span class="crop tr" aria-hidden="true"></span>
+  <span class="crop bl" aria-hidden="true"></span>
+  <span class="crop br" aria-hidden="true"></span>
+  <div class="auth-block" id="block">
+    <a class="auth-mark mono-s" href="/">MARGIN</a>
