@@ -2,11 +2,11 @@
 
 Reading, c/o the reader. A reading log built as a printed object: a work and
 edition graph, a shelf you can look at, seasons that close into catalogues,
-and a small community layer — with a privacy model enforced in SQL rather
+and a small community layer, with a privacy model enforced in SQL rather
 than in templates.
 
-Built against a set of written specs — the product, accounts and security,
-community, seasons and the lookbook, the colour system and recommendations —
+Built against a set of written specs (the product, accounts and security,
+community, seasons and the lookbook, the colour system and recommendations),
 together with the audits written when the product was measured against them.
 Those specs and the reference HTML the design was drawn from are kept
 privately and are not part of this repository.
@@ -27,7 +27,7 @@ password policy and the reserved-username list, says so every time it runs,
 and is fine on a laptop and nowhere else.
 
 If you already have a seeded library and want to attach credentials to *that*
-reader rather than create a second account, use `npm run claim` instead — the
+reader rather than create a second account, use `npm run claim` instead. The
 library predates accounts, and claiming it avoids stranding the books.
 
 ```bash
@@ -42,7 +42,7 @@ npm run reset:empty   # rebuild with no books, ready for an import
 
 - **Node ≥ 22.5.0.** The database is the built-in `node:sqlite`, which is why
   there is no build step and no schema tooling. Developed on Node 26.
-- **Four packages carry the product** — Express, EJS, `hash-wasm` (Argon2id,
+- **Four packages carry the product:** Express, EJS, `hash-wasm` (Argon2id,
   WebAssembly) and `@simplewebauthn/server` (passkeys, pure JS). Nothing in
   that list is native and nothing needs a toolchain.
 - **A fifth carries recommendations**, and it is the one exception worth
@@ -50,7 +50,7 @@ npm run reset:empty   # rebuild with no books, ready for an import
   `@huggingface/transformers` runs the embedding model in-process and brings
   roughly 115 transitive packages with it, including **prebuilt** native
   binaries (`onnxruntime-node`, and `sharp` where it installs). They are
-  downloaded, not compiled, so `npm install` still needs no toolchain — but
+  downloaded, not compiled, so `npm install` still needs no toolchain, but
   "no native dependencies" stopped being true the day the pile recommender
   shipped, and this file went on saying it for a while afterwards.
 
@@ -78,7 +78,7 @@ finished; each check exists because something got past the ones before it.
 | `npm test` | 590 tests, including regression coverage for every issue found in the security review |
 | `npm run check:routes` | Every `<form action>` **and every `<a href>`** resolves to a route that exists, and every POST route is reachable from somewhere |
 | `npm run check:templates` | Every template compiles, every `include` resolves, and every page template is rendered by some route |
-| `npm run check:css` | The stylesheet's shadowing census — the same selector declared twice with different values |
+| `npm run check:css` | The stylesheet's shadowing census: the same selector declared twice with different values |
 | `npm run check:dead` | Exports nothing imports; CSS classes no template uses |
 | `npm run test:csp` | Boots with `MARGIN_CSP=enforce` so violations break rather than report |
 
@@ -89,7 +89,7 @@ actions only. A regex edit deleted `GET /reviews`; a later one took
 `GET /season/:code/poster.png` and the public season page with it. Both were
 linked from views, both 404'd for every reader, and the checker reported
 everything fine. It now checks links too, and understands routers that are
-not named `router` — `publicRouter.get(...)` used to be invisible to it.
+not named `router`; `publicRouter.get(...)` used to be invisible to it.
 
 `check:css` can also diff:
 
@@ -106,7 +106,7 @@ computed value moved except the ones intended.
 
 ## Getting your books in
 
-### From the browser — `/settings/import`
+### From the browser: `/settings/import`
 
 The scripts below predate accounts and are still the fastest way to load a
 laptop from a shell. **A reader arriving with their own library uses the
@@ -117,8 +117,8 @@ until you have seen what it is about to write.
 | What you have | What to do |
 |---|---|
 | `goodreads_library_export.csv`, or a StoryGraph or LibraryThing CSV | Drop it. The format is read from the column headers; you are only asked which service it came from if they are unrecognisable |
-| **A folder of 44 zip files** from "Request my data" | Drop **`review.zip`** — that one is your library. Still zipped; don't unzip anything |
-| Neither — just a list of titles | Type them into the box, one a line |
+| **A folder of 44 zip files** from "Request my data" | Drop **`review.zip`**. That one is your library. Still zipped; don't unzip anything |
+| Neither, just a list of titles | Type them into the box, one a line |
 
 **The folder of 44 zips is the confusing one**, because Goodreads calls two
 entirely different things "your export" and they share no format. Only four
@@ -126,15 +126,15 @@ of the 44 hold reading:
 
 | File | What it adds |
 |---|---|
-| `review.zip` | **Your library** — books, shelves, ratings. Import this first |
+| `review.zip` | **Your library**: books, shelves, ratings. Import this first |
 | `notes.zip` | Notes you left while reading |
 | `activity.zip` | When you started and finished things |
 | `user_quote.zip` | Quotes you saved |
 
 The last three attach to books that are already there and **cannot create
 one**, so they do nothing until `review.zip` has gone in. Each is previewed
-row by row — every note named against the book it will land on, and every row
-that will be skipped, with the reason — because a supplement cannot double a
+row by row (every note named against the book it will land on, and every row
+that will be skipped, with the reason) because a supplement cannot double a
 library but it can put a note on the wrong book.
 
 That folder is the **worse** export: it carries no author, no ISBN and no
@@ -146,18 +146,18 @@ optional and improves matching when it is there:
 
 ```
 The Secret History by Donna Tartt
-Stoner — John Williams
+Stoner - John Williams
 Gilead
 ```
 
 `by`, an en/em dash, a spaced hyphen, a tab and a pipe all separate title
 from author. A comma does too, but only when the file as a whole reads that
-way — `Cloud Atlas, David Mitchell` splits and `Goodbye, Columbus` does not,
+way: `Cloud Atlas, David Mitchell` splits and `Goodbye, Columbus` does not,
 because nothing in either line settles it and only the company it keeps does.
 Numbered lines, bullets and surrounding quotes are stripped; `Anti-Oedipus`
 keeps its hyphen because an unspaced hyphen is part of a word.
 
-### Fastest — paste the table view
+### Fastest: paste the table view
 
 Goodreads → My Books → `table view`, scroll to the bottom so every row loads,
 select all, copy.
@@ -170,7 +170,7 @@ npm run import:paste -- data/goodreads-paste.txt --resolve
 
 `pbpaste` writes the clipboard straight to a file, so nothing is truncated.
 The table view carries **no ISBNs**, so resolution is a separate, resumable
-step — re-run it to retry the books that missed:
+step. Re-run it to retry the books that missed:
 
 ```bash
 npm run enrich -- --resolve
@@ -183,19 +183,19 @@ is worse than a blank one.
 
 **Things learned the hard way about that paste:**
 
-- Copying the page yields **every row twice** — the table is rendered twice in
+- Copying the page yields **every row twice**, because the table is rendered twice in
   the DOM. Records are deduplicated on title + author.
 - Two copy shapes exist. One duplicates the title from the cover's alt text
   and puts five stars on one line; the other has a single title line and five
   separate star lines. Both parse.
 - Your rating is the **bracketed** star (`[ 4 of 5 stars ]`). No brackets means
   unrated, which is not zero.
-- Open Library indexes translated authors under their native script — Murakami
-  as 村上春樹, Dostoevsky in Cyrillic — so author-string matching alone fails.
+- Open Library indexes translated authors under their native script (Murakami
+  as 村上春樹, Dostoevsky in Cyrillic), so author-string matching alone fails.
   Title-only search meanwhile ranks "Summary of X" above the novel. The
   resolver scores both and refuses anything weak.
 
-### Better data, slower — the full export
+### Better data, slower: the full export
 
 Goodreads mails you a ZIP (My Books → Import and Export). It carries real
 ISBNs, page counts and publishers, so nothing needs guessing.
@@ -218,7 +218,7 @@ eight real editions. If neither knows the book, the desk's empty state offers
 **register it by hand**.
 
 **Open Library needs no API key**, no account and no auth. It supplies book
-metadata only — covers, editions, page counts, publishers. It has no idea what
+metadata only: covers, editions, page counts, publishers. It has no idea what
 you have read; that comes from your export.
 
 **Goodreads profile scraping does not work.** Shelf listings are behind a
@@ -229,7 +229,7 @@ currently-reading and a few favourites. The export is the only complete path.
 
 ## Seasons and the lookbook
 
-Every six months a reader's reading closes into a collection — two a year, on
+Every six months a reader's reading closes into a collection, two a year, on
 the fashion retail calendar (`S/S` is January to June, which looks wrong for a
 moment and is correct to the reference).
 
@@ -244,7 +244,7 @@ books) and a **poster** (`/season/:code/poster.png`, with `?shape=story|feed|squ
 What is worth knowing:
 
 - **Nothing is a target.** No streak, no completion percentage, no progress bar.
-- **The empty movement.** A gap over 28 days becomes its own movement — named,
+- **The empty movement.** A gap over 28 days becomes its own movement: named,
   dated and empty. A month you did not read is part of your season.
 - **The facts are computed, never generated.** Every number comes from
   `lib/facts.js`. A model, where one is configured, only interprets, and
@@ -257,8 +257,8 @@ What is worth knowing:
 ### The colour system (optional, needs a key)
 
 Every book gets one colour, **blended from a fixed palette of twenty
-anchors** — each anchor an emotion with a name (`Grief — Slate, Deep`,
-`Nostalgia — Amber, Kept`). The colours are the atom the season colourway and
+anchors**, each anchor an emotion with a name (`Grief: Slate, Deep`,
+`Nostalgia: Amber, Kept`). The colours are the atom the season colourway and
 the poster are built from.
 
 The colour is **derived from the book**. There is no reader override: the
@@ -272,7 +272,7 @@ npm run colours:audit               # the review you do by eye, not by test
 ```
 
 A derivation returns **three emotions with weights**, each carrying its own
-verbatim citation, blended in **Oklab** — not hex, which loses chroma and
+verbatim citation, blended in **Oklab**, not hex, which loses chroma and
 drifts toward grey. Three is a hard cap: past it everything averages toward
 the palette centroid, a mid brown, and every book comes out a shade of it.
 The name comes from a fixed two-slot grammar (`Slate, Kept` is grief nearest
@@ -280,7 +280,7 @@ with nostalgia behind it), never from a model.
 
 The rules it works under are not tunable, and the reason is that the obvious
 failure here is a model answering "what colour is this book?" out of its own
-memory — confidently, in good type, and wrong at scale in the direction of
+memory: confidently, in good type, and wrong at scale in the direction of
 cliché.
 
 - **Retrieved text is the only permitted source.** Wikipedia's Themes, Style,
@@ -294,13 +294,13 @@ cliché.
   nothing downstream can tell an accurate paraphrase from an invention.
 - **Themes over plot, where there is a choice.** A plot summary is a list of
   what happens, and what happens is mostly where and when. Plot is citable
-  only when the article has nothing else — which is often, and is why the
+  only when the article has nothing else, which is often, and is why the
   interpretive-section *gate* was built, measured and reversed.
 - **Setting is never the answer.** A book set in a desert can be tender. This
   is enforced by the validator, by pinned fixtures in
   `test/colour-derive.test.js` that assert the *reasoning* rather than the
-  colour — Heart of Darkness passes on the severed heads at the Inner Station
-  and fails on the oppressive river — and by `npm run colours:audit`.
+  colour (Heart of Darkness passes on the severed heads at the Inner Station
+  and fails on the oppressive river), and by `npm run colours:audit`.
 - **No evidence, no colour.** An unassigned book renders as an unfilled hatch,
   on the page and on the poster. It is a state, not a gap.
 - **Every component is grounded on its own.** A blend cannot smuggle an
@@ -314,13 +314,13 @@ npm run colours:audit
 node scripts/colours-derive.mjs --limit 30   # then look again
 ```
 
-It resumes where it stopped — the query only picks up books with no colour —
+It resumes where it stopped (the query only picks up books with no colour),
 so batching costs nothing and tells you early. Twenty cards is enough to see
 a problem you would otherwise pay for fifty times.
 
 **`npm run colours:audit` is the part no test can do.** Every card can pass
 every rule and the colours can still all land in the same small patch of the
-space. It measures **Oklab distance, not palette reach** — reach stopped
+space. It measures **Oklab distance, not palette reach**. Reach stopped
 meaning anything once colours became blends, since two books can both be
 nearest Grief and be visibly different. It reports the library's mean radius
 against the palette's own 0.198, flags any season whose books sit inside a
@@ -334,7 +334,7 @@ to has been derived.
 
 Each book in a lookbook can carry a short account of the conditions under
 which it was written, retrieved from Wikipedia and written by a model against
-that retrieved text — never from the model's own memory. Every card carries a
+that retrieved text, never from the model's own memory. Every card carries a
 confidence flag, and a book with no documented history gets a shorter card
 built only from verifiable material facts.
 
@@ -351,7 +351,7 @@ hand.
 
 **Without a key this still runs.** Retrieval happens either way, and every
 book gets a thin card built from facts the catalogue can prove. A run with no
-key will never overwrite a card that was already written — absence of a key is
+key will never overwrite a card that was already written. Absence of a key is
 a fact about the run, not about the book.
 
 ---
@@ -367,13 +367,13 @@ nothing in the product is permitted to say that it does.
 ```bash
 npm run embed          # one vector per book, from text already retrieved
 npm run probe -- --kind text-plot     # does this kind carry anything at all?
-npm run reco:eval      # leave-one-out — the number that decides
+npm run reco:eval      # leave-one-out: the number that decides
 npm run reco:run       # generate and store a pile run
 ```
 
 **The pile** (`lib/reco-pile.js`) answers one question: of the books you own
 and have not opened, which should you read next? **Season complements**
-(`lib/reco-season.js`) put three books beside a closed season — the one
+(`lib/reco-season.js`) put three books beside a closed season: the one
 nearest what the season was about, one that fills something the season had
 none of, and one that follows the season's odd book out.
 
@@ -382,7 +382,7 @@ What is worth knowing:
 - **The measurement overruled the probe, and the code says so.** A linear
   probe ranked criticism best of any single kind by AUC (0.652). Leave-one-out
   ranked it *below random* (MRR 0.9×). A kind can separate two classes without
-  ordering within them, and ordering is the actual task — so the weights are
+  ordering within them, and ordering is the actual task, so the weights are
   `text-plot` alone, and the reasoning is recorded in `lib/reco.js` rather
   than in a commit message nobody will find.
 - **Both colour kinds are absent, and that is a finding.** They probed at or
@@ -397,13 +397,13 @@ What is worth knowing:
 - **The guards run after scoring and before display**, because they are
   presentation rules: one book per author, nothing already read in any
   edition, and a small week-seeded rotation among near-equal scores so the
-  same ten do not sit there forever. Deterministic within a week — a
+  same ten do not sit there forever. Deterministic within a week, because a
   recommendation that changes on refresh is one nobody can act on.
 - **Nothing on the page is a raw cosine.** The reader sees ranks, counts and
   percentages. "Of all 146, this one came closest" is the same arithmetic as
   `.84`, and it is the only one of the two that means anything.
 
-Embedding runs in-process on `Xenova/bge-small-en-v1.5` — 384 dimensions,
+Embedding runs in-process on `Xenova/bge-small-en-v1.5`: 384 dimensions,
 L2-normalised at write, byte-identical across runs. This is the one part of
 the product with a native dependency; see **Requirements**.
 
@@ -412,14 +412,14 @@ the product with a native dependency; see **Requirements**.
 ## Accounts and privacy
 
 **`SECURITY.md` is the
-honest accounting** — what is built, and what cannot be built without
+honest accounting**: what is built, and what cannot be built without
 infrastructure this deployment does not have (no real mail delivery, no KMS,
 no CI, no backups). Read it before deploying anything.
 
 - Argon2id at OWASP parameters, breach-checked passwords, no composition rules
 - TOTP with replay prevention, passkeys, recovery codes, step-up re-auth
 - Opaque revocable sessions that rotate on every privilege change
-- Three-layer visibility — account, shelf, entry — enforced in SQL through a
+- Three-layer visibility (account, shelf, entry) enforced in SQL through a
   single `visibleSQL()` scope, never in templates
 - Notes encrypted at rest, excluded from staff tooling, scrubbed from logs
 - Deletion that actually deletes, on a schedule, leaving a tombstone
@@ -430,9 +430,9 @@ no CI, no backups). Read it before deploying anything.
 reader had to find a settings page before anybody could see a single thing
 they had read.
 
-§15's protection against throwaway impersonation accounts did not go away — it
+§15's protection against throwaway impersonation accounts did not go away. It
 moved to where it bites. A new account is **viewable** by anyone with the link
-from the first minute, and **listed** — in `/readers`, in reader search — only
+from the first minute, and **listed** (in `/readers`, in reader search) only
 after seven days or ten books. An impersonator's account is worth something
 only if it reaches people who were not looking for it.
 
@@ -456,11 +456,11 @@ Everything has a working default; none of this is required to run locally.
 | `MARGIN_ORIGIN` / `MARGIN_BASE_URL` | localhost | Absolute URLs, passkey origin |
 | `MARGIN_RP_ID` | localhost | WebAuthn relying party |
 | `MARGIN_MAIL_TRANSPORT` | outbox | Mail is written to `data/outbox/` |
-| `MARGIN_STAFF_ALLOWLIST` | — | CIDRs permitted to reach `/staff` |
+| `MARGIN_STAFF_ALLOWLIST` | none | CIDRs permitted to reach `/staff` |
 | `MARGIN_TRUST_PROXY` | off | Set only behind a proxy you control |
-| `ANTHROPIC_API_KEY` | — | Composition histories and season notes |
-| `MARGIN_SECURITY_CONTACT` | — | The address in `/.well-known/security.txt` |
-| `MARGIN_CHROME` | — | Path to a Chrome binary, for poster rendering |
+| `ANTHROPIC_API_KEY` | none | Composition histories and season notes |
+| `MARGIN_SECURITY_CONTACT` | none | The address in `/.well-known/security.txt` |
+| `MARGIN_CHROME` | none | Path to a Chrome binary, for poster rendering |
 | `MARGIN_COVER_DIR` `MARGIN_AVATAR_DIR` `MARGIN_POSTER_DIR` `MARGIN_EXPORT_DIR` `MARGIN_OUTBOX` | under `data/` | Where each kind of file is written |
 
 Set secrets in the environment. A `.env` in this directory is gitignored, and
@@ -479,7 +479,7 @@ nothing in the repository reads one for you.
 | `lib/accounts.js` | Usernames, confusable folding, account creation |
 | `lib/notes.js` | Notes, encrypted at the application layer |
 | `lib/audit.js` | The append-only audit log |
-| `lib/scrub.js` | Log hygiene — wraps `console` so a careless log cannot leak |
+| `lib/scrub.js` | Log hygiene: wraps `console` so a careless log cannot leak |
 | `lib/works.js`, `lib/library.js` | The work/edition graph; shelves and reading state |
 | `lib/desk.js` | Search: parsing, trigram matching, filters |
 | `lib/covers.js` | Cover resolution, English-edition preference, caching |
@@ -544,7 +544,7 @@ nothing in the repository reads one for you.
 |---|---|
 | `npm run colours:derive` | Derive each book's colour from retrieved text |
 | `npm run colours:audit` | The fifty-card review: distribution, collapse, setting leakage |
-| `npm run colours` | The old jacket sampler — **retiring**, do not run |
+| `npm run colours` | The old jacket sampler, **retiring**, do not run |
 | `npm run seasons` | Close what is due |
 | `node scripts/histories.mjs [code] [--all] [--note] [--redo]` | Composition histories |
 | `npm run gap:corpus` | Build the corpus behind The Gap |
